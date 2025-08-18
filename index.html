@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barbería Hugo - San Juan de Mozarrifar</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <div class="logo-barber">
+      <!-- Logo en PNG -->
+      <img src="img/logo-hugo.png" alt="Logo Barbería Hugo">
+    </div>
+    <h1>Barbería Hugo</h1>
+    <p>San Juan de Mozarrifar</p>
+  </header>
+
+  <nav>
+    <a href="#servicios">Servicios</a>
+    <a href="#horario">Horario</a>
+    <a href="#contacto">Contacto</a>
+  </nav>
+
+  <div class="container">
+    <!-- Carrusel de fotos y reseñas -->
+    <section id="carrusel">
+      <h2>Lo que opinan nuestros clientes</h2>
+      <div class="carousel">
+        <div class="carousel-item active">
+          <img src="foto1.jpg" alt="Foto 1" />
+          <blockquote>“Muy profesional y trato excelente. ¡Repetiré seguro!”<br><span>- Juan P.</span></blockquote>
+        </div>
+        <div class="carousel-item">
+          <img src="foto2.jpg" alt="Foto 2" />
+          <blockquote>“El mejor barbero de San Juan de Mozarrifar.”<br><span>- Marta G.</span></blockquote>
+        </div>
+        <div class="carousel-item">
+          <img src="foto3.jpg" alt="Foto 3" />
+          <blockquote>“Ambiente agradable y resultados perfectos.”<br><span>- Luis R.</span></blockquote>
+        </div>
+        <button class="carousel-btn prev">&#10094;</button>
+        <button class="carousel-btn next">&#10095;</button>
+      </div>
+    </section>
+
+    <section id="servicios">
+      <h2>Servicios</h2>
+      <!-- Espacio para lista de servicios -->
+    </section>
+
+    <section id="horario">
+      <h2>Horario</h2>
+      <p>Lunes a Viernes: 9:30 - 13:30 y 16:30 - 20:00</p>
+      <p>Sábados: 9:00 - 14:00</p>
+      <p>Domingos: Cerrado</p>
+    </section>
+
+    <section id="contacto" class="contacto">
+      <h2>Contacto</h2>
+      <p>Dirección: Calle Principal, San Juan de Mozarrifar, Zaragoza</p>
+      <p>Teléfono: <a href="tel:123456789">123 456 789</a></p>
+      <p>Email: <a href="mailto:info@barberiahugo.com">info@barberiahugo.com</a></p>
+
+      <div class="whatsapp-destacado">
+        <a href="https://wa.me/34123456789" target="_blank" class="whatsapp-btn grande">
+          <span class="wa-icon">&#128222;</span> ¡Reserva tu cita por WhatsApp!
+        </a>
+        <p class="wa-texto">¡Respuesta rápida y sin esperas!</p>
+      </div>
+
+      <div class="mapa">
+        <iframe
+          src="https://www.google.com/maps?ll=41.71715,-0.841387&z=20&t=h&hl=es-ES&gl=US&mapclient=embed&cid=5595491698772282409"
+          width="100%" height="250" style="border:0; border-radius:8px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+
+      <form action="mailto:info@barberiahugo.com" method="POST" enctype="text/plain" class="contact-form">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="Nombre" required>
+        <label for="telefono">Teléfono:</label>
+        <input type="tel" id="telefono" name="Teléfono" required pattern="[0-9\s+()-]{9,}">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="Email" required>
+        <label for="mensaje">Mensaje:</label>
+        <textarea id="mensaje" name="Mensaje" rows="4" required></textarea>
+        <button type="submit">Enviar</button>
+      </form>
+    </section>
+  </div>
+
+  <footer>
+    &copy; 2025 Barbería Hugo - San Juan de Mozarrifar
+  </footer>
+
+  <script src="carousel.js"></script>
+</body>
+</html>
