@@ -78,9 +78,9 @@ header::before {
 
 .logo-barber {
   display: block;
-  width: 160px;
+  width: clamp(190px, 28vw, 340px);
   height: auto;
-  margin: 0 auto 16px;
+  margin: 0 auto 28px;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, .4));
   border-radius: 50%;
   border: 3px solid rgba(246, 201, 14, .75);
