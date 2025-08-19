@@ -1,27 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Barbershop",
-    "name": "Barbería Hugo",
-    "image": "https://tudominio.com/logo-hugo.png",
-    "telephone": "+34 651 435 444",
-    "address": { "@type": "PostalAddress", "addressLocality": "Zaragoza", "addressCountry": "ES" },
-    "url": "https://tudominio.com",
-    "sameAs": [
-      "https://www.instagram.com/barberia_hugo_",
-      "https://www.facebook.com/p/Hugo-Barberia-Campos-100058625056973/"
-    ],
-    "openingHoursSpecification": [
-      { "@type": "OpeningHoursSpecification", "dayOfWeek": "Monday", "opens": "16:00", "closes": "21:00" },
-      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday","Wednesday","Thursday","Friday"], "opens": "09:45", "closes": "21:00" }
-    ]
-  }
-  </script>
-
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Barbería Hugo | Cortes, Barba y Estilo en Zaragoza</title>
@@ -43,7 +22,7 @@
   <link rel="stylesheet" href="styles.css" />
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="logo-hugo.png" />
+  <link rel="icon" type="image/png" href="icons8-bigote-16.png" />
 </head>
 <body>
 
@@ -59,8 +38,9 @@
   <!-- Navegación -->
   <nav>
     <div class="nav-inner">
-      <a href="#carrusel" class="active">Opiniones</a>
+      <a href="#carrusel" class="active">Inicio</a>
       <a href="#servicios">Servicios</a>
+      <a href="#galeria">Galería</a>
       <a href="#horario">Horario</a>
       <a href="#contacto">Contacto</a>
     </div>
@@ -161,50 +141,55 @@
   <section id="servicios" class="container">
     <div class="section-card">
       <h2>Servicios</h2>
-      <!-- Eliminada la lista estática. Ahora carousel.js inyecta cards con precios y selección -->
+      <!-- carousel.js inyecta cards con precios y selección -->
     </div>
   </section>
 
-    <!-- Sección Galería -->
-  <section id="galeria" class="container">
-    <div class="section-card">
-      <h2>Galería</h2>
-      <div class="gallery-grid">
-        <!-- EJEMPLOS: duplica/edita estos items con tus rutas y alts -->
-        <a href="galeria/01@2x.jpg" data-full="galeria/01@2x.jpg" class="gallery-item">
-          <picture>
-            <source srcset="galeria/01.webp" type="image/webp">
-            <img src="galeria/01.jpg" alt="Degradado fresco con navaja" loading="lazy" width="600" height="750">
-          </picture>
-        </a>
+  <!-- Sección Galería -->
+<section id="galeria" class="container">
+  <div class="section-card">
+    <h2>Galería</h2>
+    <div class="gallery-grid">
 
-        <a href="galeria/02@2x.jpg" data-full="galeria/02@2x.jpg" class="gallery-item">
-          <picture>
-            <source srcset="galeria/02.webp" type="image/webp">
-            <img src="galeria/02.jpg" alt="Arreglo de barba perfilada" loading="lazy" width="600" height="600">
-          </picture>
-        </a>
+      <a href="galeria/foto1.png" data-full="galeria/foto1.png" class="gallery-item">
+        <img src="galeria/foto1.png" alt="Fade con diseño en la nuca" loading="lazy">
+      </a>
 
-        <a href="galeria/03@2x.jpg" data-full="galeria/03@2x.jpg" class="gallery-item">
-          <picture>
-            <source srcset="galeria/03.webp" type="image/webp">
-            <img src="galeria/03.jpg" alt="Corte clásico con peine y tijera" loading="lazy" width="600" height="750">
-          </picture>
-        </a>
+      <a href="galeria/foto2.png" data-full="galeria/foto2.png" class="gallery-item">
+        <img src="galeria/foto2.png" alt="Fachada de Barbería Hugo con el barbero" loading="lazy">
+      </a>
 
-        <!-- añade más <a> ... </a> con tus fotos -->
-      </div>
+      <a href="galeria/foto3.png" data-full="galeria/foto3.png" class="gallery-item">
+        <img src="galeria/foto3.png" alt="Afeitado a navaja en sillón" loading="lazy">
+      </a>
+
+      <a href="galeria/foto4.png" data-full="galeria/foto4.png" class="gallery-item">
+        <img src="galeria/foto4.png" alt="Hugo en el local con sillón infantil" loading="lazy">
+      </a>
+
+      <a href="galeria/foto5.png" data-full="galeria/foto5.png" class="gallery-item">
+        <img src="galeria/foto5.png" alt="Interior de la barbería" loading="lazy">
+      </a>
+
+      <a href="galeria/foto6.png" data-full="galeria/foto6.png" class="gallery-item">
+        <img src="galeria/foto6.png" alt="Perfil con corte fade" loading="lazy">
+      </a>
+
+      <a href="galeria/foto7.png" data-full="galeria/foto7.png" class="gallery-item">
+        <img src="galeria/foto7.png" alt="Detalle de diseño en la nuca" loading="lazy">
+      </a>
+
+      <a href="galeria/foto8.png" data-full="galeria/foto8.png" class="gallery-item">
+        <img src="galeria/foto8.png" alt="Fade con diseño lateral y rizos" loading="lazy">
+      </a>
+
+      <a href="galeria/foto9.png" data-full="galeria/foto9.png" class="gallery-item">
+        <img src="galeria/foto9.png" alt="Fade en cabello rizado" loading="lazy">
+      </a>
+
     </div>
-  </section>
-
-  <!-- Lightbox -->
-  <div class="lightbox" hidden>
-    <button class="lb-close" aria-label="Cerrar">&times;</button>
-    <img class="lb-img" alt="">
-    <button class="lb-prev" aria-label="Anterior">&#10094;</button>
-    <button class="lb-next" aria-label="Siguiente">&#10095;</button>
   </div>
-
+</section>
 
   <!-- Sección Horario -->
   <section id="horario" class="container">
@@ -223,10 +208,17 @@
       <h2>Contacto</h2>
       <p>Tu barbería de confianza a un mensaje 👇</p>
       <div class="whatsapp-destacado">
-        <!-- AÑADIDO class 'grande' y número actualizado -->
         <a href="https://wa.me/34651435444" class="whatsapp-btn verde grande">
           <i class="fa-brands fa-whatsapp"></i> WhatsApp
         </a>
+      </div>
+      <div class="mapa">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d288.73347942871184!2d-0.8416875!3d41.7171032!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd5913f43ccc04cd%3A0x4da72e0dc8f80c29!2sBarberia%20Hugo!5e0!3m2!1ses!2ses!4v1692128888888"
+          width="100%" height="300" style="border:0; border-radius:10px;"
+          allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+        <p>Estamos en la entrada de la avenida principal de San Juan, fácil aparcamiento en las inmediaciones</p>
       </div>
       <form class="contact-form">
         <label for="nombre">Nombre</label>
@@ -243,15 +235,6 @@
 
         <button type="submit">Enviar</button>
       </form>
-      <h2>donde Estamos</h2>
-      <div class="mapa">
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d288.73347942871184!2d-0.8416875!3d41.7171032!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd5913f43ccc04cd%3A0x4da72e0dc8f80c29!2sBarberia%20Hugo!5e0!3m2!1ses!2ses!4v1692128888888"
-          width="100%" height="300" style="border:0; border-radius:10px;"
-          allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
-        </iframe>
-        <p>Estamos en la entrada de la avenida principal de San Juan, fácil aparcamiento en las inmediaciones</p>
-      </div>
     </div>
   </section>
 
@@ -262,7 +245,7 @@
 
   <script src="carousel.js"></script>
 
-  <!-- WhatsApp flotante (NÚMERO ACTUALIZADO) -->
+  <!-- WhatsApp flotante -->
   <a href="https://wa.me/34651435444" class="whatsapp-float" target="_blank" aria-label="WhatsApp">
     <img src="icons8-whatsapp.svg" alt="WhatsApp" />
   </a>
@@ -270,10 +253,24 @@
   <a href="https://www.instagram.com/barberia_hugo_" class="social-float instagram" target="_blank" aria-label="Instagram">
     <img src="icons8-instagram.svg" alt="Instagram" />
   </a>
-
   <!-- Facebook flotante -->
   <a href="https://www.facebook.com/p/Hugo-Barberia-Campos-100058625056973/" class="social-float facebook" target="_blank" aria-label="Facebook">
     <img src="icons8-facebook-nuevo.svg" alt="Facebook" />
   </a>
+
+    <!-- CTA seguir RRSS -->
+  <div class="follow-cta" id="follow-cta" hidden>
+    <button class="cta-close" aria-label="Cerrar">&times;</button>
+    <p>¡No te olvides de seguirnos en nuestras RRSS!</p>
+    <div class="cta-actions">
+      <a href="https://www.instagram.com/barberia_hugo_" target="_blank" rel="noopener" class="btn-cta ig">
+        <img src="icons8-instagram.svg" alt="" aria-hidden="true"> Instagram
+      </a>
+      <a href="https://www.facebook.com/p/Hugo-Barberia-Campos-100058625056973/" target="_blank" rel="noopener" class="btn-cta fb">
+        <img src="icons8-facebook-nuevo.svg" alt="" aria-hidden="true"> Facebook
+      </a>
+    </div>
+  </div>
+
 </body>
 </html>
