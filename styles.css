@@ -62,7 +62,16 @@ header::before{
   border-radius: 50%;
   border: 3px solid rgba(246,201,14,.75);
 }
-header h1{color:#fff; text-shadow:0 6px 24px rgba(0,0,0,.35)}
+/* Título principal con Grand Hotel */
+header h1{
+  font-family: 'Grand Hotel', cursive;
+  font-size: clamp(3rem, 7vw, 4.5rem);
+  color: #fff;
+  font-weight: 400;
+  text-shadow: 0 4px 20px rgba(0,0,0,.4);
+  letter-spacing: 1px;
+  margin: 0 0 8px 0;
+}
 header p{color:var(--accent); font-weight:700; letter-spacing:.5px}
 
 /* ---------- Navegación sticky ---------- */
@@ -250,6 +259,7 @@ header { padding-top:120px; }
 #contacto p{ margin:.6rem 0; line-height:1.6; }
 .whatsapp-destacado{ text-align:center; margin:12px 0 6px; }
 .whatsapp-btn.grande{
+
   background:linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
   color:#111; font-weight:900; letter-spacing:.3px;
   padding:16px 26px; border-radius:14px; display:inline-flex; gap:10px; align-items:center;
@@ -323,4 +333,154 @@ footer{
 body, html{
   scroll-behavior:smooth;
   overflow-x:hidden;
+}
+/* ====== Servicios con iconos (Font Awesome) ====== */
+.servicios-lista{
+  list-style:none;
+  padding:0;
+  margin:8px 0 0 0;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  font-size:1.06rem;
+  text-align:left;            /* evita el centrado dentro de la card */
+  width:100%;
+}
+
+.servicios-lista li{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 16px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:linear-gradient(90deg, rgba(246,201,14,0.10), rgba(246,201,14,0.02));
+  box-shadow:0 4px 14px rgba(0,0,0,.25);
+  transition:transform .18s ease, background .18s ease, color .18s ease;
+}
+
+.servicios-lista li:hover{
+  transform:translateX(6px);
+  background:linear-gradient(90deg, var(--accent), var(--accent-2));
+  color:#111;
+}
+
+.servicios-lista .fa-solid{
+  font-size:1.25rem;
+  width:1.25rem;              /* fija ancho para alinear texto */
+  color:var(--accent);
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.25));
+}
+
+.servicios-lista li:hover .fa-solid{
+  color:#111;
+}
+/* ====== Sección contacto mejor alineada ====== */
+#contacto .section-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  text-align: center;
+}
+
+#contacto .mapa {
+  width: 100%;
+  max-width: 720px;
+}
+
+#contacto .contact-form {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* Botón WhatsApp verde mejorado */
+.whatsapp-btn.verde {
+  background: linear-gradient(90deg, #25D366 0%, #1ebe5a 100%);
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: .4px;
+  padding: 18px 34px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.2rem;
+  border: none;
+  box-shadow: 0 12px 28px rgba(37, 211, 102, 0.45);
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease, filter .2s ease;
+}
+
+.whatsapp-btn.verde i {
+  font-size: 1.5rem;
+}
+
+.whatsapp-btn.verde:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 16px 36px rgba(37, 211, 102, 0.55);
+  background: linear-gradient(90deg, #2ce76f 0%, #20c15c 100%);
+  filter: brightness(1.05);
+}
+
+header .whatsapp-btn.grande {
+  margin-top: 16px;
+}
+
+/* Botón WhatsApp flotante */
+.whatsapp-float {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(90deg, #25D366 0%, #1ebe5a 100%);
+  color: #fff;
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  z-index: 2000;
+  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.45);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.whatsapp-float:hover {
+  transform: translateY(-4px) scale(1.08);
+  box-shadow: 0 12px 32px rgba(37, 211, 102, 0.55);
+  background: linear-gradient(90deg, #2ce76f 0%, #20c15c 100%);
+}
+
+/* ===== Navegación: en una sola fila en móviles con scroll horizontal ===== */
+@media (max-width: 720px){
+  nav{ height:64px; }                            /* nav un poco más bajo */
+  nav .nav-inner{
+    max-width:none;
+    padding:8px 12px;
+    gap:12px;
+    justify-content:flex-start;
+    flex-wrap:nowrap;                            /* evita salto de línea */
+    overflow-x:auto;                             /* permite desplazamiento lateral */
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;                        /* oculta barra en Firefox */
+    mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%); /* borde suave */
+  }
+  nav .nav-inner::-webkit-scrollbar{ display:none; } /* oculta barra en WebKit */
+
+  nav a{
+    flex:0 0 auto;                               /* cada item conserva su ancho */
+    font-size:.95rem;
+    padding:8px 10px;
+  }
+  nav a::after{ bottom:4px; }
+
+  /* Compensa el nav fijo para los anclajes */
+  header{ padding-top:104px; }
+  #carrusel, #servicios, #horario, #contacto{ scroll-margin-top:74px; }
+}
+
+.whatsapp-float img {
+  width: 68px;
+  height: 68px;
 }
