@@ -506,3 +506,173 @@ footer p{ margin:0; text-align:center; }
 /* Ajustes del contenedor de carrusel para cards */
 .carousel-item{ padding: 18px 14px 20px; }
 
+/* ==== FIX NAV EN MÓVIL (sin cambiar HTML ni usar JS) ==== */
+@media (max-width: 680px){
+  /* El nav puede crecer a 2 filas sin recortar */
+  nav{
+    height: auto;                 /* antes: 80px fijo */
+    padding: 8px 10px 6px;        /* un pelín menos alto */
+    justify-content: center;      /* centrado bonito */
+    row-gap: 6px;                 /* espacio entre filas cuando envuelve */
+  }
+  /* Enlaces más compactos para que quepan mejor */
+  nav a{
+    padding: 8px 10px;            /* antes: 10px 12px */
+    font-size: 0.95rem;           /* un poco más pequeño */
+  }
+
+  /* Como el nav ahora puede medir >80px, damos más aire al header
+     para que no quede oculto tras el nav fijo */
+  header{
+    padding-top: 160px;           /* antes global: 120px */
+  }
+
+  /* Y ajustamos el offset de anclas para el scroll suave */
+  #carrusel, #servicios, #galeria, #horario, #contacto{
+    scroll-margin-top: 140px;     /* antes: 90px */
+  }
+}
+
+/* Extra opcional: en móviles muy pequeños, aún más compacto */
+@media (max-width: 420px){
+  nav a{
+    padding: 7px 9px;
+    font-size: 0.9rem;
+    letter-spacing: .3px;         /* mantiene legibilidad en mayúsculas */
+  }
+  header{ padding-top: 170px; }
+  #carrusel, #servicios, #galeria, #horario, #contacto{ scroll-margin-top: 150px; }
+}
+
+/* ==== GALERÍA COMPACTA EN MÓVIL (override correcto) ==== */
+@media (max-width: 560px){
+  /* Mantener 2 columnas en móviles */
+  .gallery-grid{
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px;
+  }
+
+  /* Hacer las miniaturas cuadradas (opcional, se “comprimen” y no ocupan toda la pantalla) */
+  .gallery-item{
+    aspect-ratio: 1 / 1;
+  }
+  .gallery-item img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* recorte elegante; cambia a 'contain' si no quieres recorte */
+    border-radius: 10px;
+  }
+}
+
+/* En móviles muy pequeños puedes bajar el gap aún más */
+@media (max-width: 400px){
+  .gallery-grid{ gap: 6px !important; }
+}
+
+/* ==== SERVICIOS: rejilla responsive + botones más pequeños (override) ==== */
+
+/* Desktop por defecto: 3 columnas más compactas */
+#servicios .svc-grid{
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+
+/* Tarjetas más contenidas */
+#servicios .svc-card{
+  padding: 12px !important;
+  border-width: 1px !important;
+  gap: 6px !important;
+}
+#servicios .svc-card h3{ font-size: 1rem !important; }
+#servicios .svc-card .price{ font-size: .95rem !important; }
+
+/* Botón “Añadir / Quitar” más pequeño */
+#servicios .svc-card button{
+  padding: 6px 10px !important;
+  font-size: .9rem !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+}
+
+/* Barra inferior (fecha/total/whatsapp) más ligera */
+#servicios .svc-bar{
+  gap: 10px !important;
+  padding-top: 10px !important;
+}
+#servicios .svc-dt{
+  padding: 8px !important;
+  font-size: .95rem !important;
+}
+#servicios .svc-total{ font-size: 1rem !important; }
+
+/* Botón “Reservar por WhatsApp” más discreto */
+#servicios .svc-wa{
+  padding: 10px 14px !important;
+  font-size: .95rem !important;
+  border-radius: 10px !important;
+  font-weight: 800 !important;
+}
+
+/* ===== Breakpoints ===== */
+
+/* Tablet: 2 columnas */
+@media (max-width: 900px){
+  #servicios .svc-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+
+/* Móvil: 2 columnas compactas */
+@media (max-width: 560px){
+  #servicios .svc-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+  #servicios .svc-card{
+    padding: 10px !important;
+  }
+  #servicios .svc-card h3{ font-size: .95rem !important; }
+  #servicios .svc-card .price{ font-size: .9rem !important; }
+  #servicios .svc-card button{ padding: 6px 8px !important; font-size: .85rem !important; }
+  #servicios .svc-dt{ font-size: .9rem !important; padding: 6px !important; }
+  #servicios .svc-wa{ padding: 9px 12px !important; font-size: .9rem !important; }
+}
+
+/* Móviles muy pequeños */
+@media (max-width: 380px){
+  #servicios .svc-grid{ grid-template-columns: 1fr !important; } /* si prefieres, deja 2 cols cambiando a repeat(2,1fr) */
+  #servicios .svc-card button{ padding: 6px 8px !important; font-size: .84rem !important; }
+}
+
+/* ==== GALERÍA COMO CARRUSEL ==== */
+.gallery-carousel {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.gallery-slide {
+  display: none;
+  width: 100%;
+  animation: fade 0.8s ease-in-out;
+}
+
+.gallery-slide.active {
+  display: block;
+}
+
+.gallery-slide img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+/* Animación suave */
+@keyframes fade {
+  from { opacity: 0; transform: scale(1.02); }
+  to   { opacity: 1; transform: scale(1); }
+}
