@@ -446,3 +446,63 @@ footer p{ margin:0; text-align:center; }
   filter: brightness(1.1);
 }
 
+/* ===== Reseñas bonitas en carrusel ===== */
+.review-card{
+  position: relative;
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 18px 18px;
+  box-shadow: var(--shadow);
+  text-align: left;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.review-card::before{
+  content: "“";
+  position: absolute;
+  top: -18px; left: 12px;
+  font-size: 5rem;
+  line-height: 1;
+  color: rgba(246,201,14,.20);
+  font-family: 'Georgia', serif;
+  pointer-events: none;
+}
+.review-top{
+  display: flex; align-items: center; justify-content: flex-start; gap: 10px;
+  margin-bottom: 8px;
+}
+.stars{ display: inline-flex; gap: 4px; }
+.star{
+  width: 18px; height: 18px; fill: none; stroke: var(--accent); stroke-width: 1.2;
+  opacity: .5;
+}
+.star.filled{ fill: var(--accent); stroke: var(--accent); opacity: 1; }
+.review-text{
+  margin: 6px 0 10px;
+  font-size: 1.02rem;
+  color: var(--text);
+  line-height: 1.55;
+}
+.review-author{
+  display: inline-block;
+  font-weight: 800;
+  color: var(--accent);
+  margin-top: 4px;
+}
+
+/* Badge para "Local Guide" dentro del autor */
+.review-author .badge{
+  display:inline-block;
+  margin-left:8px;
+  padding:2px 6px;
+  border-radius:8px;
+  font-size:.8em;
+  font-weight:800;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color:#111;
+}
+
+/* Ajustes del contenedor de carrusel para cards */
+.carousel-item{ padding: 18px 14px 20px; }
+
