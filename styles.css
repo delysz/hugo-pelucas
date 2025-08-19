@@ -1396,3 +1396,51 @@ footer p {
 @media (max-width: 480px){
   .gallery-carousel img{ max-height: 260px; }
 }
+
+/* === Reveal on scroll === */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity .6s ease, transform .6s ease;
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+/* Variantes */
+.reveal.slide-up    { transform: translateY(18px); }
+.reveal.slide-left  { transform: translateX(-24px); }
+.reveal.slide-right { transform: translateX(24px); }
+.reveal.pop         { transform: scale(.96); }
+
+/* Stagger (los hijos se animan uno a uno) */
+.stagger > * {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .5s ease, transform .5s ease;
+  will-change: opacity, transform;
+}
+.stagger.is-visible > * {
+  opacity: 1;
+  transform: none;
+}
+
+/* Respeto a usuarios con reducciones de movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .stagger > * {
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+header .slogan {
+  font-family: 'Imperial Script', cursive;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 400;
+  color: var(--accent);
+  letter-spacing: 0.75px;
+  line-height: 1.2;
+}

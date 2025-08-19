@@ -401,3 +401,40 @@
   // Si el usuario abre el lightbox (click en <a>), no tocamos nada: se abrirá encima
 })();
 
+// Animaciones de entrada (reveal + stagger)
+(function revealAnimations() {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const targets = Array.from(document.querySelectorAll('.reveal, .stagger'));
+  if (!targets.length) return;
+
+  // Si el usuario prefiere menos movimiento, mostramos todo y salimos
+  if (reduce) {
+    targets.forEach(el => el.classList.add('is-visible'));
+    return;
+  }
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (!en.isIntersecting) return;
+      const el = en.target;
+
+      // Activar stagger si procede
+      if (el.classList.contains('stagger')) {
+        const gap = Number(el.dataset.stagger ?? 80);   // ms entre hijos
+        const base = Number(el.dataset.delay ?? 0);     // retraso inicial
+        Array.from(el.children).forEach((child, i) => {
+          child.style.transitionDelay = `${base + i * gap}ms`;
+        });
+      } else {
+        // Elementos reveal individuales
+        const d = Number(el.dataset.delay ?? 0);
+        el.style.transitionDelay = `${d}ms`;
+      }
+
+      el.classList.add('is-visible');
+      io.unobserve(el); // ya no necesita observarse
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+
+  targets.forEach((el) => io.observe(el));
+})();
