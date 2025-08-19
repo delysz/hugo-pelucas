@@ -211,17 +211,17 @@
   })();
 
   // ===== Lightbox para galería =====
-  (function galleryLightbox(){
-    function init(){
+  (function galleryLightbox() {
+    function init() {
       const grid = document.querySelector(".gallery-grid");
-      if(!grid) return;
+      if (!grid) return;
 
       // crear contenedor si no existe
       let lb = document.querySelector(".lightbox");
-      if(!lb){
+      if (!lb) {
         lb = document.createElement("div");
         lb.className = "lightbox";
-        lb.setAttribute("hidden","");
+        lb.setAttribute("hidden", "");
         lb.innerHTML = `
           <button class="lb-close" aria-label="Cerrar">&times;</button>
           <img class="lb-img" alt="">
@@ -239,7 +239,7 @@
       const items = Array.from(grid.querySelectorAll(".gallery-item"));
       let idx = -1;
 
-      function open(i){
+      function open(i) {
         idx = i;
         const a = items[idx];
         const full = a.getAttribute("data-full") || a.getAttribute("href");
@@ -249,7 +249,7 @@
         lb.hidden = false;
         document.body.style.overflow = "hidden";
       }
-      function close(){
+      function close() {
         lb.hidden = true;
         imgEl.src = "";
         document.body.style.overflow = "";
@@ -259,21 +259,21 @@
 
       grid.addEventListener("click", (e) => {
         const a = e.target.closest(".gallery-item");
-        if(!a) return;
+        if (!a) return;
         e.preventDefault();
         const i = items.indexOf(a);
-        if(i >= 0) open(i);
+        if (i >= 0) open(i);
       });
       btnClose.addEventListener("click", close);
       btnPrev.addEventListener("click", prev);
       btnNext.addEventListener("click", next);
-      lb.addEventListener("click", (e) => { if(e.target === lb) close(); });
+      lb.addEventListener("click", (e) => { if (e.target === lb) close(); });
 
       window.addEventListener("keydown", (e) => {
-        if(lb.hidden) return;
-        if(e.key === "Escape") close();
-        if(e.key === "ArrowLeft") prev();
-        if(e.key === "ArrowRight") next();
+        if (lb.hidden) return;
+        if (e.key === "Escape") close();
+        if (e.key === "ArrowLeft") prev();
+        if (e.key === "ArrowRight") next();
       });
     }
 
@@ -285,8 +285,8 @@
   })();
 
   // Aviso 'síguenos' cuando el usuario llega al final (robusto)
-  (function followCTA(){
-    function init(){
+  (function followCTA() {
+    function init() {
       const footer = document.querySelector("footer");
       if (!footer) return;
 
@@ -315,7 +315,7 @@
       const closeBtn = cta.querySelector(".cta-close");
       const hideCTA = () => {
         cta.classList.remove("show");
-        sessionStorage.setItem("ctaDismissed","1");
+        sessionStorage.setItem("ctaDismissed", "1");
         setTimeout(() => { cta.hidden = true; }, 200);
       };
       closeBtn.addEventListener("click", hideCTA);
@@ -359,11 +359,11 @@
 })();
 
 // ===== GALERÍA: carrusel autoplay + controles =====
-(function galleryAutoplay(){
+(function galleryAutoplay() {
   const wrap = document.querySelector(".gallery-carousel");
-  if(!wrap) return;
+  if (!wrap) return;
   const slides = Array.from(wrap.querySelectorAll(".g-slide"));
-  if(slides.length === 0) return;
+  if (slides.length === 0) return;
 
   const prevBtn = wrap.querySelector(".g-prev");
   const nextBtn = wrap.querySelector(".g-next");
@@ -371,18 +371,18 @@
   let timer = null;
   const INTERVAL = 4000; // ms
 
-  function show(n){
+  function show(n) {
     slides.forEach((s, idx) => s.classList.toggle("active", idx === n));
   }
-  function next(){ i = (i + 1) % slides.length; show(i); }
-  function prev(){ i = (i - 1 + slides.length) % slides.length; show(i); }
+  function next() { i = (i + 1) % slides.length; show(i); }
+  function prev() { i = (i - 1 + slides.length) % slides.length; show(i); }
 
-  function start(){
+  function start() {
     stop();
     timer = setInterval(next, INTERVAL);
   }
-  function stop(){
-    if(timer) clearInterval(timer);
+  function stop() {
+    if (timer) clearInterval(timer);
     timer = null;
   }
 
@@ -391,8 +391,8 @@
   start();
 
   // Controles
-  if(nextBtn) nextBtn.addEventListener("click", () => { next(); start(); });
-  if(prevBtn) prevBtn.addEventListener("click", () => { prev(); start(); });
+  if (nextBtn) nextBtn.addEventListener("click", () => { next(); start(); });
+  if (prevBtn) prevBtn.addEventListener("click", () => { prev(); start(); });
 
   // Pausa al pasar el ratón (solo desktop)
   wrap.addEventListener("mouseenter", stop);
@@ -437,4 +437,391 @@
   }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
 
   targets.forEach((el) => io.observe(el));
+})();
+
+
+// ===== i18n básico (ES/EN/FR/DE) =====
+(() => {
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+  // Tabla de traducciones
+  const I18N = {
+    es: {
+      gallery_title: "Galería",          // en: "Gallery", fr: "Galerie", de: "Galerie"
+      hours_title: "Horario",            // en: "Hours", fr: "Horaires", de: "Zeiten"
+      hours_mon: "Lunes: 16:00 – 21:00",
+      hours_week: "Mar–Vie: 9:45 – 14:00 / 16:00 – 21:00",
+      hours_weekend: "Sáb–Dom: Cerrado",
+      hours_quote: "«El tiempo dedicado a ti mismo nunca es tiempo perdido»",
+      contact_title: "Contacto",         // en: "Contact", fr: "Contact", de: "Kontakt"
+      contact_blurb: "Estamos en San Juan. Escríbenos o abre el mapa para venir.",
+      btn_whatsapp: "WhatsApp",
+      btn_directions: "Cómo llegar",
+      footer_copy: "© 2025 Barbería Hugo — Todos los derechos reservados",
+      // Meta / generales
+      meta_title: "Barbería Hugo | Cortes, Barba y Estilo en Zaragoza",
+      meta_desc: "Barbería Hugo en Zaragoza. Cortes clásicos y modernos, afeitado a navaja y arreglos de barba. Reserva fácil por WhatsApp.",
+      tagline: "Donde el estilo se convierte en identidad",
+      // Nav
+      nav_home: "Inicio",
+      nav_services: "Servicios",
+      nav_gallery: "Galería",
+      nav_hours: "Horario",
+      nav_contact: "Contacto",
+      // Secciones
+      reviews_title: "Lo que nuestros clientes dicen",
+      // Servicios UI
+      svc_when_label: "Fecha y hora preferida",
+      svc_total: "Total:",
+      svc_add: "Añadir",
+      svc_remove: "Quitar",
+      svc_reserve_whatsapp: "Reservar por WhatsApp",
+      svc_no_date: "Sin fecha/hora",
+      svc_msg_header: "Hola, me gustaría reservar:",
+      svc_msg_total: "Total aprox.:",
+      svc_msg_when: "Fecha/hora preferida:",
+      svc_msg_footer: "¿Hay disponibilidad? ¡Gracias!",
+      // Catálogo
+      svc_catalog: {
+        corte: "Corte clásico",
+        fade: "Corte fade",
+        barba: "Arreglo de barba",
+        afeitado: "Afeitado a navaja",
+        combo: "Corte + Barba",
+        nino: "Corte niño",
+      },
+      aria_carousel: "Carrusel de opiniones de clientes",
+      stars_label: (n = 5) => `${n} de 5`,
+    },
+    en: {
+      gallery_title: "Gallery",
+      hours_title: "Hours",
+      hours_mon: "Monday: 16:00 – 21:00",
+      hours_week: "Tue–Fri: 9:45 – 14:00 / 16:00 – 21:00",
+      hours_weekend: "Sat–Sun: Closed",
+      hours_quote: "“Time spent on yourself is never wasted”",
+      contact_title: "Contact",
+      contact_blurb: "We’re in San Juan. Text us or open the map to visit.",
+      btn_whatsapp: "WhatsApp",
+      btn_directions: "Directions",
+      footer_copy: "© 2025 Hugo Barbershop — All rights reserved",
+      meta_title: "Hugo Barbershop | Cuts, Beard & Style in Zaragoza",
+      meta_desc: "Hugo Barbershop in Zaragoza. Classic and modern cuts, straight-razor shaves and beard trims. Easy booking via WhatsApp.",
+      tagline: "Where style becomes identity",
+      nav_home: "Home",
+      nav_services: "Services",
+      nav_gallery: "Gallery",
+      nav_hours: "Hours",
+      nav_contact: "Contact",
+      reviews_title: "What our clients say",
+      svc_when_label: "Preferred date & time",
+      svc_total: "Total:",
+      svc_add: "Add",
+      svc_remove: "Remove",
+      svc_reserve_whatsapp: "Book via WhatsApp",
+      svc_no_date: "No date/time",
+      svc_msg_header: "Hi, I'd like to book:",
+      svc_msg_total: "Approx. total:",
+      svc_msg_when: "Preferred date/time:",
+      svc_msg_footer: "Is there availability? Thanks!",
+      svc_catalog: {
+        corte: "Classic haircut",
+        fade: "Fade haircut",
+        barba: "Beard trim",
+        afeitado: "Straight-razor shave",
+        combo: "Haircut + Beard",
+        nino: "Kids haircut",
+      },
+      aria_carousel: "Customer reviews carousel",
+      stars_label: (n = 5) => `${n} out of 5`,
+    },
+    fr: {
+      hours_title: "Horaires",
+      hours_mon: "Lundi : 16h00 – 21h00",
+      hours_week: "Mar–Ven : 9h45 – 14h00 / 16h00 – 21h00",
+      hours_weekend: "Sam–Dim : Fermé",
+      hours_quote: "« Le temps consacré à soi-même n’est jamais perdu »",
+      gallery_title: "Galerie",
+      hours_title: "Horaires",
+      contact_title: "Contact",
+      contact_blurb: "Nous sommes à San Juan. Écrivez-nous ou ouvrez la carte pour venir.",
+      btn_whatsapp: "WhatsApp",
+      btn_directions: "Comment y arriver",
+      footer_copy: "© 2025 Barbería Hugo — Tous droits réservés",
+      tagline: "Là où le style devient identité",
+      nav_home: "Accueil",
+      nav_services: "Services",
+      nav_gallery: "Galerie",
+      nav_hours: "Horaires",
+      nav_contact: "Contact",
+      reviews_title: "Ce que disent nos clients",
+      svc_when_label: "Date et heure souhaitées",
+      svc_total: "Total :",
+      svc_add: "Ajouter",
+      svc_remove: "Retirer",
+      svc_reserve_whatsapp: "Réserver par WhatsApp",
+      meta_title: "Barbería Hugo | Coupes, Barbe & Style à Saragosse",
+      meta_desc: "Barbería Hugo à Saragosse. Coupes classiques et modernes, rasage au coupe-chou et taille de barbe. Réservation facile par WhatsApp.",
+      tagline: "Là où le style devient identité",
+      nav_home: "Accueil",
+      nav_services: "Services",
+      nav_gallery: "Galerie",
+      nav_hours: "Horaires",
+      nav_contact: "Contact",
+      reviews_title: "Ce que disent nos clients",
+      svc_when_label: "Date et heure préférées",
+      svc_total: "Total :",
+      svc_add: "Ajouter",
+      svc_remove: "Retirer",
+      svc_reserve_whatsapp: "Réserver via WhatsApp",
+      svc_no_date: "Sans date/heure",
+      svc_msg_header: "Bonjour, j’aimerais réserver :",
+      svc_msg_total: "Total approx. :",
+      svc_msg_when: "Date/heure préférées :",
+      svc_msg_footer: "Y a-t-il de la disponibilité ? Merci !",
+      svc_catalog: {
+        corte: "Coupe classique",
+        fade: "Coupe dégradée",
+        barba: "Taille de barbe",
+        afeitado: "Rasage au coupe-chou",
+        combo: "Coupe + Barbe",
+        nino: "Coupe enfant",
+      },
+      aria_carousel: "Carrousel d’avis clients",
+      stars_label: (n = 5) => `${n} sur 5`,
+    },
+    de: {
+      hours_title: "Öffnungszeiten",
+      hours_mon: "Montag: 16:00 – 21:00",
+      hours_week: "Di–Fr: 9:45 – 14:00 / 16:00 – 21:00",
+      hours_weekend: "Sa–So: Geschlossen",
+      hours_quote: "„Zeit für dich selbst ist nie vergeudet“",
+      gallery_title: "Galerie",
+      hours_title: "Zeiten",
+      contact_title: "Kontakt",
+      contact_blurb: "Wir sind in San Juan. Schreiben Sie uns oder öffnen Sie die Karte, um zu kommen.",
+      btn_whatsapp: "WhatsApp",
+      btn_directions: "Anfahrt",
+      footer_copy: "© 2025 Barbería Hugo — Alle Rechte vorbehalten",
+      tagline: "Wo Stil zur Identität wird",
+      nav_home: "Start",
+      nav_services: "Dienstleistungen",
+      nav_gallery: "Galerie",
+      nav_hours: "Öffnungszeiten",
+      nav_contact: "Kontakt",
+      reviews_title: "Was unsere Kunden sagen",
+      svc_when_label: "Bevorzugtes Datum und Uhrzeit",
+      svc_total: "Gesamt:",
+      svc_add: "Hinzufügen",
+      svc_remove: "Entfernen",
+      svc_reserve_whatsapp: "Über WhatsApp reservieren",
+      meta_title: "Hugo Barbershop | Haarschnitt, Bart & Stil in Saragossa",
+      meta_desc: "Hugo Barbershop in Saragossa. Klassische & moderne Schnitte, Rasur mit Klinge und Bartservice. Einfache Buchung per WhatsApp.",
+      tagline: "Wo Stil zur Identität wird",
+      nav_home: "Start",
+      nav_services: "Leistungen",
+      nav_gallery: "Galerie",
+      nav_hours: "Zeiten",
+      nav_contact: "Kontakt",
+      reviews_title: "Was unsere Kund:innen sagen",
+      svc_when_label: "Bevorzugtes Datum & Uhrzeit",
+      svc_total: "Summe:",
+      svc_add: "Hinzufügen",
+      svc_remove: "Entfernen",
+      svc_reserve_whatsapp: "Per WhatsApp buchen",
+      svc_no_date: "Kein Datum/Uhrzeit",
+      svc_msg_header: "Hallo, ich möchte buchen:",
+      svc_msg_total: "Ca. Summe:",
+      svc_msg_when: "Bevorzugte Zeit:",
+      svc_msg_footer: "Gibt es Verfügbarkeit? Danke!",
+      svc_catalog: {
+        corte: "Klassischer Haarschnitt",
+        fade: "Fade-Haarschnitt",
+        barba: "Bart trimmen",
+        afeitado: "Rasur mit Klinge",
+        combo: "Haarschnitt + Bart",
+        nino: "Kinderhaarschnitt",
+      },
+      aria_carousel: "Kundenbewertungen Karussell",
+      stars_label: (n = 5) => `${n} von 5`,
+    }
+  };
+
+
+
+  // Estado de idioma
+  let currentLang = (localStorage.getItem("lang") || navigator.language || "es").slice(0, 2);
+  if (!I18N[currentLang]) currentLang = "es";
+
+  // Utilidades de formato (moneda / fecha) dependientes de idioma
+  const formatEUR = (n) => new Intl.NumberFormat(currentLang, { style: "currency", currency: "EUR" }).format(n);
+  const formatDate = (d) => d.toLocaleDateString(currentLang);
+  const formatTime = (d) => d.toLocaleTimeString(currentLang, { hour: "2-digit", minute: "2-digit" });
+
+  // Aplicar traducciones a nodos con data-i18n / data-i18n-meta
+  function applyI18n(lang) {
+    const dict = I18N[lang] || I18N.es;
+    document.documentElement.lang = lang;
+
+    // Textos visibles
+    $$("[data-i18n]").forEach(el => {
+      const key = el.getAttribute("data-i18n");
+      if (dict[key] != null) el.textContent = typeof dict[key] === "function" ? dict[key]() : dict[key];
+    });
+
+    // Meta y título
+    $$("[data-i18n-meta]").forEach(el => {
+      const key = el.getAttribute("data-i18n-meta");
+      if (dict[key] != null) el.setAttribute("content", dict[key]);
+    });
+    const titleEl = $("title[data-i18n='meta_title']");
+    if (titleEl && dict.meta_title) titleEl.textContent = dict.meta_title;
+
+    // Carrusel: aria labels de accesibilidad
+    const carousel = document.querySelector(".carousel");
+    if (carousel && dict.aria_carousel) {
+      carousel.setAttribute("aria-label", dict.aria_carousel);
+    }
+    $$(".stars[aria-label]").forEach(st => st.setAttribute("aria-label", dict.stars_label?.(5) || "5/5"));
+
+    // Actualizar botones del selector de idioma (pressed)
+    $$(".lang-switch [data-lang]").forEach(btn => {
+      const isActive = btn.getAttribute("data-lang") === lang;
+      btn.setAttribute("aria-pressed", String(isActive));
+    });
+
+    // Re-render de Servicios para nombres/etiquetas
+    renderServicesI18n();
+  }
+
+  // Inyección/actualización del bloque de “Servicios” con textos traducidos
+  function renderServicesI18n() {
+    const host = document.querySelector("#servicios");
+    if (!host) return;
+
+    // Encontrar contenedor y partes ya creadas por tu lógica original
+    const wrap = host.querySelector(".svc-wrap");
+    if (!wrap) return;
+
+    const dict = I18N[currentLang] || I18N.es;
+    const grid = wrap.querySelector(".svc-grid");
+    const amountEl = wrap.querySelector(".svc-amount");
+    const dtLabel = wrap.querySelector(".svc-when label");
+    const dtInput = wrap.querySelector(".svc-dt");
+    const waBtn = wrap.querySelector(".svc-wa");
+
+    // 1) Reconstruir tarjetas con nombres traducidos + botones "Añadir/Quitar"
+    const CATALOG_KEYS = [
+      { id: "corte", price: 12 },
+      { id: "fade", price: 14 },
+      { id: "barba", price: 10 },
+      { id: "afeitado", price: 11 },
+      { id: "combo", price: 20 },
+      { id: "nino", price: 9 },
+    ];
+
+    // Recuperar selección actual si existe
+    const selected = new Set(
+      Array.from(grid.querySelectorAll("button.active")).map(btn => btn.getAttribute("data-id"))
+    );
+
+    grid.innerHTML = "";
+    CATALOG_KEYS.forEach((svc) => {
+      const name = dict.svc_catalog[svc.id] || svc.id;
+      const card = document.createElement("article");
+      card.className = "svc-card";
+      card.innerHTML = `
+        <h3>${name}</h3>
+        <div class="price">${formatEUR(svc.price)}</div>
+        <button type="button" data-id="${svc.id}" aria-pressed="false">${dict.svc_add}</button>
+      `;
+      const btn = card.querySelector("button");
+      if (selected.has(svc.id)) {
+        btn.classList.add("active");
+        btn.textContent = dict.svc_remove;
+        btn.setAttribute("aria-pressed", "true");
+      }
+      btn.addEventListener("click", () => {
+        const isActive = btn.classList.toggle("active");
+        btn.textContent = isActive ? dict.svc_remove : dict.svc_add;
+        btn.setAttribute("aria-pressed", String(isActive));
+        if (isActive) selected.add(svc.id); else selected.delete(svc.id);
+        updateTotal();
+      });
+      grid.appendChild(card);
+    });
+
+    function updateTotal() {
+      const total = CATALOG_KEYS
+        .filter(s => selected.has(s.id))
+        .reduce((a, b) => a + b.price, 0);
+      amountEl.textContent = formatEUR(total);
+    }
+    updateTotal();
+
+    // 2) Etiquetas inferiores traducidas
+    if (dtLabel) dtLabel.textContent = dict.svc_when_label;
+    if (waBtn) waBtn.textContent = dict.svc_reserve_whatsapp;
+
+    // 3) Rehacer click de WhatsApp con textos traducidos y fecha local
+    waBtn?.addEventListener("click", (e) => {
+      // Evitar duplicar listeners: paramos propagación si ya procesado
+      e.stopImmediatePropagation?.();
+      const chosen = CATALOG_KEYS.filter((s) => selected.has(s.id));
+      if (!chosen.length) { alert("Selecciona al menos un servicio."); return; }
+
+      const dtVal = dtInput?.value ? new Date(dtInput.value) : null;
+      const whenTxt = dtVal ? `${formatDate(dtVal)} ${formatTime(dtVal)}` : (I18N[currentLang]?.svc_no_date || "—");
+
+      const lines = [
+        dict.svc_msg_header,
+        ...chosen.map((s) => `• ${(dict.svc_catalog[s.id] || s.id)} — ${formatEUR(s.price)}`),
+        `${dict.svc_msg_total} ${formatEUR(chosen.reduce((a, b) => a + b.price, 0))}`,
+        `${dict.svc_msg_when} ${whenTxt}`,
+        "",
+        dict.svc_msg_footer
+      ];
+
+      // Tomamos el número actual desde el enlace existente (si lo tienes en tu HTML)
+      const waCTA = document.querySelector(".whatsapp-btn.grande");
+      const waHref = waCTA?.getAttribute("href") || "";
+      const waNumber = (waHref.match(/wa\.me\/(\d+)/) || [])[1] || "34123456789";
+
+      const encode = (s) => encodeURIComponent(String(s ?? ""));
+      const url = `https://wa.me/${waNumber}?text=${encode(lines.join("\n"))}`;
+      window.open(url, "_blank", "noopener");
+    }, { once: true }); // importante: solo una vez
+  }
+
+  // Eventos de la UI de idiomas
+  function bindLangSwitch() {
+    const btns = $$(".lang-switch [data-lang]");
+    if (!btns.length) return;
+    btns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const next = btn.getAttribute("data-lang");
+        if (!I18N[next]) return;
+        currentLang = next;
+        localStorage.setItem("lang", currentLang);
+        applyI18n(currentLang);
+      });
+    });
+  }
+
+  // Inicializar
+  function initI18n() {
+    // Si tu JS previo creó el bloque de servicios, aplicamos traducciones después de DOM ready
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => {
+        bindLangSwitch();
+        applyI18n(currentLang);
+      });
+    } else {
+      bindLangSwitch();
+      applyI18n(currentLang);
+    }
+  }
+
+  initI18n();
 })();

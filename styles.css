@@ -1444,3 +1444,52 @@ header .slogan {
   letter-spacing: 0.75px;
   line-height: 1.2;
 }
+
+/* ===== Selector de idioma con banderas (img) ===== */
+.lang-switch {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+}
+
+.lang-switch button {
+  /* reset y estilo del botón */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .25rem;
+  border: 2px solid var(--accent, #333);
+  border-radius: 9999px;              /* píldora/ovalado */
+  background: #fff;
+  cursor: pointer;
+  line-height: 0;                     /* evita espacio raro alrededor del img */
+  transition: transform .15s ease, background .15s ease, color .15s ease, border-color .15s ease;
+}
+
+.lang-switch button:hover {
+  transform: scale(1.05);
+}
+
+.lang-switch button[aria-pressed="true"] {
+  background: var(--accent, #333);
+  border-color: var(--accent, #333);
+  box-shadow: 0 0 0 3px rgba(0,0,0,.12);
+}
+
+/* La imagen de bandera: dale tamaño explícito */
+.lang-switch button img {
+  display: block;
+  width: 28px;    /* ajusta a tu gusto: 24–32px suele ir bien */
+  height: 21px;   /* relación 4:3 */
+  object-fit: cover;
+  border-radius: .25rem; /* esquinas suavitas al rectángulo */
+}
+
+/* Cuando el botón está activo, que la bandera no se “apague” */
+.lang-switch button[aria-pressed="true"] img {
+  filter: none;
+}
+
+/* Si en tu CSS global hay algo como img{max-width:100%}, esto lo respeta. 
+   Si ves que se estira, quita max-width o añade: */
+.lang-switch button img { max-width: none; }

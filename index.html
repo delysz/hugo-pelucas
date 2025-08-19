@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Barbería Hugo | Cortes, Barba y Estilo en Zaragoza</title>
-  <meta name="description"
+  <title data-i18n="meta_title">Barbería Hugo | Cortes, Barba y Estilo en Zaragoza</title>
+  <meta name="description" data-i18n-meta="meta_desc"
     content="Barbería Hugo en Zaragoza. Cortes clásicos y modernos, afeitado a navaja y arreglos de barba. Reserva fácil por WhatsApp.">
 
   <!-- Fuentes Google -->
@@ -15,7 +15,9 @@
     rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Imperial+Script&display=swap" rel="stylesheet">
 
- 
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+
+
   <!-- Font Awesome (iconos) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
@@ -31,26 +33,42 @@
 <body>
 
   <!-- Header -->
-  <header>
+  <header data-aos="fade-down">
     <img class="logo-barber" src="logo-hugo.png" alt="Barbería Hugo, peluquería masculina en Zaragoza" loading="lazy" />
     <h1 class="titulo-principal">Barbería Hugo</h1>
-    <p class="slogan">Donde el estilo se convierte en identidad</p>
+    <p class="slogan" data-i18n="tagline">Donde el estilo se convierte en identidad</p>
   </header>
 
   <!-- Navegación -->
   <nav>
-    <a href="#carrusel" class="active">Inicio</a>
-    <a href="#servicios">Servicios</a>
-    <a href="#galeria">Galería</a>
-    <a href="#horario">Horario</a>
-    <a href="#contacto">Contacto</a>
+    <a href="#carrusel" class="active" data-i18n="nav_home">Inicio</a>
+    <a href="#servicios" data-i18n="nav_services">Servicios</a>
+    <a href="#galeria" data-i18n="nav_gallery">Galería</a>
+    <a href="#horario" data-i18n="nav_hours">Horario</a>
+    <a href="#contacto" data-i18n="nav_contact">Contacto</a>
+
+    <!-- Selector de idioma con banderas -->
+    <div class="lang-switch" aria-label="Cambiar idioma">
+      <button type="button" data-lang="es" aria-pressed="true">
+        <img src="4x3/es.svg" alt="Español">
+      </button>
+      <button type="button" data-lang="en" aria-pressed="false">
+        <img src="4x3/gb.svg" alt="English">
+      </button>
+      <button type="button" data-lang="fr" aria-pressed="false">
+        <img src="4x3/fr.svg" alt="Français">
+      </button>
+      <button type="button" data-lang="de" aria-pressed="false">
+        <img src="4x3/de.svg" alt="Deutsch">
+      </button>
+    </div>
   </nav>
 
   <!-- Sección Carrusel -->
-  <section id="carrusel" class="container section-card">
-    <h2>Lo que nuestros clientes dicen</h2>
+  <section id="carrusel" class="container section-card" data-aos="fade-up">
+    <h2 data-i18n="reviews_title" data-aos="fade-up">Lo que nuestros clientes dicen</h2>
     <div class="carousel">
-
+      <!-- (Reseñas originales en ES — las dejamos tal cual) -->
       <!-- Reseña 1 -->
       <div class="carousel-item active">
         <article class="review-card">
@@ -418,87 +436,78 @@
       </div>
 
       <!-- Botones carrusel -->
-      <button class="carousel-btn prev">&#10094;</button>
-      <button class="carousel-btn next">&#10095;</button>
+      <button class="carousel-btn prev" aria-label="Anterior">&#10094;</button>
+      <button class="carousel-btn next" aria-label="Siguiente">&#10095;</button>
     </div>
   </section>
 
   <!-- Sección Servicios -->
-  <section id="servicios" class="container section-card">
-    <h2>Servicios</h2>
+  <section id="servicios" class="container section-card" data-aos="zoom-in">
+    <h2 data-i18n ="services_title" data-aos="fade-up">Servicios</h2>
     <!-- carousel.js inyecta cards con precios y selección -->
   </section>
 
   <!-- Sección Galería -->
-  <section id="galeria" class="container section-card">
-    <h2>Galería</h2>
+  <section id="galeria" class="container section-card" data-aos="fade-up" data-aos-delay="100">
+    <h2 data-i18n="gallery_title" data-aos="fade-up">Galería</h2>
 
     <div class="gallery-carousel" aria-label="Carrusel de fotos">
-      <!-- Slide 1 -->
+      <!-- Slides -->
       <a href="galeria/foto1.png" data-full="galeria/foto1.png" class="g-slide active" aria-label="Abrir foto 1">
         <img src="galeria/foto1.png" alt="Fade con diseño en la nuca" loading="lazy" width="600" height="750">
       </a>
-      <!-- Slide 2 -->
       <a href="galeria/foto2.png" data-full="galeria/foto2.png" class="g-slide" aria-label="Abrir foto 2">
         <img src="galeria/foto2.png" alt="Fachada de Barbería Hugo" loading="lazy" width="600" height="600">
       </a>
-      <!-- Slide 3 -->
       <a href="galeria/foto3.png" data-full="galeria/foto3.png" class="g-slide" aria-label="Abrir foto 3">
         <img src="galeria/foto3.png" alt="Afeitado a navaja en sillón" loading="lazy" width="600" height="750">
       </a>
-      <!-- Slide 4 -->
       <a href="galeria/foto4.png" data-full="galeria/foto4.png" class="g-slide" aria-label="Abrir foto 4">
         <img src="galeria/foto4.png" alt="Hugo en el local con sillón infantil" loading="lazy" width="600" height="750">
       </a>
-      <!-- Slide 5 -->
       <a href="galeria/foto5.png" data-full="galeria/foto5.png" class="g-slide" aria-label="Abrir foto 5">
         <img src="galeria/foto5.png" alt="Interior de la barbería" loading="lazy" width="600" height="750">
       </a>
-      <!-- Slide 6 -->
       <a href="galeria/foto6.png" data-full="galeria/foto6.png" class="g-slide" aria-label="Abrir foto 6">
         <img src="galeria/foto6.png" alt="Perfil con corte fade" loading="lazy" width="600" height="750">
       </a>
-      <!-- Slide 7 -->
       <a href="galeria/foto7.png" data-full="galeria/foto7.png" class="g-slide" aria-label="Abrir foto 7">
         <img src="galeria/foto7.png" alt="Detalle de diseño en la nuca" loading="lazy" width="600" height="750">
       </a>
-      <!-- Slide 8 -->
       <a href="galeria/foto8.png" data-full="galeria/foto8.png" class="g-slide" aria-label="Abrir foto 8">
         <img src="galeria/foto8.png" alt="Fade con diseño lateral y rizos" loading="lazy" width="600" height="750">
       </a>
-      <!-- Slide 9 -->
       <a href="galeria/foto9.png" data-full="galeria/foto9.png" class="g-slide" aria-label="Abrir foto 9">
         <img src="galeria/foto9.png" alt="Fade en cabello rizado" loading="lazy" width="600" height="750">
       </a>
 
-      <!-- Controles opcionales -->
       <button class="g-prev" aria-label="Anterior">‹</button>
       <button class="g-next" aria-label="Siguiente">›</button>
     </div>
   </section>
 
-
-
   <!-- Sección Horario -->
-  <section id="horario" class="container section-card">
-    <h2>Horario</h2>
-    <p>Lunes: 16:00 – 21:00</p>
-    <p>Martes a Viernes: 9:45 – 14:00 / 16:00 – 21:00</p>
-    <p>Sábados y Domingos: Cerrado</p>
-    <blockquote class="horario-cita">"El tiempo dedicado a ti mismo nunca es tiempo perdido"</blockquote>
+  <section id="horario" class="container section-card" data-aos="fade-up" data-aos-delay="150">
+    <h2 data-i18n="hours_title">Horario</h2>
+    <p data-i18n="hours_mon">Lunes: 16:00 – 21:00</p>
+    <p data-i18n="hours_week">Martes a Viernes: 9:45 – 14:00 / 16:00 – 21:00</p>
+    <p data-i18n="hours_weekend">Sábados y Domingos: Cerrado</p>
+    <blockquote class="horario-cita" data-i18n="hours_quote">"El tiempo dedicado a ti mismo nunca es tiempo perdido"
+    </blockquote>
   </section>
 
   <!-- Sección Contacto -->
-  <section id="contacto" class="container section-card">
-    <h2>Contacto</h2>
-    <p class="contact-subtitle">Estamos en San Juan. Escríbenos o abre el mapa para venir.</p>
+  <section id="contacto" class="container section-card" data-aos="fade-up" data-aos-delay="200">
+    <h2 data-i18n="contact_title" data-aos="fade-up">Contacto</h2>
+    <p class="contact-subtitle" data-i18n="contact_blurb">Estamos en San Juan. Escríbenos o abre el mapa para venir.</p>
 
     <div class="contact-actions">
       <a href="https://wa.me/34651435444" class="whatsapp-btn verde grande" aria-label="Abrir WhatsApp">
-        <i class="fa-brands fa-whatsapp" aria-hidden="true"></i> WhatsApp
+        <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+        <span data-i18n="btn_whatsapp">WhatsApp</span>
       </a>
       <a href="https://www.google.com/maps?q=41.7171479,-0.8414919" target="_blank" rel="noopener" class="btn-sec">
-        Cómo llegar
+        <span data-i18n="btn_directions">Cómo llegar</span>
       </a>
     </div>
 
@@ -508,13 +517,14 @@
         width="100%" height="300" style="border:0; border-radius:10px;" allowfullscreen="" loading="lazy"
         referrerpolicy="no-referrer-when-downgrade">
       </iframe>
-      <figcaption>Entrada por la avenida principal de San Juan · Fácil aparcamiento</figcaption>
+      <figcaption data-i18n="map_caption">Calle Dr. Alejandro Palomar, 50820 San Juan de Mozarrifar, Zaragoza
+      </figcaption>
     </figure>
   </section>
 
   <!-- Footer -->
-  <footer>
-    <p>© 2025 Barbería Hugo — Todos los derechos reservados</p>
+  <footer data-aos="fade-up" data-aos-offset="40"
+    <p data-i18n="footer_copy">© 2025 Barbería Hugo — Todos los derechos reservados</p>
   </footer>
 
   <script src="carousel.js"></script>
@@ -532,30 +542,206 @@
     <img src="icons8-facebook-nuevo.svg" alt="Facebook" />
   </a>
 
+  <!-- Galería: autoplay sencillo (corrige selector a .g-slide) -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const slides = document.querySelectorAll(".gallery-slide");
+      const slides = document.querySelectorAll(".g-slide");
+      if (!slides.length) return;
       let current = 0;
-
-      function showSlide(index) {
-        slides.forEach((slide, i) => {
-          slide.classList.toggle("active", i === index);
-        });
-      }
-
-      function nextSlide() {
-        current = (current + 1) % slides.length;
-        showSlide(current);
-      }
-
-      // Mostrar la primera de inicio
+      function showSlide(i) { slides.forEach((s, idx) => s.classList.toggle("active", idx === i)); }
+      function nextSlide() { current = (current + 1) % slides.length; showSlide(current); }
       showSlide(current);
-
-      // Pasar cada 4 segundos
       setInterval(nextSlide, 4000);
     });
   </script>
 
+  <!-- ===== Traducciones ===== -->
+  <script>
+    const T = {
+      es: {
+        nav_home: "Inicio",
+        nav_services: "Servicios",
+        nav_hours: "Horario",
+        nav_contact: "Contacto",
+        hero_title: "Barbería Hugo",
+        hero_sub: "Cortes clásicos y modernos en Campos",
+        services_title: "Servicios",
+        hours_title: "Horario",
+        hours_text: "Lunes - Viernes: 9:00 - 20:00",
+        contact_title: "Contacto",
+        contact_whatsapp: "Reservar por WhatsApp",
+        svc_add: "Añadir",
+        svc_remove: "Quitar",
+        svc_pick_dt: "Fecha y hora preferida",
+        svc_total: "Total:",
+        svc_book: "Reservar por WhatsApp",
+        svc_alert: "Selecciona al menos un servicio.",
+        svc_hello: "Hola, me gustaría reservar:",
+        svc_approx: "Total aprox.:",
+        svc_when: "Fecha/hora preferida:",
+        svc_availability: "¿Hay disponibilidad? ¡Gracias!",
+        services_catalog: {
+          corte: { name: "Corte clásico" },
+          fade: { name: "Corte fade" },
+          barba: { name: "Arreglo de barba" },
+          afeitado: { name: "Afeitado a navaja" },
+          combo: { name: "Corte + Barba" },
+          nino: { name: "Corte niño" }
+        }
+      },
+      en: {
+        nav_home: "Home",
+        nav_services: "Services",
+        nav_hours: "Hours",
+        nav_contact: "Contact",
+        hero_title: "Hugo Barbershop",
+        hero_sub: "Classic & modern cuts in Campos",
+        services_title: "Services",
+        hours_title: "Opening Hours",
+        hours_text: "Monday - Friday: 9:00 - 20:00",
+        contact_title: "Contact",
+        contact_whatsapp: "Book on WhatsApp",
+        svc_add: "Add",
+        svc_remove: "Remove",
+        svc_pick_dt: "Preferred date & time",
+        svc_total: "Total:",
+        svc_book: "Book on WhatsApp",
+        svc_alert: "Please select at least one service.",
+        svc_hello: "Hello, I’d like to book:",
+        svc_approx: "Approx. total:",
+        svc_when: "Preferred date/time:",
+        svc_availability: "Is there availability? Thanks!",
+        services_catalog: {
+          corte: { name: "Classic haircut" },
+          fade: { name: "Fade haircut" },
+          barba: { name: "Beard trim" },
+          afeitado: { name: "Straight razor shave" },
+          combo: { name: "Haircut + Beard" },
+          nino: { name: "Kids cut" }
+        }
+      },
+      de: {
+        gallery_title: "Galerie",
+        hours_title: "Zeiten",
+        hours_mon: "Montag: 16:00 – 21:00",
+        hours_week: "Di–Fr: 9:45 – 14:00 / 16:00 – 21:00",
+        hours_weekend: "Sa & So: Geschlossen",
+        hours_quote: "„Zeit für dich selbst ist nie vergeudet“",
+        contact_title: "Kontakt",
+        contact_blurb: "Wir sind in San Juan. Schreib uns oder öffne die Karte, um uns zu besuchen.",
+        btn_whatsapp: "WhatsApp",
+        btn_directions: "Anfahrt",
+        footer_copy: "© 2025 Barbería Hugo — Alle Rechte vorbehalten",
+        nav_home: "Startseite",
+        nav_services: "Dienstleistungen",
+        nav_hours: "Öffnungszeiten",
+        nav_contact: "Kontakt",
+        hero_title: "Barbier Hugo",
+        hero_sub: "Klassische & moderne Haarschnitte in Campos",
+        services_title: "Dienstleistungen",
+        hours_title: "Öffnungszeiten",
+        hours_text: "Montag - Freitag: 9:00 - 20:00",
+        contact_title: "Kontakt",
+        contact_whatsapp: "Über WhatsApp buchen",
+        svc_add: "Hinzufügen",
+        svc_remove: "Entfernen",
+        svc_pick_dt: "Bevorzugtes Datum & Uhrzeit",
+        svc_total: "Summe:",
+        svc_book: "Über WhatsApp buchen",
+        svc_alert: "Bitte mindestens eine Dienstleistung wählen.",
+        svc_hello: "Hallo, ich möchte buchen:",
+        svc_approx: "Ungef. Summe:",
+        svc_when: "Bevorzugte Zeit:",
+        svc_availability: "Gibt es Verfügbarkeit? Danke!",
+        services_catalog: {
+          corte: { name: "Klassischer Haarschnitt" },
+          fade: { name: "Fade-Haarschnitt" },
+          barba: { name: "Bartpflege" },
+          afeitado: { name: "Rasur mit Messer" },
+          combo: { name: "Haarschnitt + Bart" },
+          nino: { name: "Kinderhaarschnitt" }
+        }
+      },
+      fr: {
+        gallery_title: "Galerie",
+        hours_title: "Horaires",
+        hours_mon: "Lundi : 16h00 – 21h00",
+        hours_week: "Mar–Ven : 9h45 – 14h00 / 16h00 – 21h00",
+        hours_weekend: "Samedi & Dimanche : Fermé",
+        hours_quote: "« Le temps consacré à soi-même n’est jamais perdu »",
+        contact_title: "Contact",
+        contact_blurb: "Nous sommes à San Juan. Écrivez-nous ou ouvrez la carte pour venir.",
+        btn_whatsapp: "WhatsApp",
+        btn_directions: "Itinéraire",
+        footer_copy: "© 2025 Barbería Hugo — Tous droits réservés",
+        nav_home: "Accueil",
+        nav_services: "Services",
+        nav_hours: "Horaires",
+        nav_contact: "Contact",
+        hero_title: "Barbier Hugo",
+        hero_sub: "Coupes classiques et modernes à Campos",
+        services_title: "Services",
+        hours_title: "Horaires",
+        hours_text: "Lundi - Vendredi: 9h00 - 20h00",
+        contact_title: "Contact",
+        contact_whatsapp: "Réserver sur WhatsApp",
+        svc_add: "Ajouter",
+        svc_remove: "Retirer",
+        svc_pick_dt: "Date et heure souhaitées",
+        svc_total: "Total :",
+        svc_book: "Réserver sur WhatsApp",
+        svc_alert: "Sélectionnez au moins un service.",
+        svc_hello: "Bonjour, je souhaite réserver :",
+        svc_approx: "Total approx. :",
+        svc_when: "Date/heure souhaitées :",
+        svc_availability: "Y a-t-il de la disponibilité ? Merci !",
+        services_catalog: {
+          corte: { name: "Coupe classique" },
+          fade: { name: "Coupe dégradée (fade)" },
+          barba: { name: "Taille de barbe" },
+          afeitado: { name: "Rasage à l’ancienne" },
+          combo: { name: "Coupe + Barbe" },
+          nino: { name: "Coupe enfant" }
+        }
+      }
+    };
+
+    function setLang(lang) {
+      localStorage.setItem("lang", lang);
+      document.querySelectorAll("[data-key]").forEach(el => {
+        let key = el.getAttribute("data-key");
+        if (T[lang][key]) el.textContent = T[lang][key];
+      });
+      renderServices(lang);
+    }
+
+    function renderServices(lang) {
+      const dict = T[lang] || T.es;
+      const container = document.getElementById("services-list");
+      container.innerHTML = "";
+      Object.values(dict.services_catalog).forEach(svc => {
+        const card = document.createElement("div");
+        card.className = "service-card";
+        card.innerHTML = `<p>${svc.name}</p>`;
+        container.appendChild(card);
+      });
+    }
+
+    document.querySelectorAll(".lang-btn").forEach(btn => {
+      btn.addEventListener("click", () => setLang(btn.dataset.lang));
+    });
+
+    // inicial
+    setLang(localStorage.getItem("lang") || "es");
+  </script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init({
+      duration: 800,   // duración de la animación
+      offset: 80,      // desplazar el trigger para empezar un poco antes
+      once: true       // animar solo la primera vez
+    });
+  </script>
 </body>
 
 </html>
