@@ -77,3 +77,21 @@ body{margin:0; background:var(--bg); color:var(--text); font-family:'Lato',syste
 .btn.disabled{opacity:.6; cursor:not-allowed}
 .pickup{display:flex; align-items:center; gap:8px; margin-top:6px; color:var(--muted)}
 .shop-footer{margin:24px 0; text-align:center; color:var(--muted)}
+
+.notice {
+  margin: 20px 0;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: rgba(246, 201, 14, 0.15);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-weight: 800;
+  text-align: center;
+  font-size: 1.05rem;
+  box-shadow: 0 4px 14px rgba(0,0,0,.25);
+}
+@media (max-width: 600px) {
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .cart-panel{width:100%; border-left:none; border-top:1px solid var(--border)}
+  .cart-drawer[aria-hidden="false"] .cart-panel{transform:translateY(-100%); height:100vh; border-radius:16px 16px 0 0}
+}

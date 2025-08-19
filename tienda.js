@@ -8,16 +8,79 @@
   const money = (n) => fmt.format(n);
 
   // Demo catalog — replace with your real products later
-  const CATALOG = [
-    { id:"pomada-mate", name:"Pomada Mate Fijación Media", price:12.5, img:"https://images.unsplash.com/photo-1604900257830-1a6a9b826d09?q=80&w=800&auto=format&fit=crop", desc:"Textura natural, sin brillo." },
-    { id:"aceite-barba", name:"Aceite para Barba Citrus", price:15.0, img:"https://images.unsplash.com/photo-1600180758890-6b94519a8ba6?q=80&w=800&auto=format&fit=crop", desc:"Hidratación y aroma fresco." },
-    { id:"aftershave", name:"After Shave Bálsamo", price:9.9, img:"https://images.unsplash.com/photo-1582092728066-5a6a6a6e7a7b?q=80&w=800&auto=format&fit=crop", desc:"Calma y protege la piel." },
-    { id:"shampoo", name:"Champú Caballero 300ml", price:8.5, img:"https://images.unsplash.com/photo-1603933222839-37f2347340b9?q=80&w=800&auto=format&fit=crop", desc:"Limpieza diaria suave." },
-    { id:"peine-madera", name:"Peine de Madera", price:6.0, img:"https://images.unsplash.com/photo-1556228907-94e5c0d6b97e?q=80&w=800&auto=format&fit=crop", desc:"Antiestático, acabado natural." },
-    { id:"cera-fuerte", name:"Cera Fijación Fuerte", price:13.2, img:"https://images.unsplash.com/photo-1592802842365-4ec5cbb3f2c2?q=80&w=800&auto=format&fit=crop", desc:"Control total todo el día." },
-    { id:"brocha-afeitar", name:"Brocha de Afeitar Sintética", price:11.0, img:"https://images.unsplash.com/photo-1626869051697-447ddb5a0bc1?q=80&w=800&auto=format&fit=crop", desc:"Suave y duradera." },
-    { id:"toalla", name:"Toalla Facial Caliente", price:5.5, img:"https://images.unsplash.com/photo-1582582621959-e8284d4a4c7a?q=80&w=800&auto=format&fit=crop", desc:"Para ritual de afeitado." }
-  ];
+const CATALOG = [
+  {
+    id: "cosmetics-tenerife",
+    name: "Cosmetics Tenerife (aceite natural)",
+    price: 14.0,
+    img: "tienda/cosmetics-tenerife.jpg",
+    desc: "Natural, buena absorción, sin residuos grasos"
+  },
+  {
+    id: "uppercut-deluxe",
+    name: "Uppercut Deluxe (aceite)",
+    price: 19.5,
+    img: "tienda/uppercut-deluxe.jpg",
+    desc: "Fragancia masculina (pachulí/cuero), sin grasa"
+  },
+  {
+    id: "beardburys-deluxe",
+    name: "Beardburys Deluxe (navaja)",
+    price: 29.0,
+    img: "https://via.placeholder.com/400x400?text=Beardburys+Navaja",
+    desc: "Herramienta premium, estética de lujo"
+  },
+  {
+    id: "captain-fawcett",
+    name: "Captain Fawcett Whisky (aceite)",
+    price: 24.0,
+    img: "https://via.placeholder.com/400x400?text=Captain+Fawcett",
+    desc: "Fragancia intensa de whisky, branding icónico"
+  },
+  {
+    id: "suavecito-whiskey",
+    name: "Suavecito Whiskey (aceite)",
+    price: 18.0,
+    img: "https://via.placeholder.com/400x400?text=Suavecito+Whiskey",
+    desc: "Fórmula nutritiva y botella protectora"
+  },
+  {
+    id: "jameson-zew",
+    name: "Jameson x Zew (aceite)",
+    price: 22.0,
+    img: "https://via.placeholder.com/400x400?text=Jameson+ZEW",
+    desc: "Aroma whisky sour y cítricos, ingredientes 100 % naturales"
+  },
+  {
+    id: "cyrulicy-burboneska",
+    name: "Cyrulicy Burboneska (aceite)",
+    price: 23.5,
+    img: "https://via.placeholder.com/400x400?text=Cyrulicy+Burboneska",
+    desc: "Aroma complejo y rico, alto nivel de ingredientes nutritivos"
+  },
+  {
+    id: "gentlemans-tipple",
+    name: "Gentleman’s Tipple (aceite)",
+    price: 20.0,
+    img: "https://via.placeholder.com/400x400?text=Gentlemans+Tipple",
+    desc: "Fragancia británica refinada en formato compacto"
+  },
+  {
+    id: "superior-dry-goods",
+    name: "Superior Dry Goods (set vegano)",
+    price: 27.0,
+    img: "https://via.placeholder.com/400x400?text=Superior+Dry+Goods",
+    desc: "Regalo artesanal, sensible, libre de fragancias"
+  },
+  {
+    id: "vintage-balm-tin",
+    name: "Vintage balm tin (bálsamo)",
+    price: 16.0,
+    img: "https://via.placeholder.com/400x400?text=Vintage+Balm+Tin",
+    desc: "Vintage, atractivo visual, coleccionable"
+  }
+];
+
 
   const STORAGE_KEY = "hugo_shop_cart_v1";
 
