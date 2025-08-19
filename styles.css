@@ -117,7 +117,7 @@ nav a:hover::after, nav a.active::after{transform:scaleX(1)}
 
 /* ---------- Compensa nav fijo ---------- */
 header { padding-top:120px; } 
-#carrusel, #servicios, #galeria, #horario, #contacto { scroll-margin-top: 90px; }
+#carrusel, #servicios, #horario, #contacto { scroll-margin-top: 90px; }
 
 /* ---------- Contenedor principal ---------- */
 .container{
@@ -136,6 +136,11 @@ header { padding-top:120px; }
   border:1px solid var(--border);
   backdrop-filter: blur(10px);
 }
+.container h1{
+  font-size:clamp(2.2rem, 4vw, 3.2rem);
+  color:#fff; text-align:center;
+  margin-bottom:12px;
+}               
 .section-card{
   background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
   border:1px solid var(--border);
@@ -148,6 +153,8 @@ header { padding-top:120px; }
   align-items:center;
   text-align:center;
   color:var(--text);
+  font-family:'Lato', 'Segoe UI', system-ui, Arial, sans-serif;
+  font-size:1rem; line-height:1.6;
   transition:background .2s ease, box-shadow .2s ease;
   position:relative;  
   overflow:hidden;
@@ -178,21 +185,54 @@ header { padding-top:120px; }
   border:1px solid var(--border); border-radius:18px; background:var(--card);
   box-shadow: var(--shadow);
 }
-.carousel-item{ display:none; padding:28px 24px 24px; text-align:center; animation:fadeIn .6s ease; }
+.carousel-item{
+  display:none; padding:28px 24px 24px; text-align:center;
+  animation:fadeIn .6s ease;
+}
 .carousel-item.active{display:block}
 @keyframes fadeIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
-.carousel-item img {
-  width: 100%; max-height: 420px; object-fit: cover; border-radius: 16px; border: none;
-  box-shadow: 0 8px 24px rgba(0,0,0,.4); margin: 0 auto; display: block;
+
+/* --- Avatares de reseñas (pequeños y redondos) --- */
+.carousel blockquote img,
+.carousel-item blockquote img {
+  width:128px;
+  height:128px;
+  object-fit:cover;
+  border-radius:50%;
+  margin:0 auto 16px;
+  border:3px solid rgba(246,201,14,.75);
+  box-shadow:0 10px 24px rgba(0,0,0,.4);
 }
-@media (max-width: 768px){ .carousel-item img { max-height: 260px; border-radius: 12px; } }
+
+/* --- Fotos grandes del local --- */
+.carousel-item img {
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+  border-radius: 16px;
+  border: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  margin: 0 auto;
+  display: block;
+}
+
+/* Responsive para fotos */
+@media (max-width: 768px) {
+  .carousel-item img {
+    max-height: 260px;
+    border-radius: 12px;
+  }
+}
+
 .carousel blockquote{
   margin:0 auto; max-width:440px; color:var(--text); font-style:italic;
   background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
   border:1px solid var(--border); border-left:4px solid var(--accent);
   padding:16px 14px; border-radius:12px;
 }
-.carousel blockquote span{ display:block; margin-top:10px; color:var(--accent); font-weight:800; }
+.carousel blockquote span{
+  display:block; margin-top:10px; color:var(--accent); font-weight:800;
+}
 .carousel-btn{
   position:absolute; top:50%; transform:translateY(-50%);
   width:44px; height:44px; border-radius:50%; border:1px solid var(--border);
@@ -214,15 +254,6 @@ header { padding-top:120px; }
     var(--card);
 }
 
-/* Cita personalizada del horario */
-.horario-cita {
-  margin-top: 16px;
-  font-style: italic;
-  font-size: 1.05rem;
-  color: var(--accent);
-  opacity: 0.9;
-}
-
 /* ---------- Contacto ---------- */
 #contacto .section-card{ display:grid; gap:26px; padding:36px; }
 #contacto p{ margin:.6rem 0; line-height:1.6; }
@@ -236,6 +267,8 @@ header { padding-top:120px; }
   transition:transform .15s ease, filter .2s ease;
 }
 .whatsapp-btn.grande:hover{transform:translateY(-2px); filter:saturate(1.1)}
+.wa-icon{font-size:1.3em}
+.wa-texto{color:var(--muted); font-weight:700}
 .mapa{border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:var(--shadow)}
 .mapa iframe{display:block; width:100%; height:260px}
 
@@ -243,8 +276,13 @@ header { padding-top:120px; }
 .contact-form{
   background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
   border:1px solid var(--border);
-  border-radius:14px; padding:22px; margin:12px auto 0; width:100%; max-width:520px;
-  box-shadow: var(--shadow); display:flex; flex-direction:column; gap:14px;
+  border-radius:14px;
+  padding:22px;
+  margin:12px auto 0;
+  width:100%; max-width:520px;
+  box-shadow: var(--shadow);
+  display:flex; flex-direction:column;
+  gap:14px;
 }
 .contact-form label{font-weight:800; color:#fff; font-size:.95rem}
 .contact-form input, .contact-form textarea{
@@ -268,96 +306,22 @@ header { padding-top:120px; }
 }
 .error-msg{color:#ff7a7a !important; font-weight:700}
 
-/* ---------- Botones flotantes (tamaño más pequeño) ---------- */
-.whatsapp-float,
-.social-float {
-  position: fixed;
-  right: 20px;
-  border-radius: 50%;
-  width: 48px;   /* antes 64px */
-  height: 48px;  /* antes 64px */
-  display: flex; justify-content: center; align-items: center;
-  color: #fff;
-  box-shadow: 0 6px 18px rgba(0,0,0,.35);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  z-index: 2000;
+/* ---------- Pie ---------- */
+footer{
+  margin-top:44px; padding:24px 16px; text-align:center;
+  color:var(--muted);
+  border-top:1px solid var(--border);
+  background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
 }
-.whatsapp-float:hover,
-.social-float:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 12px 28px rgba(0,0,0,.45); }
-.whatsapp-float img,
-.whatsapp-float svg,
-.social-float i {
-  width: 32px;  /* antes 68px */
-  height: 32px; /* antes 68px */
-  font-size: 20px;
-}
-.whatsapp-float { bottom: 20px; background: linear-gradient(90deg, #25D366 0%, #1ebe5a 100%); }
-.social-float.instagram { bottom: 76px; background: radial-gradient(circle at 30% 30%, #feda75, #d62976, #962fbf, #4f5bd5); }
-.social-float.facebook  { bottom: 132px; background: #1877F2; }
 
-/* ====== Servicios con iconos (si decides usarlos) ====== */
-/* (… se mantiene igual …) */
-
-/* ===== Galería ===== */
-.gallery-grid{
-  display:grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap:14px;
-  width:100%;
-  max-width: 1000px;
-}
-@media (max-width: 900px){ .gallery-grid{ grid-template-columns: repeat(2, 1fr);} }
-@media (max-width: 560px){ .gallery-grid{ grid-template-columns: 1fr; } }
-
-.gallery-item{
-  display:block;
-  border-radius:12px;
-  overflow:hidden;
-  border:1px solid var(--border);
-  background: var(--card);
-  box-shadow: 0 6px 18px rgba(0,0,0,.30);
-  transform: translateZ(0);
-}
-.gallery-item img{
-  width:100%; height:auto; display:block;
-  transition: transform .25s ease, filter .25s ease;
-}
-.gallery-item:hover img{ transform: scale(1.03); filter: saturate(1.05); }
-
-/* Lightbox */
-.lightbox{
-  position:fixed; inset:0;
-  display:grid; place-items:center;
-  background: rgba(0,0,0,.85);
-  z-index:3000;
-}
-.lightbox[hidden]{ display:none; }
-.lb-img{
-  max-width: min(92vw, 1200px);
-  max-height: 86vh;
-  border-radius:12px;
-  box-shadow: 0 10px 32px rgba(0,0,0,.55);
-}
-.lb-close, .lb-prev, .lb-next{
-  position: fixed;
-  background: rgba(0,0,0,.5);
-  color:#fff;
-  border:1px solid var(--border);
-  width:44px; height:44px; border-radius:50%;
-  display:grid; place-items:center;
-  font-size:1.4rem; cursor:pointer;
-  box-shadow:0 8px 24px rgba(0,0,0,.35);
-  transition:transform .2s ease, background .2s ease;
-}
-.lb-close{ top:18px; right:18px; }
-.lb-prev{ left:18px; top:50%; transform: translateY(-50%); }
-.lb-next{ right:18px; top:50%; transform: translateY(-50%); }
-.lb-prev:hover, .lb-next:hover, .lb-close:hover{ background: var(--accent); color:#111; transform: scale(1.05); }
-
-/* ---------- Responsive pequeños ---------- */
+/* ---------- Responsive ---------- */
 @media (max-width: 840px){
   .carousel{max-width:100%}
   .section-card{padding:22px}
+}
+@media (max-width: 560px){
+  .carousel-btn{top:auto; bottom:10px; transform:none}
+  .carousel-btn.prev{left:10px} .carousel-btn.next{right:10px}
 }
 
 /* ---------- Accesibilidad ---------- */
@@ -369,55 +333,156 @@ body, html{
   scroll-behavior:smooth;
   overflow-x:hidden;
 }
-/* Footer perfectamente centrado */
-footer{
+
+/* ====== Servicios con iconos (Font Awesome) ====== */
+.servicios-lista{
+  list-style:none;
+  padding:0;
+  margin:8px 0 0 0;
   display:flex;
-  justify-content:center;
+  flex-direction:column;
+  gap:14px;
+  font-size:1.06rem;
+  text-align:left;
+  width:100%;
+}
+
+.servicios-lista li{
+  display:flex;
   align-items:center;
+  gap:12px;
+  padding:12px 16px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:linear-gradient(90deg, rgba(246,201,14,0.10), rgba(246,201,14,0.02));
+  box-shadow:0 4px 14px rgba(0,0,0,.25);
+  transition:transform .18s ease, background .18s ease, color .18s ease;
 }
-footer p{ margin:0; text-align:center; }
 
-/* Aviso RRSS al llegar al final */
-.follow-cta{
-  position: fixed;
-  left: 50%;
-  bottom: 24px;
-  transform: translateX(-50%) translateY(20px);
-  background: linear-gradient(180deg, rgba(13,16,39,.96), rgba(13,16,39,.90));
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 14px 16px 12px;
-  box-shadow: var(--shadow);
-  z-index: 2500;
-  backdrop-filter: blur(8px);
-  opacity: 0; pointer-events: none;
-  transition: opacity .25s ease, transform .25s ease;
+.servicios-lista li:hover{
+  transform:translateX(6px);
+  background:linear-gradient(90deg, var(--accent), var(--accent-2));
+  color:#111;
+}
+
+.servicios-lista .fa-solid{
+  font-size:1.25rem;
+  width:1.25rem;
+  color:var(--accent);
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.25));
+}
+
+.servicios-lista li:hover .fa-solid{
+  color:#111;
+}
+
+/* ====== Sección contacto mejor alineada ====== */
+#contacto .section-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
   text-align: center;
+}
+
+#contacto .mapa {
+  width: 100%;
+  max-width: 720px;
+}
+
+#contacto .contact-form {
+  width: 100%;
   max-width: 520px;
-  width: calc(100% - 32px);
-}
-.follow-cta.show{ opacity: 1; transform: translateX(-50%) translateY(0); pointer-events:auto; }
-.follow-cta p{ margin: 0 0 8px; font-weight: 800; color: var(--text); }
-
-.follow-cta .cta-actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-.follow-cta .btn-cta{
-  display:inline-flex; align-items:center; gap:8px;
-  padding:8px 12px; border-radius:10px; font-weight:800; text-decoration:none;
-  border:1px solid var(--border);
-}
-.follow-cta .btn-cta img{ width:18px; height:18px; }
-
-.follow-cta .btn-cta.ig{ background: radial-gradient(circle at 30% 30%, #feda75, #d62976, #962fbf, #4f5bd5); color:#fff; }
-.follow-cta .btn-cta.fb{ background:#1877F2; color:#fff; }
-
-.follow-cta .cta-close{
-  position:absolute; top:6px; right:6px;
-  width:32px; height:32px; border-radius:50%;
-  border:1px solid var(--border);
-  background: rgba(0,0,0,.3); color:#fff; cursor:pointer;
+  margin: 0 auto;
 }
 
-@media (max-width:560px){
-  /* súbelo un poco para no chocar con los botones flotantes */
-  .follow-cta{ bottom: 92px; }
+/* Botón WhatsApp verde mejorado */
+.whatsapp-btn.verde {
+  background: linear-gradient(90deg, #25D366 0%, #1ebe5a 100%);
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: .3px;
+  padding: 14px 24px;
+  border-radius: 14px;
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  border: none;
+  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+  transition: transform .15s ease, filter .2s ease, box-shadow .2s ease;
 }
+.whatsapp-btn.verde:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+  box-shadow: 0 12px 32px rgba(37, 211, 102, 0.5);
+}
+
+/* ---------- Botones flotantes unificados ---------- */
+.whatsapp-float,
+.social-float {
+  position: fixed;
+  right: 20px;
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 2000;
+}
+
+/* Hover común */
+.whatsapp-float:hover,
+.social-float:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 28px rgba(0,0,0,.45);
+}
+
+/* Iconos dentro */
+.whatsapp-float img,
+.whatsapp-float svg,
+.social-float i {
+  width: 68px;
+  height: 68px;
+  font-size: 28px;
+}
+
+/* Colores individuales */
+.whatsapp-float { bottom: 20px; background: linear-gradient(90deg, #25D366 0%, #1ebe5a 100%); }
+.social-float.instagram { bottom: 92px; background: radial-gradient(circle at 30% 30%, #feda75, #d62976, #962fbf, #4f5bd5); }
+.social-float.facebook  { bottom: 164px; background: #1877F2; }
+
+/* === Overrides & CTA (appended by assistant) === */
+footer{display:flex;justify-content:center;align-items:center;}
+footer p{margin:0;text-align:center;}
+
+/* Floating buttons smaller */
+.whatsapp-float,
+.social-float{width:48px;height:48px;box-shadow:0 6px 18px rgba(0,0,0,.35);}
+.whatsapp-float img,
+.whatsapp-float svg,
+.social-float i{width:32px;height:32px;font-size:20px;}
+.social-float.instagram{bottom:76px;}
+.social-float.facebook{bottom:132px;}
+
+/* Follow CTA */
+.follow-cta{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
+  background:linear-gradient(180deg, rgba(13,16,39,.96), rgba(13,16,39,.90));
+  border:1px solid var(--border);border-radius:16px;padding:14px 16px 12px;
+  box-shadow:var(--shadow);z-index:2500;backdrop-filter:blur(8px);
+  opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease;
+  text-align:center;max-width:520px;width:calc(100% - 32px);
+}
+.follow-cta.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+.follow-cta p{margin:0 0 8px;font-weight:800;color:var(--text);}
+.follow-cta .cta-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.follow-cta .btn-cta{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;font-weight:800;text-decoration:none;border:1px solid var(--border);}
+.follow-cta .btn-cta img{width:18px;height:18px;}
+.follow-cta .btn-cta.ig{background:radial-gradient(circle at 30% 30%, #feda75, #d62976, #962fbf, #4f5bd5);color:#fff;}
+.follow-cta .btn-cta.fb{background:#1877F2;color:#fff;}
+.follow-cta .cta-close{position:absolute;top:6px;right:6px;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:rgba(0,0,0,.3);color:#fff;cursor:pointer;}
+@media (max-width:560px){.follow-cta{bottom:92px;}}

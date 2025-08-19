@@ -28,10 +28,20 @@
       items.forEach((el, k) => el.classList.toggle("active", k === i));
       idx = i;
     }
-    function next() { show((idx + 1) % items.length); }
-    function prev() { show((idx - 1 + items.length) % items.length); }
-    function play() { stop(); timer = setInterval(next, DURATION); }
-    function stop() { if (timer) clearInterval(timer); timer = null; }
+    function next() {
+      show((idx + 1) % items.length);
+    }
+    function prev() {
+      show((idx - 1 + items.length) % items.length);
+    }
+    function play() {
+      stop();
+      timer = setInterval(next, DURATION);
+    }
+    function stop() {
+      if (timer) clearInterval(timer);
+      timer = null;
+    }
 
     on(prevBtn, "click", () => { prev(); play(); });
     on(nextBtn, "click", () => { next(); play(); });
@@ -104,6 +114,7 @@
   (function services() {
     const host = $("#servicios");
     if (!host) return;
+
     if (host.querySelector(".svc-wrap")) return;
 
     const CATALOG = [
@@ -136,18 +147,57 @@
 
     const style = document.createElement("style");
     style.textContent = `
-      .svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 16px; }
-      .svc-card { border: 2px solid #f6c90e; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 12px rgba(26,34,56,0.06); background: #fff; }
-      .svc-card h3 { margin: 0; font-size: 1.05rem; color: #232946; }
-      .svc-card .price { font-weight: 700; color: #232946; }
-      .svc-card button { align-self: flex-start; background: #232946; color:#fff; border: 2px solid #f6c90e; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-weight: 700; }
+      .svc-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+      .svc-card {
+        border: 2px solid #f6c90e;
+        border-radius: 12px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        box-shadow: 0 2px 12px rgba(26,34,56,0.06);
+        background: #fff;
+      }
+      .svc-card h3 {
+        margin: 0;
+        font-size: 1.05rem;
+        color: #232946;
+      }
+      .svc-card .price {
+        font-weight: 700; color: #232946;
+      }
+      .svc-card button {
+        align-self: flex-start;
+        background: #232946; color:#fff; border: 2px solid #f6c90e;
+        padding: 8px 10px; border-radius: 8px; cursor: pointer; font-weight: 700;
+      }
       .svc-card button.active { background: #f6c90e; color:#232946; }
-      .svc-bar { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; border-top: 3px solid #f6c90e; padding-top: 14px; }
+      .svc-bar {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        gap: 12px;
+        align-items: center;
+        border-top: 3px solid #f6c90e;
+        padding-top: 14px;
+      }
       .svc-when label { display:block; font-weight:700; margin-bottom:6px; color:#232946;}
-      .svc-dt { padding: 10px; border-radius: 6px; border:1.5px solid #232946; background:#f5f6fa; }
+      .svc-dt {
+        padding: 10px; border-radius: 6px; border:1.5px solid #232946; background:#f5f6fa;
+      }
       .svc-total { font-size:1.1rem; }
-      .svc-wa { background: linear-gradient(90deg, #f6c90e 0%, #232946 100%); color:#232946; border: 2px solid #f6c90e; border-radius: 10px; padding: 10px 14px; font-weight: 800; cursor: pointer; }
-      @media (max-width:720px){ .svc-bar { grid-template-columns: 1fr; } .svc-total { justify-self: start; } }
+      .svc-wa {
+        background: linear-gradient(90deg, #f6c90e 0%, #232946 100%);
+        color:#232946; border: 2px solid #f6c90e; border-radius: 10px; padding: 10px 14px; font-weight: 800; cursor: pointer;
+      }
+      @media (max-width:720px){
+        .svc-bar { grid-template-columns: 1fr; }
+        .svc-total { justify-self: start; }
+      }
     `;
     document.head.appendChild(style);
 
@@ -182,13 +232,18 @@
     }
 
     function updateTotal() {
-      const total = CATALOG.filter((s) => selected.has(s.id)).reduce((a, b) => a + b.price, 0);
+      const total = CATALOG
+        .filter((s) => selected.has(s.id))
+        .reduce((a, b) => a + b.price, 0);
       amountEl.textContent = formatEUR(total);
     }
 
     on(waBtn, "click", () => {
       const chosen = CATALOG.filter((s) => selected.has(s.id));
-      if (!chosen.length) { alert("Selecciona al menos un servicio."); return; }
+      if (!chosen.length) {
+        alert("Selecciona al menos un servicio.");
+        return;
+      }
       const dtVal = dtInput.value ? new Date(dtInput.value) : null;
       const whenTxt = dtVal
         ? `${dtVal.toLocaleDateString("es-ES")} ${dtVal.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`
@@ -210,67 +265,59 @@
     updateTotal();
   })();
 
-  // ===== Lightbox para galería =====
-  (function galleryLightbox(){
-    const grid = document.querySelector(".gallery-grid");
-    const lb = document.createElement("div");
-    if(!grid) return;
+  // Validaciones suaves del formulario de contacto
+  (function contactForm() {
+    const form = $(".contact-form");
+    if (!form) return;
 
-    lb.className = "lightbox";
-    lb.setAttribute("hidden", "");
-    lb.innerHTML = `
-      <button class="lb-close" aria-label="Cerrar">&times;</button>
-      <img class="lb-img" alt="">
-      <button class="lb-prev" aria-label="Anterior">&#10094;</button>
-      <button class="lb-next" aria-label="Siguiente">&#10095;</button>
-    `;
-    document.body.appendChild(lb);
+    const name = $("#nombre", form);
+    const phone = $("#telefono", form);
+    const email = $("#email", form);
+    const msg = $("#mensaje", form);
 
-    const imgEl = lb.querySelector(".lb-img");
-    const btnClose = lb.querySelector(".lb-close");
-    const btnPrev = lb.querySelector(".lb-prev");
-    const btnNext = lb.querySelector(".lb-next");
-
-    const items = Array.from(grid.querySelectorAll(".gallery-item"));
-    let idx = -1;
-
-    function open(i){
-      idx = i;
-      const a = items[idx];
-      const full = a.getAttribute("data-full") || a.getAttribute("href");
-      const alt = a.querySelector("img")?.getAttribute("alt") || "";
-      imgEl.src = full;
-      imgEl.alt = alt;
-      lb.hidden = false;
-      document.body.style.overflow = "hidden";
+    function setError(input, text) {
+      let box = input.parentElement.querySelector(".error-msg");
+      if (!box) {
+        box = document.createElement("div");
+        box.className = "error-msg";
+        box.style.color = "#b00020";
+        box.style.fontSize = "0.9em";
+        box.style.marginTop = "4px";
+        input.parentElement.appendChild(box);
+      }
+      box.textContent = text || "";
+      if (text) input.setAttribute("aria-invalid", "true");
+      else input.removeAttribute("aria-invalid");
     }
-    function close(){
-      lb.hidden = true;
-      imgEl.src = "";
-      document.body.style.overflow = "";
+
+    const reMail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const rePhone = /^[0-9\s+().-]{9,}$/;
+
+    function validate() {
+      let ok = true;
+      if (!name.value.trim()) { setError(name, "Por favor, dinos tu nombre."); ok = false; }
+      else setError(name, "");
+
+      if (!rePhone.test(phone.value.trim())) { setError(phone, "Teléfono no válido."); ok = false; }
+      else setError(phone, "");
+
+      if (!reMail.test(email.value.trim())) { setError(email, "Email no válido."); ok = false; }
+      else setError(email, "");
+
+      if (!msg.value.trim()) { setError(msg, "Escribe un mensaje breve."); ok = false; }
+      else setError(msg, "");
+      return ok;
     }
-    function prev(){ open((idx - 1 + items.length) % items.length); }
-    function next(){ open((idx + 1) % items.length); }
 
-    grid.addEventListener("click", (e) => {
-      const a = e.target.closest(".gallery-item");
-      if(!a) return;
-      e.preventDefault();
-      const i = items.indexOf(a);
-      if(i >= 0) open(i);
+    on(form, "submit", (e) => {
+      if (!validate()) {
+        e.preventDefault();
+        const firstErr = form.querySelector("[aria-invalid='true']");
+        firstErr?.focus();
+      }
     });
-    btnClose.addEventListener("click", close);
-    btnPrev.addEventListener("click", prev);
-    btnNext.addEventListener("click", next);
 
-    lb.addEventListener("click", (e) => { if(e.target === lb) close(); });
-
-    window.addEventListener("keydown", (e) => {
-      if(lb.hidden) return;
-      if(e.key === "Escape") close();
-      if(e.key === "ArrowLeft") prev();
-      if(e.key === "ArrowRight") next();
-    });
+    [name, phone, email, msg].forEach((el) => on(el, "input", () => setError(el, "")));
   })();
 
   // Miscelánea
@@ -278,6 +325,7 @@
     $$("a[target='_blank']").forEach((a) => {
       if (!/noopener/.test(a.rel)) a.rel = (a.rel ? a.rel + " " : "") + "noopener";
     });
+
     const map = $(".mapa iframe");
     if (map) {
       on(map, "error", () => {
@@ -288,32 +336,62 @@
     }
   })();
 
-  // Aviso 'síguenos' cuando el usuario llega al final
-(function followCTA(){
-  const footer = document.querySelector("footer");
-  const cta = document.getElementById("follow-cta");
-  if (!footer || !cta) return;
 
-  const closeBtn = cta.querySelector(".cta-close");
-  const hideCTA = () => {
-    cta.classList.remove("show");
-    sessionStorage.setItem("ctaDismissed","1");
-    setTimeout(() => { cta.hidden = true; }, 200);
-  };
-  closeBtn.addEventListener("click", hideCTA);
+  // Aviso 'síguenos' cuando el usuario llega al final (robusto)
+  (function followCTA(){
+    function init(){
+      const footer = document.querySelector("footer");
+      if (!footer) return;
 
-  // Muestra cuando el footer entra en pantalla (si no se ha cerrado ya)
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((en) => {
-      if (en.isIntersecting && !sessionStorage.getItem("ctaDismissed")) {
-        cta.hidden = false;
-        requestAnimationFrame(() => cta.classList.add("show"));
+      // Crear CTA si no existe
+      let cta = document.getElementById("follow-cta");
+      if (!cta) {
+        cta = document.createElement("div");
+        cta.className = "follow-cta";
+        cta.id = "follow-cta";
+        cta.hidden = true;
+        cta.innerHTML = `
+          <button class="cta-close" aria-label="Cerrar">&times;</button>
+          <p>¡No te olvides de seguirnos en nuestras RRSS!</p>
+          <div class="cta-actions">
+            <a href="https://www.instagram.com/barberia_hugo_" target="_blank" rel="noopener" class="btn-cta ig">
+              <img src="icons8-instagram.svg" alt="" aria-hidden="true"> Instagram
+            </a>
+            <a href="https://www.facebook.com/p/Hugo-Barberia-Campos-100058625056973/" target="_blank" rel="noopener" class="btn-cta fb">
+              <img src="icons8-facebook-nuevo.svg" alt="" aria-hidden="true"> Facebook
+            </a>
+          </div>
+        `;
+        document.body.appendChild(cta);
       }
-    });
-  }, { threshold: 0.1 });
 
-  io.observe(footer);
-})();
+      const closeBtn = cta.querySelector(".cta-close");
+      const hideCTA = () => {
+        cta.classList.remove("show");
+        sessionStorage.setItem("ctaDismissed","1");
+        setTimeout(() => { cta.hidden = true; }, 200);
+      };
+      closeBtn.addEventListener("click", hideCTA);
+
+      // Observer para mostrar al ver el footer
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting && !sessionStorage.getItem("ctaDismissed")) {
+            cta.hidden = false;
+            requestAnimationFrame(() => cta.classList.add("show"));
+          }
+        });
+      }, { threshold: 0.1 });
+
+      io.observe(footer);
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
 
 
 })();
