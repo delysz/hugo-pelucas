@@ -357,3 +357,47 @@
   })();
 
 })();
+
+// ===== GALERÍA: carrusel autoplay + controles =====
+(function galleryAutoplay(){
+  const wrap = document.querySelector(".gallery-carousel");
+  if(!wrap) return;
+  const slides = Array.from(wrap.querySelectorAll(".g-slide"));
+  if(slides.length === 0) return;
+
+  const prevBtn = wrap.querySelector(".g-prev");
+  const nextBtn = wrap.querySelector(".g-next");
+  let i = 0;
+  let timer = null;
+  const INTERVAL = 4000; // ms
+
+  function show(n){
+    slides.forEach((s, idx) => s.classList.toggle("active", idx === n));
+  }
+  function next(){ i = (i + 1) % slides.length; show(i); }
+  function prev(){ i = (i - 1 + slides.length) % slides.length; show(i); }
+
+  function start(){
+    stop();
+    timer = setInterval(next, INTERVAL);
+  }
+  function stop(){
+    if(timer) clearInterval(timer);
+    timer = null;
+  }
+
+  // init
+  show(i);
+  start();
+
+  // Controles
+  if(nextBtn) nextBtn.addEventListener("click", () => { next(); start(); });
+  if(prevBtn) prevBtn.addEventListener("click", () => { prev(); start(); });
+
+  // Pausa al pasar el ratón (solo desktop)
+  wrap.addEventListener("mouseenter", stop);
+  wrap.addEventListener("mouseleave", start);
+
+  // Si el usuario abre el lightbox (click en <a>), no tocamos nada: se abrirá encima
+})();
+
