@@ -1480,10 +1480,10 @@ header .slogan {
   justify-content: center;
   padding: .25rem;
   border: 2px solid var(--accent, #333);
-  border-radius: 9999px;              /* píldora/ovalado */
+  border-radius: 9999px;            
   background: #fff;
   cursor: pointer;
-  line-height: 0;                     /* evita espacio raro alrededor del img */
+  line-height: 0;                    
   transition: transform .15s ease, background .15s ease, color .15s ease, border-color .15s ease;
 }
 
@@ -1500,17 +1500,43 @@ header .slogan {
 /* La imagen de bandera: dale tamaño explícito */
 .lang-switch button img {
   display: block;
-  width: 28px;    /* ajusta a tu gusto: 24–32px suele ir bien */
-  height: 21px;   /* relación 4:3 */
+  width: 28px;    
+  height: 21px;   
   object-fit: cover;
-  border-radius: .25rem; /* esquinas suavitas al rectángulo */
+  border-radius: .25rem; 
 }
 
-/* Cuando el botón está activo, que la bandera no se “apague” */
+
 .lang-switch button[aria-pressed="true"] img {
   filter: none;
 }
 
-/* Si en tu CSS global hay algo como img{max-width:100%}, esto lo respeta. 
-   Si ves que se estira, quita max-width o añade: */
 .lang-switch button img { max-width: none; }
+
+.credits {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.6);
+  margin-top: 6px;
+}
+
+.credits a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.credits a:hover {
+  text-decoration: underline;
+}
+
+footer {
+  text-align: center;
+  padding: 20px 0;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.7);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  display: flex;             
+  flex-direction: column;     
+  align-items: center;
+  gap: 4px;                 
+}
+footer p { margin: 0; }       

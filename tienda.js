@@ -298,3 +298,5 @@ const CATALOG = [
   renderCart();
 
 })();
+
+console.log("%cSitio diseñado por delysz — https://github.com/delysz", "color: #f6c90e; font-size:14px;");
