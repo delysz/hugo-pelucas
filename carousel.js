@@ -764,34 +764,44 @@
     if (dtLabel) dtLabel.textContent = dict.svc_when_label;
     if (waBtn) waBtn.textContent = dict.svc_reserve_whatsapp;
 
-    // 3) Rehacer click de WhatsApp con textos traducidos y fecha local
-    waBtn?.addEventListener("click", (e) => {
-      // Evitar duplicar listeners: paramos propagación si ya procesado
-      e.stopImmediatePropagation?.();
-      const chosen = CATALOG_KEYS.filter((s) => selected.has(s.id));
-      if (!chosen.length) { alert("Selecciona al menos un servicio."); return; }
+   // 3) Click de WhatsApp (único y limpio)
+if (waBtn) {
+  // eliminar posibles listeners previos clonando el botón
+  const cleanBtn = waBtn.cloneNode(true);
+  waBtn.replaceWith(cleanBtn);
 
-      const dtVal = dtInput?.value ? new Date(dtInput.value) : null;
-      const whenTxt = dtVal ? `${formatDate(dtVal)} ${formatTime(dtVal)}` : (I18N[currentLang]?.svc_no_date || "—");
+  cleanBtn.addEventListener("click", () => {
+    const chosen = CATALOG_KEYS.filter((s) => selected.has(s.id));
+    if (!chosen.length) { alert("Selecciona al menos un servicio."); return; }
 
-      const lines = [
-        dict.svc_msg_header,
-        ...chosen.map((s) => `• ${(dict.svc_catalog[s.id] || s.id)} — ${formatEUR(s.price)}`),
-        `${dict.svc_msg_total} ${formatEUR(chosen.reduce((a, b) => a + b.price, 0))}`,
-        `${dict.svc_msg_when} ${whenTxt}`,
-        "",
-        dict.svc_msg_footer
-      ];
+    const dtVal = dtInput?.value ? new Date(dtInput.value) : null;
+    const whenTxt = dtVal ? `${formatDate(dtVal)} ${formatTime(dtVal)}`
+                          : (I18N[currentLang]?.svc_no_date || "—");
+
+    const lines = [
+      dict.svc_msg_header,
+      ...chosen.map((s) => `• ${(dict.svc_catalog[s.id] || s.id)} — ${formatEUR(s.price)}`),
+      `${dict.svc_msg_total} ${formatEUR(chosen.reduce((a, b) => a + b.price, 0))}`,
+      `${dict.svc_msg_when} ${whenTxt}`,
+      "",
+      dict.svc_msg_footer
+    ];
+
+    const waCTA = document.querySelector(".whatsapp-btn.grande");
+    const waHref = waCTA?.getAttribute("href") || "";
+    const waNumber = (waHref.match(/wa\.me\/(\d+)/) || [])[1] || "34123456789";
+
+    const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(lines.join("\n"))}`;
+    window.open(url, "_blank", "noopener");
+  });
+}
 
       // Tomamos el número actual desde el enlace existente (si lo tienes en tu HTML)
       const waCTA = document.querySelector(".whatsapp-btn.grande");
       const waHref = waCTA?.getAttribute("href") || "";
       const waNumber = (waHref.match(/wa\.me\/(\d+)/) || [])[1] || "34123456789";
 
-      const encode = (s) => encodeURIComponent(String(s ?? ""));
-      const url = `https://wa.me/${waNumber}?text=${encode(lines.join("\n"))}`;
-      window.open(url, "_blank", "noopener");
-    }, { once: true }); // importante: solo una vez
+    // (El resto del código de WhatsApp click handler ya está gestionado arriba)
   }
 
   // Eventos de la UI de idiomas
