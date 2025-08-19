@@ -1,6 +1,27 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Barbershop",
+    "name": "Barbería Hugo",
+    "image": "https://tudominio.com/logo-hugo.png",
+    "telephone": "+34 651 435 444",
+    "address": { "@type": "PostalAddress", "addressLocality": "Zaragoza", "addressCountry": "ES" },
+    "url": "https://tudominio.com",
+    "sameAs": [
+      "https://www.instagram.com/barberia_hugo_",
+      "https://www.facebook.com/p/Hugo-Barberia-Campos-100058625056973/"
+    ],
+    "openingHoursSpecification": [
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": "Monday", "opens": "16:00", "closes": "21:00" },
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday","Wednesday","Thursday","Friday"], "opens": "09:45", "closes": "21:00" }
+    ]
+  }
+  </script>
+
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Barbería Hugo | Cortes, Barba y Estilo en Zaragoza</title>
@@ -144,13 +165,55 @@
     </div>
   </section>
 
+    <!-- Sección Galería -->
+  <section id="galeria" class="container">
+    <div class="section-card">
+      <h2>Galería</h2>
+      <div class="gallery-grid">
+        <!-- EJEMPLOS: duplica/edita estos items con tus rutas y alts -->
+        <a href="galeria/01@2x.jpg" data-full="galeria/01@2x.jpg" class="gallery-item">
+          <picture>
+            <source srcset="galeria/01.webp" type="image/webp">
+            <img src="galeria/01.jpg" alt="Degradado fresco con navaja" loading="lazy" width="600" height="750">
+          </picture>
+        </a>
+
+        <a href="galeria/02@2x.jpg" data-full="galeria/02@2x.jpg" class="gallery-item">
+          <picture>
+            <source srcset="galeria/02.webp" type="image/webp">
+            <img src="galeria/02.jpg" alt="Arreglo de barba perfilada" loading="lazy" width="600" height="600">
+          </picture>
+        </a>
+
+        <a href="galeria/03@2x.jpg" data-full="galeria/03@2x.jpg" class="gallery-item">
+          <picture>
+            <source srcset="galeria/03.webp" type="image/webp">
+            <img src="galeria/03.jpg" alt="Corte clásico con peine y tijera" loading="lazy" width="600" height="750">
+          </picture>
+        </a>
+
+        <!-- añade más <a> ... </a> con tus fotos -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Lightbox -->
+  <div class="lightbox" hidden>
+    <button class="lb-close" aria-label="Cerrar">&times;</button>
+    <img class="lb-img" alt="">
+    <button class="lb-prev" aria-label="Anterior">&#10094;</button>
+    <button class="lb-next" aria-label="Siguiente">&#10095;</button>
+  </div>
+
+
   <!-- Sección Horario -->
   <section id="horario" class="container">
     <div class="section-card">
       <h2>Horario</h2>
-      <p>Lunes a Viernes: 10:00 - 14:00 / 16:00 - 20:00</p>
-      <p>Sábados: 9:00 - 14:00</p>
-      <p>Domingos: Cerrado</p>
+      <p>Lunes: 16:00 – 21:00</p>
+      <p>Martes a Viernes: 9:45 – 14:00 / 16:00 – 21:00</p>
+      <p>Sábados y Domingos: Cerrado</p>
+      <blockquote class="horario-cita">"El tiempo dedicado a ti mismo nunca es tiempo perdido"</blockquote>
     </div>
   </section>
 
@@ -160,17 +223,10 @@
       <h2>Contacto</h2>
       <p>Tu barbería de confianza a un mensaje 👇</p>
       <div class="whatsapp-destacado">
-            <a href="https://wa.me/34600000000" class="whatsapp-btn verde">
-                <i class="fa-brands fa-whatsapp"></i> WhatsApp
-            </a>
-        </div>
-      <div class="mapa">
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d288.73347942871184!2d-0.8416875!3d41.7171032!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd5913f43ccc04cd%3A0x4da72e0dc8f80c29!2sBarberia%20Hugo!5e0!3m2!1ses!2ses!4v1692128888888"
-          width="100%" height="300" style="border:0; border-radius:10px;"
-          allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
-        </iframe>
-        <p>Estamos en la entrada de la avenida principal de San Juan, fácil aparcamiento en las inmediaciones</p>
+        <!-- AÑADIDO class 'grande' y número actualizado -->
+        <a href="https://wa.me/34651435444" class="whatsapp-btn verde grande">
+          <i class="fa-brands fa-whatsapp"></i> WhatsApp
+        </a>
       </div>
       <form class="contact-form">
         <label for="nombre">Nombre</label>
@@ -187,6 +243,15 @@
 
         <button type="submit">Enviar</button>
       </form>
+      <h2>donde Estamos</h2>
+      <div class="mapa">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d288.73347942871184!2d-0.8416875!3d41.7171032!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd5913f43ccc04cd%3A0x4da72e0dc8f80c29!2sBarberia%20Hugo!5e0!3m2!1ses!2ses!4v1692128888888"
+          width="100%" height="300" style="border:0; border-radius:10px;"
+          allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+        <p>Estamos en la entrada de la avenida principal de San Juan, fácil aparcamiento en las inmediaciones</p>
+      </div>
     </div>
   </section>
 
@@ -196,18 +261,19 @@
   </footer>
 
   <script src="carousel.js"></script>
-<!-- WhatsApp flotante -->
-    <a href="https://wa.me/34600000000" class="whatsapp-float" target="_blank" aria-label="WhatsApp">
-  <img src="whatsapp_101778.svg" alt="WhatsApp" />
-</a>
-<!-- Instagram flotante -->
-<a href="https://www.instagram.com/barberia_hugo_" class="social-float instagram" target="_blank" aria-label="Instagram">
-  <img src="icons8-instagram.svg" alt="Instagram" />
-</a>
 
-<!-- Facebook flotante -->
-<a href="https://www.facebook.com/p/Hugo-Barberia-Campos-100058625056973/" class="social-float facebook" target="_blank" aria-label="Facebook">
-  <img src="icons8-facebook-nuevo.svg" alt="Facebook" />
-</a>
+  <!-- WhatsApp flotante (NÚMERO ACTUALIZADO) -->
+  <a href="https://wa.me/34651435444" class="whatsapp-float" target="_blank" aria-label="WhatsApp">
+    <img src="icons8-whatsapp.svg" alt="WhatsApp" />
+  </a>
+  <!-- Instagram flotante -->
+  <a href="https://www.instagram.com/barberia_hugo_" class="social-float instagram" target="_blank" aria-label="Instagram">
+    <img src="icons8-instagram.svg" alt="Instagram" />
+  </a>
+
+  <!-- Facebook flotante -->
+  <a href="https://www.facebook.com/p/Hugo-Barberia-Campos-100058625056973/" class="social-float facebook" target="_blank" aria-label="Facebook">
+    <img src="icons8-facebook-nuevo.svg" alt="Facebook" />
+  </a>
 </body>
 </html>

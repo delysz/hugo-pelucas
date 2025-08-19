@@ -254,6 +254,15 @@ header { padding-top:120px; }
     var(--card);
 }
 
+/* Cita personalizada del horario */
+.horario-cita {
+  margin-top: 16px;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--accent);
+  opacity: 0.9;
+}
+
 /* ---------- Contacto ---------- */
 #contacto .section-card{ display:grid; gap:26px; padding:36px; }
 #contacto p{ margin:.6rem 0; line-height:1.6; }
@@ -423,16 +432,17 @@ body, html{
   position: fixed;
   right: 20px;
   border-radius: 50%;
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   display: flex;
   justify-content: center;
   align-items: center;
   color: #fff;
-  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   z-index: 2000;
 }
+
 
 /* Hover común */
 .whatsapp-float:hover,
@@ -445,12 +455,69 @@ body, html{
 .whatsapp-float img,
 .whatsapp-float svg,
 .social-float i {
-  width: 68px;
-  height: 68px;
-  font-size: 28px;
+  width: 32px;
+  height: 32px;
+  font-size: 20px;
 }
+
 
 /* Colores individuales */
 .whatsapp-float { bottom: 20px; background: linear-gradient(90deg, #25D366 0%, #1ebe5a 100%); }
 .social-float.instagram { bottom: 92px; background: radial-gradient(circle at 30% 30%, #feda75, #d62976, #962fbf, #4f5bd5); }
 .social-float.facebook  { bottom: 164px; background: #1877F2; }
+
+/* ===== Galería ===== */
+.gallery-grid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:14px;
+  width:100%;
+  max-width: 1000px;
+}
+@media (max-width: 900px){ .gallery-grid{ grid-template-columns: repeat(2, 1fr);} }
+@media (max-width: 560px){ .gallery-grid{ grid-template-columns: 1fr; } }
+
+.gallery-item{
+  display:block;
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  background: var(--card);
+  box-shadow: 0 6px 18px rgba(0,0,0,.30);
+  transform: translateZ(0);
+}
+.gallery-item img{
+  width:100%; height:auto; display:block;
+  transition: transform .25s ease, filter .25s ease;
+}
+.gallery-item:hover img{ transform: scale(1.03); filter: saturate(1.05); }
+
+/* Lightbox */
+.lightbox{
+  position:fixed; inset:0;
+  display:grid; place-items:center;
+  background: rgba(0,0,0,.85);
+  z-index:3000;
+}
+.lightbox[hidden]{ display:none; }
+.lb-img{
+  max-width: min(92vw, 1200px);
+  max-height: 86vh;
+  border-radius:12px;
+  box-shadow: 0 10px 32px rgba(0,0,0,.55);
+}
+.lb-close, .lb-prev, .lb-next{
+  position: fixed;
+  background: rgba(0,0,0,.5);
+  color:#fff;
+  border:1px solid var(--border);
+  width:44px; height:44px; border-radius:50%;
+  display:grid; place-items:center;
+  font-size:1.4rem; cursor:pointer;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+  transition:transform .2s ease, background .2s ease;
+}
+.lb-close{ top:18px; right:18px; }
+.lb-prev{ left:18px; top:50%; transform: translateY(-50%); }
+.lb-next{ right:18px; top:50%; transform: translateY(-50%); }
+.lb-prev:hover, .lb-next:hover, .lb-close:hover{ background: var(--accent); color:#111; transform: scale(1.05); }
