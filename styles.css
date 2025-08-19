@@ -259,7 +259,6 @@ header { padding-top:120px; }
 #contacto p{ margin:.6rem 0; line-height:1.6; }
 .whatsapp-destacado{ text-align:center; margin:12px 0 6px; }
 .whatsapp-btn.grande{
-
   background:linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
   color:#111; font-weight:900; letter-spacing:.3px;
   padding:16px 26px; border-radius:14px; display:inline-flex; gap:10px; align-items:center;
@@ -334,6 +333,7 @@ body, html{
   scroll-behavior:smooth;
   overflow-x:hidden;
 }
+
 /* ====== Servicios con iconos (Font Awesome) ====== */
 .servicios-lista{
   list-style:none;
@@ -343,7 +343,7 @@ body, html{
   flex-direction:column;
   gap:14px;
   font-size:1.06rem;
-  text-align:left;            /* evita el centrado dentro de la card */
+  text-align:left;
   width:100%;
 }
 
@@ -367,7 +367,7 @@ body, html{
 
 .servicios-lista .fa-solid{
   font-size:1.25rem;
-  width:1.25rem;              /* fija ancho para alinear texto */
+  width:1.25rem;
   color:var(--accent);
   filter:drop-shadow(0 1px 2px rgba(0,0,0,.25));
 }
@@ -375,6 +375,7 @@ body, html{
 .servicios-lista li:hover .fa-solid{
   color:#111;
 }
+
 /* ====== Sección contacto mejor alineada ====== */
 #contacto .section-card {
   display: flex;
@@ -400,87 +401,56 @@ body, html{
   background: linear-gradient(90deg, #25D366 0%, #1ebe5a 100%);
   color: #fff;
   font-weight: 800;
-  letter-spacing: .4px;
-  padding: 18px 34px;
+  letter-spacing: .3px;
+  padding: 14px 24px;
   border-radius: 14px;
   display: inline-flex;
+  gap: 10px;
   align-items: center;
-  gap: 12px;
-  font-size: 1.2rem;
   border: none;
-  box-shadow: 0 12px 28px rgba(37, 211, 102, 0.45);
-  transition: transform .2s ease, box-shadow .2s ease, background .2s ease, filter .2s ease;
+  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+  transition: transform .15s ease, filter .2s ease, box-shadow .2s ease;
 }
-
-.whatsapp-btn.verde i {
-  font-size: 1.5rem;
-}
-
 .whatsapp-btn.verde:hover {
-  transform: translateY(-3px) scale(1.03);
-  box-shadow: 0 16px 36px rgba(37, 211, 102, 0.55);
-  background: linear-gradient(90deg, #2ce76f 0%, #20c15c 100%);
-  filter: brightness(1.05);
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+  box-shadow: 0 12px 32px rgba(37, 211, 102, 0.5);
 }
 
-header .whatsapp-btn.grande {
-  margin-top: 16px;
-}
-
-/* Botón WhatsApp flotante */
-.whatsapp-float {
+/* ---------- Botones flotantes unificados ---------- */
+.whatsapp-float,
+.social-float {
   position: fixed;
-  bottom: 20px;
   right: 20px;
-  background: linear-gradient(90deg, #25D366 0%, #1ebe5a 100%);
-  color: #fff;
   border-radius: 50%;
   width: 64px;
   height: 64px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 2rem;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   z-index: 2000;
-  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.45);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-.whatsapp-float:hover {
-  transform: translateY(-4px) scale(1.08);
-  box-shadow: 0 12px 32px rgba(37, 211, 102, 0.55);
-  background: linear-gradient(90deg, #2ce76f 0%, #20c15c 100%);
+/* Hover común */
+.whatsapp-float:hover,
+.social-float:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 28px rgba(0,0,0,.45);
 }
 
-/* ===== Navegación: en una sola fila en móviles con scroll horizontal ===== */
-@media (max-width: 720px){
-  nav{ height:64px; }                            /* nav un poco más bajo */
-  nav .nav-inner{
-    max-width:none;
-    padding:8px 12px;
-    gap:12px;
-    justify-content:flex-start;
-    flex-wrap:nowrap;                            /* evita salto de línea */
-    overflow-x:auto;                             /* permite desplazamiento lateral */
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;                        /* oculta barra en Firefox */
-    mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%); /* borde suave */
-  }
-  nav .nav-inner::-webkit-scrollbar{ display:none; } /* oculta barra en WebKit */
-
-  nav a{
-    flex:0 0 auto;                               /* cada item conserva su ancho */
-    font-size:.95rem;
-    padding:8px 10px;
-  }
-  nav a::after{ bottom:4px; }
-
-  /* Compensa el nav fijo para los anclajes */
-  header{ padding-top:104px; }
-  #carrusel, #servicios, #horario, #contacto{ scroll-margin-top:74px; }
-}
-
-.whatsapp-float img {
+/* Iconos dentro */
+.whatsapp-float img,
+.whatsapp-float svg,
+.social-float i {
   width: 68px;
   height: 68px;
+  font-size: 28px;
 }
+
+/* Colores individuales */
+.whatsapp-float { bottom: 20px; background: linear-gradient(90deg, #25D366 0%, #1ebe5a 100%); }
+.social-float.instagram { bottom: 92px; background: radial-gradient(circle at 30% 30%, #feda75, #d62976, #962fbf, #4f5bd5); }
+.social-float.facebook  { bottom: 164px; background: #1877F2; }
