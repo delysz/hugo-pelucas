@@ -28,20 +28,10 @@
       items.forEach((el, k) => el.classList.toggle("active", k === i));
       idx = i;
     }
-    function next() {
-      show((idx + 1) % items.length);
-    }
-    function prev() {
-      show((idx - 1 + items.length) % items.length);
-    }
-    function play() {
-      stop();
-      timer = setInterval(next, DURATION);
-    }
-    function stop() {
-      if (timer) clearInterval(timer);
-      timer = null;
-    }
+    function next() { show((idx + 1) % items.length); }
+    function prev() { show((idx - 1 + items.length) % items.length); }
+    function play() { stop(); timer = setInterval(next, DURATION); }
+    function stop() { if (timer) clearInterval(timer); timer = null; }
 
     on(prevBtn, "click", () => { prev(); play(); });
     on(nextBtn, "click", () => { next(); play(); });
@@ -114,7 +104,6 @@
   (function services() {
     const host = $("#servicios");
     if (!host) return;
-
     if (host.querySelector(".svc-wrap")) return;
 
     const CATALOG = [
@@ -147,57 +136,18 @@
 
     const style = document.createElement("style");
     style.textContent = `
-      .svc-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 14px;
-        margin-bottom: 16px;
-      }
-      .svc-card {
-        border: 2px solid #f6c90e;
-        border-radius: 12px;
-        padding: 14px;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        box-shadow: 0 2px 12px rgba(26,34,56,0.06);
-        background: #fff;
-      }
-      .svc-card h3 {
-        margin: 0;
-        font-size: 1.05rem;
-        color: #232946;
-      }
-      .svc-card .price {
-        font-weight: 700; color: #232946;
-      }
-      .svc-card button {
-        align-self: flex-start;
-        background: #232946; color:#fff; border: 2px solid #f6c90e;
-        padding: 8px 10px; border-radius: 8px; cursor: pointer; font-weight: 700;
-      }
+      .svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 16px; }
+      .svc-card { border: 2px solid #f6c90e; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 12px rgba(26,34,56,0.06); background: #fff; }
+      .svc-card h3 { margin: 0; font-size: 1.05rem; color: #232946; }
+      .svc-card .price { font-weight: 700; color: #232946; }
+      .svc-card button { align-self: flex-start; background: #232946; color:#fff; border: 2px solid #f6c90e; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-weight: 700; }
       .svc-card button.active { background: #f6c90e; color:#232946; }
-      .svc-bar {
-        display: grid;
-        grid-template-columns: 1fr auto auto;
-        gap: 12px;
-        align-items: center;
-        border-top: 3px solid #f6c90e;
-        padding-top: 14px;
-      }
+      .svc-bar { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; border-top: 3px solid #f6c90e; padding-top: 14px; }
       .svc-when label { display:block; font-weight:700; margin-bottom:6px; color:#232946;}
-      .svc-dt {
-        padding: 10px; border-radius: 6px; border:1.5px solid #232946; background:#f5f6fa;
-      }
+      .svc-dt { padding: 10px; border-radius: 6px; border:1.5px solid #232946; background:#f5f6fa; }
       .svc-total { font-size:1.1rem; }
-      .svc-wa {
-        background: linear-gradient(90deg, #f6c90e 0%, #232946 100%);
-        color:#232946; border: 2px solid #f6c90e; border-radius: 10px; padding: 10px 14px; font-weight: 800; cursor: pointer;
-      }
-      @media (max-width:720px){
-        .svc-bar { grid-template-columns: 1fr; }
-        .svc-total { justify-self: start; }
-      }
+      .svc-wa { background: linear-gradient(90deg, #f6c90e 0%, #232946 100%); color:#232946; border: 2px solid #f6c90e; border-radius: 10px; padding: 10px 14px; font-weight: 800; cursor: pointer; }
+      @media (max-width:720px){ .svc-bar { grid-template-columns: 1fr; } .svc-total { justify-self: start; } }
     `;
     document.head.appendChild(style);
 
@@ -232,18 +182,13 @@
     }
 
     function updateTotal() {
-      const total = CATALOG
-        .filter((s) => selected.has(s.id))
-        .reduce((a, b) => a + b.price, 0);
+      const total = CATALOG.filter((s) => selected.has(s.id)).reduce((a, b) => a + b.price, 0);
       amountEl.textContent = formatEUR(total);
     }
 
     on(waBtn, "click", () => {
       const chosen = CATALOG.filter((s) => selected.has(s.id));
-      if (!chosen.length) {
-        alert("Selecciona al menos un servicio.");
-        return;
-      }
+      if (!chosen.length) { alert("Selecciona al menos un servicio."); return; }
       const dtVal = dtInput.value ? new Date(dtInput.value) : null;
       const whenTxt = dtVal
         ? `${dtVal.toLocaleDateString("es-ES")} ${dtVal.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`
@@ -265,77 +210,79 @@
     updateTotal();
   })();
 
-  // Validaciones suaves del formulario de contacto
-  (function contactForm() {
-    const form = $(".contact-form");
-    if (!form) return;
+  // ===== Lightbox para galería =====
+  (function galleryLightbox(){
+    function init(){
+      const grid = document.querySelector(".gallery-grid");
+      if(!grid) return;
 
-    const name = $("#nombre", form);
-    const phone = $("#telefono", form);
-    const email = $("#email", form);
-    const msg = $("#mensaje", form);
-
-    function setError(input, text) {
-      let box = input.parentElement.querySelector(".error-msg");
-      if (!box) {
-        box = document.createElement("div");
-        box.className = "error-msg";
-        box.style.color = "#b00020";
-        box.style.fontSize = "0.9em";
-        box.style.marginTop = "4px";
-        input.parentElement.appendChild(box);
+      // crear contenedor si no existe
+      let lb = document.querySelector(".lightbox");
+      if(!lb){
+        lb = document.createElement("div");
+        lb.className = "lightbox";
+        lb.setAttribute("hidden","");
+        lb.innerHTML = `
+          <button class="lb-close" aria-label="Cerrar">&times;</button>
+          <img class="lb-img" alt="">
+          <button class="lb-prev" aria-label="Anterior">&#10094;</button>
+          <button class="lb-next" aria-label="Siguiente">&#10095;</button>
+        `;
+        document.body.appendChild(lb);
       }
-      box.textContent = text || "";
-      if (text) input.setAttribute("aria-invalid", "true");
-      else input.removeAttribute("aria-invalid");
-    }
 
-    const reMail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const rePhone = /^[0-9\s+().-]{9,}$/;
+      const imgEl = lb.querySelector(".lb-img");
+      const btnClose = lb.querySelector(".lb-close");
+      const btnPrev = lb.querySelector(".lb-prev");
+      const btnNext = lb.querySelector(".lb-next");
 
-    function validate() {
-      let ok = true;
-      if (!name.value.trim()) { setError(name, "Por favor, dinos tu nombre."); ok = false; }
-      else setError(name, "");
+      const items = Array.from(grid.querySelectorAll(".gallery-item"));
+      let idx = -1;
 
-      if (!rePhone.test(phone.value.trim())) { setError(phone, "Teléfono no válido."); ok = false; }
-      else setError(phone, "");
+      function open(i){
+        idx = i;
+        const a = items[idx];
+        const full = a.getAttribute("data-full") || a.getAttribute("href");
+        const alt = a.querySelector("img")?.getAttribute("alt") || "";
+        imgEl.src = full;
+        imgEl.alt = alt;
+        lb.hidden = false;
+        document.body.style.overflow = "hidden";
+      }
+      function close(){
+        lb.hidden = true;
+        imgEl.src = "";
+        document.body.style.overflow = "";
+      }
+      const prev = () => open((idx - 1 + items.length) % items.length);
+      const next = () => open((idx + 1) % items.length);
 
-      if (!reMail.test(email.value.trim())) { setError(email, "Email no válido."); ok = false; }
-      else setError(email, "");
-
-      if (!msg.value.trim()) { setError(msg, "Escribe un mensaje breve."); ok = false; }
-      else setError(msg, "");
-      return ok;
-    }
-
-    on(form, "submit", (e) => {
-      if (!validate()) {
+      grid.addEventListener("click", (e) => {
+        const a = e.target.closest(".gallery-item");
+        if(!a) return;
         e.preventDefault();
-        const firstErr = form.querySelector("[aria-invalid='true']");
-        firstErr?.focus();
-      }
-    });
+        const i = items.indexOf(a);
+        if(i >= 0) open(i);
+      });
+      btnClose.addEventListener("click", close);
+      btnPrev.addEventListener("click", prev);
+      btnNext.addEventListener("click", next);
+      lb.addEventListener("click", (e) => { if(e.target === lb) close(); });
 
-    [name, phone, email, msg].forEach((el) => on(el, "input", () => setError(el, "")));
-  })();
-
-  // Miscelánea
-  (function misc() {
-    $$("a[target='_blank']").forEach((a) => {
-      if (!/noopener/.test(a.rel)) a.rel = (a.rel ? a.rel + " " : "") + "noopener";
-    });
-
-    const map = $(".mapa iframe");
-    if (map) {
-      on(map, "error", () => {
-        const backup = document.createElement("p");
-        backup.innerHTML = `<a href="https://www.google.com/maps?q=41.7171479,-0.8414919" target="_blank">Abrir mapa en Google Maps</a>`;
-        map.replaceWith(backup);
+      window.addEventListener("keydown", (e) => {
+        if(lb.hidden) return;
+        if(e.key === "Escape") close();
+        if(e.key === "ArrowLeft") prev();
+        if(e.key === "ArrowRight") next();
       });
     }
-  })();
 
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
 
   // Aviso 'síguenos' cuando el usuario llega al final (robusto)
   (function followCTA(){
@@ -393,5 +340,20 @@
     }
   })();
 
+  // Miscelánea
+  (function misc() {
+    $$("a[target='_blank']").forEach((a) => {
+      if (!/noopener/.test(a.rel)) a.rel = (a.rel ? a.rel + " " : "") + "noopener";
+    });
+
+    const map = $(".mapa iframe");
+    if (map) {
+      on(map, "error", () => {
+        const backup = document.createElement("p");
+        backup.innerHTML = `<a href="https://www.google.com/maps?q=41.7171479,-0.8414919" target="_blank">Abrir mapa en Google Maps</a>`;
+        map.replaceWith(backup);
+      });
+    }
+  })();
 
 })();
