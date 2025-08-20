@@ -19,40 +19,17 @@
 
 <body>
   <header class="shop-header">
-    <a href="index.html" class="brand" aria-label="Volver al inicio">
-      <img src="logo-hugo.png" alt="Barbería Hugo logo">
-      <span>Barbería Hugo</span>
+    <!-- Botón "Volver a la web" como marca centrada -->
+    <a href="index.html" class="brand" aria-label="Volver a la web">
+      <img src="logo-hugo.png" alt="Barbería Hugo">
+      <span>Volver a la web</span>
     </a>
 
-    <nav class="shop-nav" aria-label="Navegación principal">
-      <a href="index.html#carrusel" data-i18n="nav_home">Inicio</a>
-      <a href="index.html#servicios" data-i18n="nav_services">Servicios</a>
-      <a href="index.html#galeria" data-i18n="nav_gallery">Galería</a>
-      <a href="index.html#horario" data-i18n="nav_hours">Horario</a>
-      <a href="index.html#contacto" data-i18n="nav_contact">Contacto</a>
-      <a href="tienda.html" class="active" aria-current="page">Tienda</a>
-
-      <!-- Selector de idioma (mismo de index) -->
-      <div class="lang-switch" aria-label="Cambiar idioma">
-        <button type="button" data-lang="es" aria-pressed="true">
-          <img src="4x3/es.svg" alt="Español">
-        </button>
-        <button type="button" data-lang="en" aria-pressed="false">
-          <img src="4x3/gb.svg" alt="English">
-        </button>
-        <button type="button" data-lang="fr" aria-pressed="false">
-          <img src="4x3/fr.svg" alt="Français">
-        </button>
-        <button type="button" data-lang="de" aria-pressed="false">
-          <img src="4x3/de.svg" alt="Deutsch">
-        </button>
-      </div>
-
-      <button class="cart-btn" aria-label="Abrir carrito" id="openCart">
-        <i class="fa-solid fa-bag-shopping"></i>
-        <span class="cart-count" id="cartCount">0</span>
-      </button>
-    </nav>
+    <!-- Carrito (necesita este id para funcionar con tienda.js) -->
+    <button class="cart-btn" aria-label="Abrir carrito" id="openCart">
+      <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+      <span class="cart-count" id="cartCount">0</span>
+    </button>
   </header>
 
   <main class="container">
@@ -159,7 +136,7 @@
       <button class="chat-send" aria-label="Enviar">➤</button>
     </form>
   </section>
-  
+
 </body>
 
 </html>

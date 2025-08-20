@@ -850,20 +850,23 @@
     // (El resto del código de WhatsApp click handler ya está gestionado arriba)
   }
 
-  // Eventos de la UI de idiomas
+  // Eventos de la UI de idiomas (delegación robusta)
   function bindLangSwitch() {
-    const btns = $$(".lang-switch [data-lang]");
-    if (!btns.length) return;
-    btns.forEach(btn => {
-      btn.addEventListener("click", () => {
-        const next = btn.getAttribute("data-lang");
-        if (!I18N[next]) return;
-        currentLang = next;
-        localStorage.setItem("lang", currentLang);
-        applyI18n(currentLang);
-      });
+    const wrap = document.querySelector(".lang-switch");
+    if (!wrap) return;
+
+    wrap.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-lang]");
+      if (!btn || !wrap.contains(btn)) return;
+      const next = btn.getAttribute("data-lang");
+      if (!I18N[next]) return;
+
+      currentLang = next;
+      localStorage.setItem("lang", currentLang);
+      applyI18n(currentLang);
     });
   }
+
 
   // Inicializar
   function initI18n() {
@@ -883,26 +886,26 @@
 })();
 
 // WOW: tilt suave del logo en el hero (respeta reduced-motion)
-(function tiltHero(){
+(function tiltHero() {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduce) return;
   const hero = document.querySelector("header");
   const logo = document.querySelector(".logo-barber");
   if (!hero || !logo) return;
 
-  hero.addEventListener("mousemove", (e)=>{
+  hero.addEventListener("mousemove", (e) => {
     const r = hero.getBoundingClientRect();
-    const x = (e.clientX - r.left)/r.width - .5;
-    const y = (e.clientY - r.top)/r.height - .5;
-    logo.style.transform = `rotateX(${(-y*6)}deg) rotateY(${x*6}deg) translateZ(0)`;
+    const x = (e.clientX - r.left) / r.width - .5;
+    const y = (e.clientY - r.top) / r.height - .5;
+    logo.style.transform = `rotateX(${(-y * 6)}deg) rotateY(${x * 6}deg) translateZ(0)`;
   });
-  hero.addEventListener("mouseleave", ()=> {
+  hero.addEventListener("mouseleave", () => {
     logo.style.transform = "rotateX(0) rotateY(0)";
   });
 })();
 
 // WOW: scroll progress (respeta reduced-motion)
-(function scrollProgress(){
+(function scrollProgress() {
   const bar = document.getElementById("scrollProgress");
   if (!bar) return;
   const update = () => {
@@ -913,7 +916,7 @@
     bar.style.width = pct + "%";
   };
   update();
-  window.addEventListener("scroll", update, { passive:true });
+  window.addEventListener("scroll", update, { passive: true });
   window.addEventListener("resize", update);
 })();
 

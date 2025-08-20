@@ -185,7 +185,10 @@
   function openCart() { drawer.setAttribute("aria-hidden", "false"); drawer.querySelector(".cart-panel").focus?.(); }
   function closeCart() { drawer.setAttribute("aria-hidden", "true"); }
 
-  on(openBtn, "click", openCart);
+  on(openBtn, "click", () => {
+    const isOpen = drawer.getAttribute("aria-hidden") === "false";
+    if (isOpen) closeCart(); else openCart();
+  });
   on(closeBtn, "click", closeCart);
   on(backdrop, "click", closeCart);
   on(drawer, "keydown", (e) => { if (e.key === "Escape") closeCart(); });

@@ -114,20 +114,22 @@
     <a href="#contacto" data-i18n="nav_contact">Contacto</a>
     <a href="tienda.html">Tienda</a>
 
-    <!-- Selector de idioma con banderas -->
-    <div class="lang-switch" aria-label="Cambiar idioma">
-      <button type="button" data-lang="es" aria-pressed="true">
-        <img src="4x3/es.svg" alt="Español">
+    <div class="lang-group" aria-expanded="false">
+      <button class="lang-toggle" type="button" aria-haspopup="true" aria-expanded="false" title="Cambiar idioma">
+        <img id="lang-current" src="4x3/es.svg" alt="Idioma actual: Español" width="24" height="18">
+        <span class="caret" aria-hidden="true">▾</span>
       </button>
-      <button type="button" data-lang="en" aria-pressed="false">
-        <img src="4x3/gb.svg" alt="English">
-      </button>
-      <button type="button" data-lang="fr" aria-pressed="false">
-        <img src="4x3/fr.svg" alt="Français">
-      </button>
-      <button type="button" data-lang="de" aria-pressed="false">
-        <img src="4x3/de.svg" alt="Deutsch">
-      </button>
+
+      <div class="lang-menu" role="menu" aria-label="Elegir idioma">
+        <button class="lang-btn" type="button" data-lang="es" aria-pressed="true" role="menuitem"><img src="4x3/es.svg"
+            alt="Español"></button>
+        <button class="lang-btn" type="button" data-lang="en" aria-pressed="false" role="menuitem"><img src="4x3/gb.svg"
+            alt="English"></button>
+        <button class="lang-btn" type="button" data-lang="fr" aria-pressed="false" role="menuitem"><img src="4x3/fr.svg"
+            alt="Français"></button>
+        <button class="lang-btn" type="button" data-lang="de" aria-pressed="false" role="menuitem"><img src="4x3/de.svg"
+            alt="Deutsch"></button>
+      </div>
     </div>
   </nav>
 
@@ -630,73 +632,94 @@
       showSlide(current);
     });
   </script>
-
-  <!-- ===== Traducciones ===== -->
+  <!-- ===== Traducciones (reemplazo completo) ===== -->
   <script>
     const T = {
       es: {
+        // NAV / TITULARES
         nav_home: "Inicio",
         nav_services: "Servicios",
+        nav_gallery: "Galería",
         nav_hours: "Horario",
         nav_contact: "Contacto",
+        // HERO
         hero_title: "Barbería Hugo",
-        hero_sub: "Cortes clásicos y modernos en Campos",
-        services_title: "Servicios",
+        tagline: "Donde el estilo se convierte en identidad",
+        // CARRUSEL / GALERÍA
+        reviews_title: "Lo que nuestros clientes dicen",
+        gallery_title: "Galería",
+        // HORARIO
         hours_title: "Horario",
-        hours_text: "Lunes - Viernes: 9:00 - 20:00",
+        hours_mon: "Lunes: 16:00 – 21:00",
+        hours_week: "Martes a Viernes: 9:45 – 14:00 / 16:00 – 21:00",
+        hours_weekend: "Sábados y Domingos: Cerrado",
+        hours_quote: "«El tiempo dedicado a ti mismo nunca es tiempo perdido»",
+        // CONTACTO
         contact_title: "Contacto",
-        contact_whatsapp: "Reservar por WhatsApp",
-        svc_add: "Añadir",
-        svc_remove: "Quitar",
-        svc_pick_dt: "Fecha y hora preferida",
-        svc_total: "Total:",
-        svc_book: "Reservar por WhatsApp",
-        svc_alert: "Selecciona al menos un servicio.",
-        svc_hello: "Hola, me gustaría reservar:",
-        svc_approx: "Total aprox.:",
-        svc_when: "Fecha/hora preferida:",
-        svc_availability: "¿Hay disponibilidad? ¡Gracias!",
-        services_catalog: {
-          corte: { name: "Corte clásico" },
-          fade: { name: "Corte fade" },
-          barba: { name: "Arreglo de barba" },
-          afeitado: { name: "Afeitado a navaja" },
-          combo: { name: "Corte + Barba" },
-          nino: { name: "Corte niño" }
-        }
+        contact_blurb: "Encuéntranos en San Juan de Mozarrifar, Zaragoza. Llámanos, escríbenos por WhatsApp o ven a visitarnos.",
+        btn_whatsapp: "WhatsApp",
+        btn_directions: "Cómo llegar",
+        // FOOTER
+        footer_copy: "© 2025 Barbería Hugo — Todos los derechos reservados",
+        // META
+        meta_title: "Barbería Hugo | Cortes, Barba y Estilo en Zaragoza",
+        meta_desc: "Barbería Hugo en Zaragoza. Cortes clásicos y modernos, afeitado a navaja y arreglos de barba. Reserva fácil por WhatsApp."
       },
       en: {
         nav_home: "Home",
         nav_services: "Services",
+        nav_gallery: "Gallery",
         nav_hours: "Hours",
         nav_contact: "Contact",
         hero_title: "Hugo Barbershop",
-        hero_sub: "Classic & modern cuts in Campos",
-        services_title: "Services",
+        tagline: "Where style becomes identity",
+        reviews_title: "What our clients say",
+        gallery_title: "Gallery",
         hours_title: "Opening Hours",
-        hours_text: "Monday - Friday: 9:00 - 20:00",
+        hours_mon: "Monday: 16:00 – 21:00",
+        hours_week: "Tue–Fri: 9:45 – 14:00 / 16:00 – 21:00",
+        hours_weekend: "Sat & Sun: Closed",
+        hours_quote: "“Time spent on yourself is never wasted”",
         contact_title: "Contact",
-        contact_whatsapp: "Book on WhatsApp",
-        svc_add: "Add",
-        svc_remove: "Remove",
-        svc_pick_dt: "Preferred date & time",
-        svc_total: "Total:",
-        svc_book: "Book on WhatsApp",
-        svc_alert: "Please select at least one service.",
-        svc_hello: "Hello, I’d like to book:",
-        svc_approx: "Approx. total:",
-        svc_when: "Preferred date/time:",
-        svc_availability: "Is there availability? Thanks!",
-        services_catalog: {
-          corte: { name: "Classic haircut" },
-          fade: { name: "Fade haircut" },
-          barba: { name: "Beard trim" },
-          afeitado: { name: "Straight razor shave" },
-          combo: { name: "Haircut + Beard" },
-          nino: { name: "Kids cut" }
-        }
+        contact_blurb: "Find us in San Juan de Mozarrifar, Zaragoza. Call us, write on WhatsApp or come visit.",
+        btn_whatsapp: "WhatsApp",
+        btn_directions: "Directions",
+        footer_copy: "© 2025 Barbería Hugo — All rights reserved",
+        meta_title: "Hugo Barbershop | Cuts, Beard & Style in Zaragoza",
+        meta_desc: "Classic and modern cuts, straight razor shaves and beard trims. Easy booking via WhatsApp."
+      },
+      fr: {
+        nav_home: "Accueil",
+        nav_services: "Services",
+        nav_gallery: "Galerie",
+        nav_hours: "Horaires",
+        nav_contact: "Contact",
+        hero_title: "Barbier Hugo",
+        tagline: "Là où le style devient identité",
+        reviews_title: "Ce que disent nos clients",
+        gallery_title: "Galerie",
+        hours_title: "Horaires",
+        hours_mon: "Lundi : 16:00 – 21:00",
+        hours_week: "Mar–Ven : 9:45 – 14:00 / 16:00 – 21:00",
+        hours_weekend: "Sam & Dim : Fermé",
+        hours_quote: "« Le temps consacré à soi-même n’est jamais perdu »",
+        contact_title: "Contact",
+        contact_blurb: "Nous sommes à San Juan de Mozarrifar, Saragosse. Appelez‑nous, écrivez sur WhatsApp ou passez nous voir.",
+        btn_whatsapp: "WhatsApp",
+        btn_directions: "Itinéraire",
+        footer_copy: "© 2025 Barbería Hugo — Tous droits réservés",
+        meta_title: "Barbier Hugo | Coupes, Barbe & Style à Saragosse",
+        meta_desc: "Coupes classiques et modernes, rasage à l’ancienne et taille de barbe. Réservation facile via WhatsApp."
       },
       de: {
+        nav_home: "Startseite",
+        nav_services: "Dienstleistungen",
+        nav_gallery: "Galerie",
+        nav_hours: "Öffnungszeiten",
+        nav_contact: "Kontakt",
+        hero_title: "Barbier Hugo",
+        tagline: "Wo Stil zur Identität wird",
+        reviews_title: "Was unsere Kunden sagen",
         gallery_title: "Galerie",
         hours_title: "Zeiten",
         hours_mon: "Montag: 16:00 – 21:00",
@@ -704,112 +727,68 @@
         hours_weekend: "Sa & So: Geschlossen",
         hours_quote: "„Zeit für dich selbst ist nie vergeudet“",
         contact_title: "Kontakt",
-        contact_blurb: "Wir sind in San Juan. Schreib uns oder öffne die Karte, um uns zu besuchen.",
+        contact_blurb: "Wir sind in San Juan de Mozarrifar, Saragossa. Ruf uns an, schreib per WhatsApp oder komm vorbei.",
         btn_whatsapp: "WhatsApp",
         btn_directions: "Anfahrt",
         footer_copy: "© 2025 Barbería Hugo — Alle Rechte vorbehalten",
-        nav_home: "Startseite",
-        nav_services: "Dienstleistungen",
-        nav_hours: "Öffnungszeiten",
-        nav_contact: "Kontakt",
-        hero_title: "Barbier Hugo",
-        hero_sub: "Klassische & moderne Haarschnitte in Campos",
-        services_title: "Dienstleistungen",
-        hours_title: "Öffnungszeiten",
-        hours_text: "Montag - Freitag: 9:00 - 20:00",
-        contact_title: "Kontakt",
-        contact_whatsapp: "Über WhatsApp buchen",
-        svc_add: "Hinzufügen",
-        svc_remove: "Entfernen",
-        svc_pick_dt: "Bevorzugtes Datum & Uhrzeit",
-        svc_total: "Summe:",
-        svc_book: "Über WhatsApp buchen",
-        svc_alert: "Bitte mindestens eine Dienstleistung wählen.",
-        svc_hello: "Hallo, ich möchte buchen:",
-        svc_approx: "Ungef. Summe:",
-        svc_when: "Bevorzugte Zeit:",
-        svc_availability: "Gibt es Verfügbarkeit? Danke!",
-        services_catalog: {
-          corte: { name: "Klassischer Haarschnitt" },
-          fade: { name: "Fade-Haarschnitt" },
-          barba: { name: "Bartpflege" },
-          afeitado: { name: "Rasur mit Messer" },
-          combo: { name: "Haarschnitt + Bart" },
-          nino: { name: "Kinderhaarschnitt" }
-        }
-      },
-      fr: {
-        gallery_title: "Galerie",
-        hours_title: "Horaires",
-        hours_mon: "Lundi : 16h00 – 21h00",
-        hours_week: "Mar–Ven : 9h45 – 14h00 / 16h00 – 21h00",
-        hours_weekend: "Samedi & Dimanche : Fermé",
-        hours_quote: "« Le temps consacré à soi-même n’est jamais perdu »",
-        contact_title: "Contact",
-        contact_blurb: "Nous sommes à San Juan. Écrivez-nous ou ouvrez la carte pour venir.",
-        btn_whatsapp: "WhatsApp",
-        btn_directions: "Itinéraire",
-        footer_copy: "© 2025 Barbería Hugo — Tous droits réservés",
-        nav_home: "Accueil",
-        nav_services: "Services",
-        nav_hours: "Horaires",
-        nav_contact: "Contact",
-        hero_title: "Barbier Hugo",
-        hero_sub: "Coupes classiques et modernes à Campos",
-        services_title: "Services",
-        hours_title: "Horaires",
-        hours_text: "Lundi - Vendredi: 9h00 - 20h00",
-        contact_title: "Contact",
-        contact_whatsapp: "Réserver sur WhatsApp",
-        svc_add: "Ajouter",
-        svc_remove: "Retirer",
-        svc_pick_dt: "Date et heure souhaitées",
-        svc_total: "Total :",
-        svc_book: "Réserver sur WhatsApp",
-        svc_alert: "Sélectionnez au moins un service.",
-        svc_hello: "Bonjour, je souhaite réserver :",
-        svc_approx: "Total approx. :",
-        svc_when: "Date/heure souhaitées :",
-        svc_availability: "Y a-t-il de la disponibilité ? Merci !",
-        services_catalog: {
-          corte: { name: "Coupe classique" },
-          fade: { name: "Coupe dégradée (fade)" },
-          barba: { name: "Taille de barbe" },
-          afeitado: { name: "Rasage à l’ancienne" },
-          combo: { name: "Coupe + Barbe" },
-          nino: { name: "Coupe enfant" }
-        }
+        meta_title: "Barbier Hugo | Schnitte, Bart & Style in Saragossa",
+        meta_desc: "Klassische & moderne Schnitte, Messerrasur und Bartpflege. Einfache Buchung per WhatsApp."
       }
     };
 
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+    function applyI18n(lang) {
+      const dict = T[lang] || T.es;
+
+      // Texto normal
+      $$("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key] != null) el.textContent = dict[key];
+      });
+
+      // Metas (title/description con data-i18n-meta)
+      $$("[data-i18n-meta]").forEach(el => {
+        const key = el.getAttribute("data-i18n-meta");
+        if (dict[key] != null) el.setAttribute("content", dict[key]);
+      });
+
+      // <title> con data-i18n en el head
+      const titleEl = $("head > title[data-i18n]");
+      if (titleEl) {
+        const key = titleEl.getAttribute("data-i18n");
+        if (dict[key] != null) titleEl.textContent = dict[key];
+      }
+
+      // atributo lang del documento
+      document.documentElement.setAttribute("lang", lang);
+
+      // estado visual de las banderas
+      $$(".lang-switch button").forEach(btn => {
+        btn.setAttribute("aria-pressed", String(btn.dataset.lang === lang));
+      });
+    }
+
     function setLang(lang) {
       localStorage.setItem("lang", lang);
-      document.querySelectorAll("[data-key]").forEach(el => {
-        let key = el.getAttribute("data-key");
-        if (T[lang][key]) el.textContent = T[lang][key];
-      });
-      renderServices(lang);
+      applyI18n(lang);
     }
 
-    function renderServices(lang) {
-      const dict = T[lang] || T.es;
-      const container = document.getElementById("services-list");
-      container.innerHTML = "";
-      Object.values(dict.services_catalog).forEach(svc => {
-        const card = document.createElement("div");
-        card.className = "service-card";
-        card.innerHTML = `<p>${svc.name}</p>`;
-        container.appendChild(card);
+    // Eventos en las banderas (los botones ya existen en tu nav)
+    document.addEventListener("DOMContentLoaded", () => {
+      $$(".lang-switch button").forEach(btn => {
+        btn.addEventListener("click", () => setLang(btn.dataset.lang));
       });
-    }
 
-    document.querySelectorAll(".lang-btn").forEach(btn => {
-      btn.addEventListener("click", () => setLang(btn.dataset.lang));
+      // Idioma inicial: prioridad localStorage > navegador > es
+      const saved = localStorage.getItem("lang");
+      const browser = (navigator.language || "es").slice(0, 2);
+      const initial = saved || (["es", "en", "fr", "de"].includes(browser) ? browser : "es");
+      setLang(initial);
     });
-
-    // inicial
-    setLang(localStorage.getItem("lang") || "es");
   </script>
+
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
     AOS.init({
@@ -818,6 +797,58 @@
       once: true       // animar solo la primera vez
     });
   </script>
+
+  <script>
+    // --- Desplegable de idioma ---
+    (function () {
+      const group = document.querySelector('.lang-group');
+      if (!group) return;
+      const toggle = group.querySelector('.lang-toggle');
+      const menu = group.querySelector('.lang-menu');
+      const currentImg = document.getElementById('lang-current');
+
+      function open() { group.setAttribute('aria-expanded', 'true'); toggle.setAttribute('aria-expanded', 'true'); }
+      function close() { group.setAttribute('aria-expanded', 'false'); toggle.setAttribute('aria-expanded', 'false'); }
+      function toggleMenu() { (group.getAttribute('aria-expanded') === 'true') ? close() : open(); }
+
+      // Abrir/cerrar
+      toggle.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
+      document.addEventListener('click', (e) => { if (!group.contains(e.target)) close(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+
+      // Mantener UI según idioma guardado
+      function updateLangUI(lang) {
+        // Marca aria-pressed
+        group.querySelectorAll('.lang-btn').forEach(b => {
+          b.setAttribute('aria-pressed', String(b.dataset.lang === lang));
+        });
+        // Cambia icono del botón principal
+        const map = { es: '4x3/es.svg', en: '4x3/gb.svg', fr: '4x3/fr.svg', de: '4x3/de.svg' };
+        currentImg.src = map[lang] || map.es;
+        const altMap = { es: 'Español', en: 'English', fr: 'Français', de: 'Deutsch' };
+        currentImg.alt = `Idioma actual: ${altMap[lang] || 'Español'}`;
+      }
+
+      // Enlaza con tu lógica de traducciones existente
+      const _setLang = window.setLang;  // guardamos la original
+      window.setLang = function (lang) {
+        _setLang(lang);           // ejecuta la tuya
+        updateLangUI(lang);       // y sincroniza la UI
+        close();
+      };
+
+      // Click en opciones
+      menu.addEventListener('click', (e) => {
+        const btn = e.target.closest('.lang-btn'); if (!btn) return;
+        window.setLang(btn.dataset.lang);
+      });
+
+      // Estado inicial
+      const initial = localStorage.getItem('lang') || 'es';
+      updateLangUI(initial);
+    })();
+  </script>
+
 
 </body>
 
