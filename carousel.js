@@ -68,20 +68,35 @@
     play();
   })();
 
-  // Scroll suave + nav activo
+  // Scroll suave + nav activo (sin hash para INICIO)
   (function smoothScrollAndActiveNav() {
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
     const links = $$("nav a[href^='#']");
     if (!links.length) return;
 
-    links.forEach((a) => on(a, "click", (e) => {
+    links.forEach((a) => a.addEventListener("click", (e) => {
+      const isHome = a.getAttribute("data-i18n") === "nav_home"; // "Inicio"
       const id = a.getAttribute("href");
       const target = id ? $(id) : null;
-      if (!target) return;
-      e.preventDefault();
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-      history.pushState(null, "", id);
+
+      if (isHome) {
+        // INICIO: scroll al top y URL limpia (sin #)
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        history.replaceState(null, "", location.pathname + location.search);
+        return;
+      }
+
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        history.pushState(null, "", id);
+      }
     }));
 
+    // Mantén el "active" según la sección visible
     const sections = links
       .map((a) => a.getAttribute("href"))
       .filter(Boolean)
@@ -99,6 +114,7 @@
 
     sections.forEach(({ el }) => io.observe(el));
   })();
+
 
   // Servicios dinámicos + total y reserva por WhatsApp
   (function services() {
