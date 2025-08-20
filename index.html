@@ -453,7 +453,7 @@
   <section id="galeria" class="container section-card" data-aos="fade-up" data-aos-delay="100">
     <h2 data-i18n="gallery_title" data-aos="fade-up">Galería</h2>
 
-    <div class="gallery-carousel" aria-label="Carrusel de fotos">
+    <div class="gallery-carousel" aria-label="Carrusel de fotos" data-interval="9731">
       <!-- Slides -->
       <a href="galeria/foto1.png" data-full="galeria/foto1.png" class="g-slide active" aria-label="Abrir foto 1">
         <img src="galeria/foto1.png" alt="Fade con diseño en la nuca" loading="lazy" width="600" height="750">
@@ -562,7 +562,6 @@
       function showSlide(i) { slides.forEach((s, idx) => s.classList.toggle("active", idx === i)); }
       function nextSlide() { current = (current + 1) % slides.length; showSlide(current); }
       showSlide(current);
-      setInterval(nextSlide, 4000);
     });
   </script>
 
@@ -753,6 +752,7 @@
       once: true       // animar solo la primera vez
     });
   </script>
+
 </body>
 
 </html>

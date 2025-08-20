@@ -22,7 +22,7 @@
     if (idx < 0) idx = 0;
 
     let timer = null;
-    const DURATION = 5000;
+    const DURATION = 9000;
 
     function show(i) {
       items.forEach((el, k) => el.classList.toggle("active", k === i));
@@ -284,13 +284,13 @@
     }
   })();
 
-  // Aviso 'síguenos' cuando el usuario llega al final (robusto)
+  // Aviso 'síguenos' cuando el usuario llega al final (con retardo robusto)
   (function followCTA() {
     function init() {
       const footer = document.querySelector("footer");
       if (!footer) return;
 
-      // Crear CTA si no existe
+      // 1) Asegurar que el CTA existe ANTES de usarlo
       let cta = document.getElementById("follow-cta");
       if (!cta) {
         cta = document.createElement("div");
@@ -298,38 +298,52 @@
         cta.id = "follow-cta";
         cta.hidden = true;
         cta.innerHTML = `
-          <button class="cta-close" aria-label="Cerrar">&times;</button>
-          <p>¡No te olvides de seguirnos en nuestras RRSS!</p>
-          <div class="cta-actions">
-            <a href="https://www.instagram.com/barberia_hugo_" target="_blank" rel="noopener" class="btn-cta ig">
-              <img src="icons8-instagram.svg" alt="" aria-hidden="true"> Instagram
-            </a>
-            <a href="https://www.facebook.com/p/Hugo-Barberia-Campos-100058625056973/" target="_blank" rel="noopener" class="btn-cta fb">
-              <img src="icons8-facebook-nuevo.svg" alt="" aria-hidden="true"> Facebook
-            </a>
-          </div>
-        `;
+        <button class="cta-close" aria-label="Cerrar">&times;</button>
+        <p>¡No te olvides de seguirnos en nuestras RRSS!</p>
+        <div class="cta-actions">
+          <a href="https://www.instagram.com/barberia_hugo_" target="_blank" rel="noopener" class="btn-cta ig">
+            <img src="icons8-instagram.svg" alt="" aria-hidden="true"> Instagram
+          </a>
+          <a href="https://www.facebook.com/p/Hugo-Barberia-Campos-100058625056973/" target="_blank" rel="noopener" class="btn-cta fb">
+            <img src="icons8-facebook-nuevo.svg" alt="" aria-hidden="true"> Facebook
+          </a>
+        </div>
+      `;
         document.body.appendChild(cta);
       }
 
+      // 2) Cerrar y recordar el descarte
       const closeBtn = cta.querySelector(".cta-close");
       const hideCTA = () => {
         cta.classList.remove("show");
         sessionStorage.setItem("ctaDismissed", "1");
+        clearTimeout(timer);
         setTimeout(() => { cta.hidden = true; }, 200);
       };
-      closeBtn.addEventListener("click", hideCTA);
+      closeBtn?.addEventListener("click", hideCTA);
 
-      // Observer para mostrar al ver el footer
+      // 3) Retardo de aparición
+      const DELAY = 3000; // 3s
+      let timer = null;
+
+      const showCTA = () => {
+        if (sessionStorage.getItem("ctaDismissed") || cta.classList.contains("show")) return;
+        cta.hidden = false;
+        requestAnimationFrame(() => cta.classList.add("show"));
+      };
+      const scheduleShow = () => {
+        clearTimeout(timer);
+        timer = setTimeout(showCTA, DELAY);
+      };
+      const cancelShow = () => {
+        clearTimeout(timer);
+        timer = null;
+      };
+
+      // 4) Observar el footer (con retardo y cancelación si se va)
       const io = new IntersectionObserver((entries) => {
-        entries.forEach((en) => {
-          if (en.isIntersecting && !sessionStorage.getItem("ctaDismissed")) {
-            cta.hidden = false;
-            requestAnimationFrame(() => cta.classList.add("show"));
-          }
-        });
+        entries.forEach((en) => en.isIntersecting ? scheduleShow() : cancelShow());
       }, { threshold: 0.1 });
-
       io.observe(footer);
     }
 
@@ -358,48 +372,64 @@
 
 })();
 
-// ===== GALERÍA: carrusel autoplay + controles =====
+// ===== GALERÍA: autoplay controlado (sin duplicados, con intervalo configurable) =====
 (function galleryAutoplay() {
   const wrap = document.querySelector(".gallery-carousel");
   if (!wrap) return;
+
+  // Evitar doble inicialización
+  if (wrap.dataset.autoplayInit === "1") return;
+  wrap.dataset.autoplayInit = "1";
+
   const slides = Array.from(wrap.querySelectorAll(".g-slide"));
-  if (slides.length === 0) return;
+  if (slides.length <= 1) return;
+
+  // Permite setear <div class="gallery-carousel" data-interval="12000">
+  const INTERVAL = Math.max(1000, parseInt(wrap.dataset.interval || "12000", 10));
 
   const prevBtn = wrap.querySelector(".g-prev");
   const nextBtn = wrap.querySelector(".g-next");
-  let i = 0;
+
+  // Si ninguna está activa, activar la primera
+  let i = slides.findIndex(s => s.classList.contains("active"));
+  if (i < 0) { i = 0; slides[0].classList.add("active"); }
+
+  // Guardar el timer en la instancia para poder limpiarlo si se re-ejecuta
+  if (wrap._autoplayTimer) clearInterval(wrap._autoplayTimer);
   let timer = null;
-  const INTERVAL = 4000; // ms
 
   function show(n) {
     slides.forEach((s, idx) => s.classList.toggle("active", idx === n));
+    i = n;
   }
-  function next() { i = (i + 1) % slides.length; show(i); }
-  function prev() { i = (i - 1 + slides.length) % slides.length; show(i); }
+  function next() { show((i + 1) % slides.length); }
+  function prev() { show((i - 1 + slides.length) % slides.length); }
 
   function start() {
     stop();
-    timer = setInterval(next, INTERVAL);
+    wrap._autoplayTimer = timer = setInterval(next, INTERVAL);
   }
   function stop() {
     if (timer) clearInterval(timer);
     timer = null;
   }
 
-  // init
-  show(i);
-  start();
-
-  // Controles
-  if (nextBtn) nextBtn.addEventListener("click", () => { next(); start(); });
-  if (prevBtn) prevBtn.addEventListener("click", () => { prev(); start(); });
-
-  // Pausa al pasar el ratón (solo desktop)
+  prevBtn?.addEventListener("click", () => { prev(); start(); });
+  nextBtn?.addEventListener("click", () => { next(); start(); });
   wrap.addEventListener("mouseenter", stop);
   wrap.addEventListener("mouseleave", start);
 
-  // Si el usuario abre el lightbox (click en <a>), no tocamos nada: se abrirá encima
+  // Swipe táctil
+  let startX = 0, dx = 0, touching = false;
+  wrap.addEventListener("touchstart", (e) => { touching = true; startX = e.touches[0].clientX; dx = 0; stop(); }, { passive: true });
+  wrap.addEventListener("touchmove", (e) => { if (touching) dx = e.touches[0].clientX - startX; }, { passive: true });
+  wrap.addEventListener("touchend", () => { touching = false; if (Math.abs(dx) > 40) (dx < 0 ? next : prev)(); start(); });
+
+  console.log("Gallery autoplay running at", INTERVAL, "ms");
+  show(i);
+  start();
 })();
+
 
 // Animaciones de entrada (reveal + stagger)
 (function revealAnimations() {
@@ -764,42 +794,42 @@
     if (dtLabel) dtLabel.textContent = dict.svc_when_label;
     if (waBtn) waBtn.textContent = dict.svc_reserve_whatsapp;
 
-   // 3) Click de WhatsApp (único y limpio)
-if (waBtn) {
-  // eliminar posibles listeners previos clonando el botón
-  const cleanBtn = waBtn.cloneNode(true);
-  waBtn.replaceWith(cleanBtn);
+    // 3) Click de WhatsApp (único y limpio)
+    if (waBtn) {
+      // eliminar posibles listeners previos clonando el botón
+      const cleanBtn = waBtn.cloneNode(true);
+      waBtn.replaceWith(cleanBtn);
 
-  cleanBtn.addEventListener("click", () => {
-    const chosen = CATALOG_KEYS.filter((s) => selected.has(s.id));
-    if (!chosen.length) { alert("Selecciona al menos un servicio."); return; }
+      cleanBtn.addEventListener("click", () => {
+        const chosen = CATALOG_KEYS.filter((s) => selected.has(s.id));
+        if (!chosen.length) { alert("Selecciona al menos un servicio."); return; }
 
-    const dtVal = dtInput?.value ? new Date(dtInput.value) : null;
-    const whenTxt = dtVal ? `${formatDate(dtVal)} ${formatTime(dtVal)}`
-                          : (I18N[currentLang]?.svc_no_date || "—");
+        const dtVal = dtInput?.value ? new Date(dtInput.value) : null;
+        const whenTxt = dtVal ? `${formatDate(dtVal)} ${formatTime(dtVal)}`
+          : (I18N[currentLang]?.svc_no_date || "—");
 
-    const lines = [
-      dict.svc_msg_header,
-      ...chosen.map((s) => `• ${(dict.svc_catalog[s.id] || s.id)} — ${formatEUR(s.price)}`),
-      `${dict.svc_msg_total} ${formatEUR(chosen.reduce((a, b) => a + b.price, 0))}`,
-      `${dict.svc_msg_when} ${whenTxt}`,
-      "",
-      dict.svc_msg_footer
-    ];
+        const lines = [
+          dict.svc_msg_header,
+          ...chosen.map((s) => `• ${(dict.svc_catalog[s.id] || s.id)} — ${formatEUR(s.price)}`),
+          `${dict.svc_msg_total} ${formatEUR(chosen.reduce((a, b) => a + b.price, 0))}`,
+          `${dict.svc_msg_when} ${whenTxt}`,
+          "",
+          dict.svc_msg_footer
+        ];
 
+        const waCTA = document.querySelector(".whatsapp-btn.grande");
+        const waHref = waCTA?.getAttribute("href") || "";
+        const waNumber = (waHref.match(/wa\.me\/(\d+)/) || [])[1] || "34123456789";
+
+        const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(lines.join("\n"))}`;
+        window.open(url, "_blank", "noopener");
+      });
+    }
+
+    // Tomamos el número actual desde el enlace existente (si lo tienes en tu HTML)
     const waCTA = document.querySelector(".whatsapp-btn.grande");
     const waHref = waCTA?.getAttribute("href") || "";
     const waNumber = (waHref.match(/wa\.me\/(\d+)/) || [])[1] || "34123456789";
-
-    const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(lines.join("\n"))}`;
-    window.open(url, "_blank", "noopener");
-  });
-}
-
-      // Tomamos el número actual desde el enlace existente (si lo tienes en tu HTML)
-      const waCTA = document.querySelector(".whatsapp-btn.grande");
-      const waHref = waCTA?.getAttribute("href") || "";
-      const waNumber = (waHref.match(/wa\.me\/(\d+)/) || [])[1] || "34123456789";
 
     // (El resto del código de WhatsApp click handler ya está gestionado arriba)
   }
@@ -835,3 +865,5 @@ if (waBtn) {
 
   initI18n();
 })();
+
+console.log("%cSitio diseñado por delysz — https://github.com/delysz", "color: #f6c90e; font-size:14px;");
