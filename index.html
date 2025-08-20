@@ -17,8 +17,6 @@
     rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Imperial+Script&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
-
   <link rel="canonical" href="https://barberiahugo.vercel.app/">
   <meta name="robots" content="index, follow, max-image-preview:large">
 
@@ -87,7 +85,7 @@
 
 <body>
   <div id="scrollProgress" aria-hidden="true"></div>
-  <header id="top">
+  <header id="top" class="reveal pop" data-delay="120">
     <img class="logo-barber" src="logo-hugo.png" alt="Barbería Hugo, peluquería masculina en Zaragoza" loading="lazy" />
     <h1 class="titulo-principal">Barbería Hugo</h1>
     <p class="slogan" data-i18n="tagline">Donde el estilo se convierte en identidad</p>
@@ -115,71 +113,337 @@
     </div>
   </nav>
 
-  <section id="carrusel" class="container section-card">
+  <!-- Reseñas -->
+  <section id="carrusel" class="container section-card reveal slide-up" data-delay="400">
     <h2 data-i18n="reviews_title">Lo que nuestros clientes dicen</h2>
     <div class="carousel">
       <div class="carousel-item active">
         <article class="review-card">
           <div class="review-top">
-            <div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg></div>
+            <div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg></div>
           </div>
-          <p class="review-text">“Local impecable, limpio y precioso. Vino de cero y se ha ganado todo el barrio por lo bien que trabaja y lo simpático que es. Rápido, económico y muy profesional. Se nota que le gusta lo que hace. Mi marido siempre sale encantado. ¡Lo recomiendo!”</p>
+          <p class="review-text">“Local impecable, limpio y precioso. Vino de cero y se ha ganado todo el barrio por lo
+            bien que trabaja y lo simpático que es. Rápido, económico y muy profesional. Se nota que le gusta lo que
+            hace. Mi marido siempre sale encantado. ¡Lo recomiendo!”</p>
           <span class="review-author">- María Cabanes</span>
         </article>
       </div>
-      <div class="carousel-item"><article class="review-card"><div class="review-top"><div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg></div></div><p class="review-text">“Un auténtico profesional. Servicio, trato y corte de 10. Gracias, Hugo, por hacerme sentir como en casa.”</p><span class="review-author">- Alberto Vitaller</span></article></div>
-      <div class="carousel-item"><article class="review-card"><div class="review-top"><div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg></div></div><p class="review-text">“He ido muchas veces y siempre hace un trabajo excelente. Atento a cualquier corte que le pidas, muy profesional y siempre encuentra un hueco. 100% recomendable.”</p><span class="review-author">- Jorge Laclaustra Serrano</span></article></div>
-      <div class="carousel-item"><article class="review-card"><div class="review-top"><div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg></div></div><p class="review-text">“Siempre que voy quedo encantado. Instalaciones muy limpias y Hugo es muy servicial. Repetiré sin duda.”</p><span class="review-author">- Jesús Pomar</span></article></div>
-      <div class="carousel-item"><article class="review-card"><div class="review-top"><div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg></div></div><p class="review-text">“Muy contento con el corte de pelo a mi hijo de 4 años. Muy atento con él y el precio genial. Volveremos, tanto mi hijo como yo.”</p><span class="review-author">- I.A. <span class="badge">Local Guide</span></span></article></div>
-      <div class="carousel-item"><article class="review-card"><div class="review-top"><div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg></div></div><p class="review-text">“Profesional y trato exquisito. Te asesora en corte, afeitado, mascarilla caliente o barba. Todo por unos precios sin competencia. Imprescindible pedir cita.”</p><span class="review-author">- Martín Costa Martínez <span class="badge">Local Guide</span></span></article></div>
-      <div class="carousel-item"><article class="review-card"><div class="review-top"><div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg></div></div><p class="review-text">“Antes me cortaba en Zaragoza, ahora voy a su nueva barbería y no será la última. Buena atención, buena música, precio asequible y Hugo es un crack. Me asesora siempre y me deja perfecto. Voy desde Zaragoza solo por él.”</p><span class="review-author">- Ricardin 10</span></article></div>
-      <div class="carousel-item"><article class="review-card"><div class="review-top"><div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg></div></div><p class="review-text">“Increíble trato al cliente y servicio de primera. La mejor barbería de caballero de Zaragoza sin duda. Cortes actuales, limpieza y masaje facial con lo último en tecnología. Un gran profesional.”</p><span class="review-author">- Carballo's United <span class="badge">Local Guide</span></span></article></div>
-      <div class="carousel-item"><article class="review-card"><div class="review-top"><div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg></div></div><p class="review-text">“Qué gran profesional. Mi corte era sencillo, pero al llegar antes pude ver cómo trabajaba con otros clientes y quedé impresionado por el resultado.”</p<span class="review-author">- Agencia Lemar</span></article></div>
-      <div class="carousel-item"><article class="review-card"><div class="review-top"><div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg></div></div><p class="review-text">“Rápido, buen corte, instalaciones correctas y buen trato. Totalmente recomendable.”</p><span class="review-author">- BIARRITZ-inmo <span class="badge">Local Guide</span></span></article></div>
-      <div class="carousel-item"><article class="review-card"><div class="review-top"><div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg><svg class="star filled" viewBox="0 0 24 24"><path d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" /></svg></div></div><p class="review-text">“Hugo, además de encantador, hace cortes fantásticos tanto a niños como adultos. Súper recomendable.”</p><span class="review-author">- Fire Rescue <span class="badge">Local Guide</span></span></article></div>
+      <div class="carousel-item">
+        <article class="review-card">
+          <div class="review-top">
+            <div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg></div>
+          </div>
+          <p class="review-text">“Un auténtico profesional. Servicio, trato y corte de 10. Gracias, Hugo, por hacerme
+            sentir como en casa.”</p><span class="review-author">- Alberto Vitaller</span>
+        </article>
+      </div>
+      <div class="carousel-item">
+        <article class="review-card">
+          <div class="review-top">
+            <div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg></div>
+          </div>
+          <p class="review-text">“He ido muchas veces y siempre hace un trabajo excelente. Atento a cualquier corte que
+            le pidas, muy profesional y siempre encuentra un hueco. 100% recomendable.”</p><span class="review-author">-
+            Jorge Laclaustra Serrano</span>
+        </article>
+      </div>
+      <div class="carousel-item">
+        <article class="review-card">
+          <div class="review-top">
+            <div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg></div>
+          </div>
+          <p class="review-text">“Siempre que voy quedo encantado. Instalaciones muy limpias y Hugo es muy servicial.
+            Repetiré sin duda.”</p><span class="review-author">- Jesús Pomar</span>
+        </article>
+      </div>
+      <div class="carousel-item">
+        <article class="review-card">
+          <div class="review-top">
+            <div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg></div>
+          </div>
+          <p class="review-text">“Muy contento con el corte de pelo a mi hijo de 4 años. Muy atento con él y el precio
+            genial. Volveremos, tanto mi hijo como yo.”</p><span class="review-author">- I.A. <span class="badge">Local
+              Guide</span></span>
+        </article>
+      </div>
+      <div class="carousel-item">
+        <article class="review-card">
+          <div class="review-top">
+            <div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg></div>
+          </div>
+          <p class="review-text">“Profesional y trato exquisito. Te asesora en corte, afeitado, mascarilla caliente o
+            barba. Todo por unos precios sin competencia. Imprescindible pedir cita.”</p><span class="review-author">-
+            Martín Costa Martínez <span class="badge">Local Guide</span></span>
+        </article>
+      </div>
+      <div class="carousel-item">
+        <article class="review-card">
+          <div class="review-top">
+            <div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg></div>
+          </div>
+          <p class="review-text">“Antes me cortaba en Zaragoza, ahora voy a su nueva barbería y no será la última. Buena
+            atención, buena música, precio asequible y Hugo es un crack. Me asesora siempre y me deja perfecto. Voy
+            desde Zaragoza solo por él.”</p><span class="review-author">- Ricardin 10</span>
+        </article>
+      </div>
+      <div class="carousel-item">
+        <article class="review-card">
+          <div class="review-top">
+            <div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg></div>
+          </div>
+          <p class="review-text">“Increíble trato al cliente y servicio de primera. La mejor barbería de caballero de
+            Zaragoza sin duda. Cortes actuales, limpieza y masaje facial con lo último en tecnología. Un gran
+            profesional.”</p><span class="review-author">- Carballo's United <span class="badge">Local
+              Guide</span></span>
+        </article>
+      </div>
+      <div class="carousel-item">
+        <article class="review-card">
+          <div class="review-top">
+            <div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg></div>
+          </div>
+          <p class="review-text">“Qué gran profesional. Mi corte era sencillo, pero al llegar antes pude ver cómo
+            trabajaba con otros clientes y quedé impresionado por el resultado.”</p<span class="review-author">- Agencia
+            Lemar</span>
+        </article>
+      </div>
+      <div class="carousel-item">
+        <article class="review-card">
+          <div class="review-top">
+            <div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg></div>
+          </div>
+          <p class="review-text">“Rápido, buen corte, instalaciones correctas y buen trato. Totalmente recomendable.”
+          </p><span class="review-author">- BIARRITZ-inmo <span class="badge">Local Guide</span></span>
+        </article>
+      </div>
+      <div class="carousel-item">
+        <article class="review-card">
+          <div class="review-top">
+            <div class="stars" aria-label="5 de 5"><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg><svg class="star filled" viewBox="0 0 24 24">
+                <path
+                  d="M12 .9l3.09 6.26 6.91 1.01-5 4.87 1.18 6.89L12 17.77 5.82 19.93 7 13.04 2 8.17l6.91-1.01L12 .9z" />
+              </svg></div>
+          </div>
+          <p class="review-text">“Hugo, además de encantador, hace cortes fantásticos tanto a niños como adultos. Súper
+            recomendable.”</p><span class="review-author">- Fire Rescue <span class="badge">Local Guide</span></span>
+        </article>
+      </div>
 
       <button class="carousel-btn prev" aria-label="Anterior">❮</button>
       <button class="carousel-btn next" aria-label="Siguiente">❯</button>
     </div>
   </section>
 
-  <section id="servicios" class="container section-card">
+  <section id="servicios" class="container section-card reveal slide-up" data-delay="140">
     <h2 data-i18n="nav_services">Servicios</h2>
-    </section>
+  </section>
 
-  <section id="galeria" class="container section-card">
+  <section id="galeria" class="container section-card reveal slide-up" data-delay="160">
     <h2 data-i18n="gallery_title">Galería</h2>
     <div class="gallery-carousel" aria-label="Carrusel de fotos de la galería" data-interval="9731">
-      <a href="galeria/foto1.png" data-full="galeria/foto1.png" class="g-slide active" aria-label="Abrir foto 1"><img src="galeria/foto1.png" alt="Fade con diseño en la nuca" loading="lazy" width="600" height="750"></a>
-      <a href="galeria/foto2.png" data-full="galeria/foto2.png" class="g-slide" aria-label="Abrir foto 2"><img src="galeria/foto2.png" alt="Fachada de Barbería Hugo" loading="lazy" width="600" height="600"></a>
-      <a href="galeria/foto3.png" data-full="galeria/foto3.png" class="g-slide" aria-label="Abrir foto 3"><img src="galeria/foto3.png" alt="Afeitado a navaja en sillón" loading="lazy" width="600" height="750"></a>
-      <a href="galeria/foto4.png" data-full="galeria/foto4.png" class="g-slide" aria-label="Abrir foto 4"><img src="galeria/foto4.png" alt="Hugo en el local con sillón infantil" loading="lazy" width="600" height="750"></a>
-      <a href="galeria/foto5.png" data-full="galeria/foto5.png" class="g-slide" aria-label="Abrir foto 5"><img src="galeria/foto5.png" alt="Interior de la barbería" loading="lazy" width="600" height="750"></a>
-      <a href="galeria/foto6.png" data-full="galeria/foto6.png" class="g-slide" aria-label="Abrir foto 6"><img src="galeria/foto6.png" alt="Perfil con corte fade" loading="lazy" width="600" height="750"></a>
-      <a href="galeria/foto7.png" data-full="galeria/foto7.png" class="g-slide" aria-label="Abrir foto 7"><img src="galeria/foto7.png" alt="Detalle de diseño en la nuca" loading="lazy" width="600" height="750"></a>
-      <a href="galeria/foto8.png" data-full="galeria/foto8.png" class="g-slide" aria-label="Abrir foto 8"><img src="galeria/foto8.png" alt="Fade con diseño lateral y rizos" loading="lazy" width="600" height="750"></a>
-      <a href="galeria/foto9.png" data-full="galeria/foto9.png" class="g-slide" aria-label="Abrir foto 9"><img src="galeria/foto9.png" alt="Fade en cabello rizado" loading="lazy" width="600" height="750"></a>
+      <a href="galeria/foto1.png" data-full="galeria/foto1.png" class="g-slide active" aria-label="Abrir foto 1"><img
+          src="galeria/foto1.png" alt="Fade con diseño en la nuca" loading="lazy" width="600" height="750"></a>
+      <a href="galeria/foto2.png" data-full="galeria/foto2.png" class="g-slide" aria-label="Abrir foto 2"><img
+          src="galeria/foto2.png" alt="Fachada de Barbería Hugo" loading="lazy" width="600" height="600"></a>
+      <a href="galeria/foto3.png" data-full="galeria/foto3.png" class="g-slide" aria-label="Abrir foto 3"><img
+          src="galeria/foto3.png" alt="Afeitado a navaja en sillón" loading="lazy" width="600" height="750"></a>
+      <a href="galeria/foto4.png" data-full="galeria/foto4.png" class="g-slide" aria-label="Abrir foto 4"><img
+          src="galeria/foto4.png" alt="Hugo en el local con sillón infantil" loading="lazy" width="600"
+          height="750"></a>
+      <a href="galeria/foto5.png" data-full="galeria/foto5.png" class="g-slide" aria-label="Abrir foto 5"><img
+          src="galeria/foto5.png" alt="Interior de la barbería" loading="lazy" width="600" height="750"></a>
+      <a href="galeria/foto6.png" data-full="galeria/foto6.png" class="g-slide" aria-label="Abrir foto 6"><img
+          src="galeria/foto6.png" alt="Perfil con corte fade" loading="lazy" width="600" height="750"></a>
+      <a href="galeria/foto7.png" data-full="galeria/foto7.png" class="g-slide" aria-label="Abrir foto 7"><img
+          src="galeria/foto7.png" alt="Detalle de diseño en la nuca" loading="lazy" width="600" height="750"></a>
+      <a href="galeria/foto8.png" data-full="galeria/foto8.png" class="g-slide" aria-label="Abrir foto 8"><img
+          src="galeria/foto8.png" alt="Fade con diseño lateral y rizos" loading="lazy" width="600" height="750"></a>
+      <a href="galeria/foto9.png" data-full="galeria/foto9.png" class="g-slide" aria-label="Abrir foto 9"><img
+          src="galeria/foto9.png" alt="Fade en cabello rizado" loading="lazy" width="600" height="750"></a>
 
       <button class="g-prev" aria-label="Anterior">‹</button>
       <button class="g-next" aria-label="Siguiente">›</button>
     </div>
   </section>
 
-  <section id="horario" class="container section-card">
+  <section id="horario" class="container section-card reveal slide-up" data-delay="180">
     <h2 data-i18n="hours_title">Horario</h2>
     <p data-i18n="hours_mon">Lunes: 16:00 – 21:00</p>
     <p data-i18n="hours_week">Martes a Viernes: 9:45 – 14:00 / 16:00 – 21:00</p>
     <p data-i18n="hours_weekend">Sábados y Domingos: Cerrado</p>
-    <blockquote class="horario-cita" data-i18n="hours_quote">"El tiempo dedicado a ti mismo nunca es tiempo perdido"</blockquote>
+    <blockquote class="horario-cita" data-i18n="hours_quote">"El tiempo dedicado a ti mismo nunca es tiempo perdido"
+    </blockquote>
   </section>
 
-  <section id="contacto" class="container section-card">
+  <section id="contacto" class="container section-card reveal slide-up" data-delay="200">
     <h2 data-i18n="contact_title">Contacto</h2>
     <p class="contact-subtitle" data-i18n="contact_blurb">
       Encuéntranos en San Juan de Mozarrifar, Zaragoza. Llámanos, escríbenos por WhatsApp o ven a visitarnos.
     </p>
 
-    <div class="contact-actions">
+    <div class="contact-actions stagger" data-stagger="120" data-delay="220">
       <a href="tel:+34651435444" class="call-btn grande btn--shine" aria-label="Llamar por teléfono">
         <i class="fa-solid fa-phone" aria-hidden="true"></i>
         <span>Llama a Hugo</span>
@@ -202,7 +466,8 @@
         width="100%" height="300" style="border:0; border-radius:10px;" allowfullscreen="" loading="lazy"
         referrerpolicy="no-referrer-when-downgrade">
       </iframe>
-      <figcaption data-i18n="map_caption">Calle Dr. Alejandro Palomar, 50820 San Juan de Mozarrifar, Zaragoza</figcaption>
+      <figcaption data-i18n="map_caption">Calle Dr. Alejandro Palomar, 50820 San Juan de Mozarrifar, Zaragoza
+      </figcaption>
     </figure>
   </section>
 
@@ -211,19 +476,14 @@
     <p class="credits">Design by <a href="https://github.com/delysz" target="_blank" rel="noopener">delysz</a></p>
   </footer>
 
-  <a href="https://wa.me/34651435444" class="whatsapp-float" target="_blank" aria-label="WhatsApp"><img src="icons8-whatsapp.svg" alt="WhatsApp" /></a>
-  <a href="https://www.instagram.com/barberia_hugo_" class="social-float instagram" target="_blank" aria-label="Instagram"><img src="icons8-instagram.svg" alt="Instagram" /></a>
-  <a href="https://www.facebook.com/p/Hugo-Barberia-Campos-100058625056973/" class="social-float facebook" target="_blank" aria-label="Facebook"><img src="icons8-facebook-nuevo.svg" alt="Facebook" /></a>
-  
-  <script src="carousel.js"></script>
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>
-    AOS.init({
-      duration: 800,
-      offset: 80,
-      once: true
-    });
-  </script>
+  <a href="https://wa.me/34651435444" class="whatsapp-float" target="_blank" aria-label="WhatsApp"><img
+      src="icons8-whatsapp.svg" alt="WhatsApp" /></a>
+  <a href="https://www.instagram.com/barberia_hugo_" class="social-float instagram" target="_blank"
+    aria-label="Instagram"><img src="icons8-instagram.svg" alt="Instagram" /></a>
+  <a href="https://www.facebook.com/p/Hugo-Barberia-Campos-100058625056973/" class="social-float facebook"
+    target="_blank" aria-label="Facebook"><img src="icons8-facebook-nuevo.svg" alt="Facebook" /></a>
 
+  <script src="carousel.js"></script>
 </body>
+
 </html>

@@ -307,9 +307,9 @@
 
       const carousel = $(".carousel");
       if (carousel && dict.aria_carousel) carousel.setAttribute("aria-label", dict.aria_carousel);
-      
+
       $$(".stars[aria-label]").forEach(st => st.setAttribute("aria-label", dict.stars_label?.(5) || "5/5"));
-      
+
       // La sección de servicios se actualiza a través de su propia lógica
       if (typeof window.renderServicesI18n === 'function') {
         window.renderServicesI18n(lang);
@@ -336,7 +336,7 @@
 
       const open = () => { dd.classList.add("open"); toggle.setAttribute("aria-expanded", "true"); }
       const close = () => { dd.classList.remove("open"); toggle.setAttribute("aria-expanded", "false"); }
-      
+
       on(toggle, "click", (e) => {
         e.stopPropagation();
         dd.classList.contains("open") ? close() : open();
@@ -362,7 +362,7 @@
       });
       on(document, "keydown", (e) => { if (e.key === "Escape") close(); });
     }
-    
+
     // Hacemos el diccionario accesible globalmente para otros módulos
     window.I18N = I18N;
 
@@ -394,7 +394,7 @@
       { id: "barba", price: 10 }, { id: "afeitado", price: 11 },
       { id: "combo", price: 20 }, { id: "nino", price: 9 },
     ];
-    
+
     const selected = new Set();
     let currentLang = (localStorage.getItem("lang") || "es").slice(0, 2);
 
@@ -430,22 +430,30 @@
     }
 
     // Exponemos la función de renderizado para que el sistema i18n pueda llamarla
-    window.renderServicesI18n = function(lang) {
+    // Exponemos la función de renderizado para que el sistema i18n pueda llamarla
+    window.renderServicesI18n = function (lang) {
       currentLang = lang;
       const dict = window.I18N[lang] || window.I18N.es;
-      
+
+      // Asegura animación por stagger en la cuadrícula
+      grid.classList.add("stagger");
+      grid.dataset.stagger = "90";   // gap entre hijos (ms)
+      grid.dataset.delay = "120";    // retardo base (ms)
+
       grid.innerHTML = "";
       CATALOG_DATA.forEach((svc) => {
         const name = dict.svc_catalog[svc.id] || svc.id;
         const card = document.createElement("article");
         card.className = "svc-card";
         const isSelected = selected.has(svc.id);
-        
+
         card.innerHTML = `
-          <h3>${name}</h3>
-          <div class="price">${formatEUR(svc.price, lang)}</div>
-          <button type="button" data-id="${svc.id}" aria-pressed="${isSelected}">${isSelected ? dict.svc_remove : dict.svc_add}</button>`;
-        
+      <h3>${name}</h3>
+      <div class="price">${formatEUR(svc.price, lang)}</div>
+      <button type="button" data-id="${svc.id}" aria-pressed="${isSelected}">
+        ${isSelected ? dict.svc_remove : dict.svc_add}
+      </button>`;
+
         const btn = $("button", card);
         if (isSelected) btn.classList.add("active");
 
@@ -453,42 +461,44 @@
           const isActive = btn.classList.toggle("active");
           btn.textContent = isActive ? dict.svc_remove : dict.svc_add;
           btn.setAttribute("aria-pressed", String(isActive));
-          if (isActive) selected.add(svc.id);
-          else selected.delete(svc.id);
+          if (isActive) selected.add(svc.id); else selected.delete(svc.id);
           updateTotal(lang);
         });
+
         grid.appendChild(card);
       });
 
-      dtLabel.textContent = dict.svc_when_label;
-      waBtn.textContent = dict.svc_reserve_whatsapp;
+      // Textos barra inferior + total
+      $(".svc-when label", wrap).textContent = dict.svc_when_label;
+      $(".svc-wa", wrap).textContent = dict.svc_reserve_whatsapp;
       updateTotal(lang);
     };
-    
+
+
     on(waBtn, "click", () => {
-        const dict = window.I18N[currentLang] || window.I18N.es;
-        const chosen = CATALOG_DATA.filter((s) => selected.has(s.id));
-        if (!chosen.length) { alert("Selecciona al menos un servicio."); return; }
-        
-        const dtVal = dtInput.value ? new Date(dtInput.value) : null;
-        const whenTxt = dtVal ? `${dtVal.toLocaleDateString(currentLang)} ${dtVal.toLocaleTimeString(currentLang, { hour: "2-digit", minute: "2-digit" })}` : dict.svc_no_date;
+      const dict = window.I18N[currentLang] || window.I18N.es;
+      const chosen = CATALOG_DATA.filter((s) => selected.has(s.id));
+      if (!chosen.length) { alert("Selecciona al menos un servicio."); return; }
 
-        const total = chosen.reduce((a, b) => a + b.price, 0);
+      const dtVal = dtInput.value ? new Date(dtInput.value) : null;
+      const whenTxt = dtVal ? `${dtVal.toLocaleDateString(currentLang)} ${dtVal.toLocaleTimeString(currentLang, { hour: "2-digit", minute: "2-digit" })}` : dict.svc_no_date;
 
-        const lines = [
-            dict.svc_msg_header,
-            ...chosen.map((s) => `• ${dict.svc_catalog[s.id]} — ${formatEUR(s.price, currentLang)}`),
-            `${dict.svc_msg_total} ${formatEUR(total, currentLang)}`,
-            `${dict.svc_msg_when} ${whenTxt}`,
-            "",
-            dict.svc_msg_footer
-        ];
+      const total = chosen.reduce((a, b) => a + b.price, 0);
 
-        const waCTA = $(".whatsapp-btn.grande");
-        const waHref = waCTA?.getAttribute("href") || "";
-        const waNumber = (waHref.match(/wa\.me\/(\d+)/) || [])[1] || "34651435444";
-        const url = `https://wa.me/${waNumber}?text=${encode(lines.join("\n"))}`;
-        window.open(url, "_blank", "noopener");
+      const lines = [
+        dict.svc_msg_header,
+        ...chosen.map((s) => `• ${dict.svc_catalog[s.id]} — ${formatEUR(s.price, currentLang)}`),
+        `${dict.svc_msg_total} ${formatEUR(total, currentLang)}`,
+        `${dict.svc_msg_when} ${whenTxt}`,
+        "",
+        dict.svc_msg_footer
+      ];
+
+      const waCTA = $(".whatsapp-btn.grande");
+      const waHref = waCTA?.getAttribute("href") || "";
+      const waNumber = (waHref.match(/wa\.me\/(\d+)/) || [])[1] || "34651435444";
+      const url = `https://wa.me/${waNumber}?text=${encode(lines.join("\n"))}`;
+      window.open(url, "_blank", "noopener");
     });
 
     // Renderizado inicial
@@ -511,7 +521,7 @@
     const INTERVAL = Math.max(1000, parseInt(wrap.dataset.interval || "9000", 10));
     const prevBtn = $(".g-prev", wrap);
     const nextBtn = $(".g-next", wrap);
-    
+
     let i = slides.findIndex(s => s.classList.contains("active"));
     if (i < 0) { i = 0; slides[0].classList.add("active"); }
 
@@ -535,7 +545,7 @@
 
     show(i);
     start();
-    
+
     // --- Lightbox (integrado y corregido) ---
     let lb = $(".lightbox");
     if (!lb) {
@@ -566,13 +576,13 @@
       lb.hidden = false;
       document.body.style.overflow = "hidden";
     }
-    
+
     function closeLightbox() {
       lb.hidden = true;
       imgEl.src = ""; // Libera memoria
       document.body.style.overflow = "";
     }
-    
+
     const prevLightbox = () => openLightbox((currentIdx - 1 + slides.length) % slides.length);
     const nextLightbox = () => openLightbox((currentIdx + 1) % slides.length);
 
@@ -674,7 +684,7 @@
     }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
     targets.forEach((el) => io.observe(el));
   })();
-  
+
   // =================================
   //  8. EFECTOS "WOW" Y MISCELÁNEA
   // =================================
@@ -722,7 +732,7 @@
       on(window, "resize", updateProgress);
     }
   })();
-  
+
   console.log("%cSitio diseñado por delysz — https://github.com/delysz", "color: #f6c90e; font-size:14px;");
 
 })();
