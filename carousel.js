@@ -882,4 +882,40 @@
   initI18n();
 })();
 
+// WOW: tilt suave del logo en el hero (respeta reduced-motion)
+(function tiltHero(){
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) return;
+  const hero = document.querySelector("header");
+  const logo = document.querySelector(".logo-barber");
+  if (!hero || !logo) return;
+
+  hero.addEventListener("mousemove", (e)=>{
+    const r = hero.getBoundingClientRect();
+    const x = (e.clientX - r.left)/r.width - .5;
+    const y = (e.clientY - r.top)/r.height - .5;
+    logo.style.transform = `rotateX(${(-y*6)}deg) rotateY(${x*6}deg) translateZ(0)`;
+  });
+  hero.addEventListener("mouseleave", ()=> {
+    logo.style.transform = "rotateX(0) rotateY(0)";
+  });
+})();
+
+// WOW: scroll progress (respeta reduced-motion)
+(function scrollProgress(){
+  const bar = document.getElementById("scrollProgress");
+  if (!bar) return;
+  const update = () => {
+    const h = document.documentElement;
+    const scrolled = h.scrollTop || document.body.scrollTop;
+    const max = (h.scrollHeight - h.clientHeight) || 1;
+    const pct = Math.min(100, Math.max(0, (scrolled / max) * 100));
+    bar.style.width = pct + "%";
+  };
+  update();
+  window.addEventListener("scroll", update, { passive:true });
+  window.addEventListener("resize", update);
+})();
+
+
 console.log("%cSitio diseñado por delysz — https://github.com/delysz", "color: #f6c90e; font-size:14px;");

@@ -1541,3 +1541,84 @@ footer {
 }
 footer p { margin: 0; }       
 
+/* ==== WOW: Borde luminoso animado en secciones ==== */
+.container.section-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.container.section-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: var(--radius);
+  background:
+    conic-gradient(from var(--angle, 0turn),
+      var(--accent), var(--accent-2), var(--accent), var(--accent-2));
+  padding: 1px;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  animation: spinBorder 8s linear infinite;
+  opacity: .45;
+  pointer-events: none;
+}
+@keyframes spinBorder { to { --angle: 1turn; } }
+
+/* ==== WOW: Glow y blobs en el hero ==== */
+header {
+  perspective: 800px;
+}
+header::after{
+  content:"";
+  position:absolute; inset:-20% -10% auto -10%;
+  height: 60%;
+  background:
+    radial-gradient(45% 60% at 70% 20%, rgba(246,201,14,.22), transparent 60%),
+    radial-gradient(40% 55% at 30% 10%, rgba(255,219,77,.18), transparent 60%);
+  filter: blur(32px);
+  animation: heroFloat 16s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes heroFloat{
+  0%,100%{ transform: translateY(0) scale(1); opacity:.45 }
+  50%{ transform: translateY(10px) scale(1.04); opacity:.6 }
+}
+.logo-barber{
+  transition: transform .35s ease, filter .35s ease;
+  transform-style: preserve-3d;
+}
+
+/* ==== WOW: shine en botones ==== */
+.btn--shine{ position:relative; overflow:hidden; }
+.btn--shine::after{
+  content:"";
+  position:absolute; inset:0;
+  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,.35) 20%, transparent 40%);
+  transform: translateX(-130%);
+}
+.btn--shine:hover::after,
+.btn--shine:focus-visible::after{
+  transition: transform .7s ease;
+  transform: translateX(130%);
+}
+
+/* ==== WOW: lift sutil en galería SIN recortar ==== */
+.gallery-item{
+  transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
+}
+.gallery-item:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 14px 34px rgba(0,0,0,.45), 0 0 0 1px var(--border);
+  filter: saturate(1.04);
+}
+
+/* ==== WOW: barra de progreso de scroll ==== */
+#scrollProgress{
+  position: fixed; top:0; left:0; height:3px; width:0%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  z-index: 2000; box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+
