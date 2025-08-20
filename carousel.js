@@ -1,14 +1,25 @@
+// =================================================================
+//  BARBERÍA HUGO - SCRIPT PRINCIPAL UNIFICADO
+// =================================================================
+//  Autor: delysz (https://github.com/delysz)
+//  Descripción: Este archivo contiene toda la lógica funcional
+//  de la web, unificando carruseles, galería, traducciones y
+//  otras interacciones para evitar conflictos y mejorar el
+//  rendimiento.
+// =================================================================
+
 (() => {
   "use strict";
 
+  // --- Utilidades comunes ---
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const on = (el, ev, fn, opts) => el && el.addEventListener(ev, fn, opts);
-  const formatEUR = (n) =>
-    new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(n);
   const encode = (s) => encodeURIComponent(String(s ?? ""));
 
-  // Carrusel
+  // =================================
+  //  1. CARRUSEL DE RESEÑAS
+  // =================================
   (function carousel() {
     const root = $(".carousel");
     if (!root) return;
@@ -16,7 +27,7 @@
     const items = $$(".carousel-item", root);
     const prevBtn = $(".carousel-btn.prev", root);
     const nextBtn = $(".carousel-btn.next", root);
-    if (!items.length) return;
+    if (items.length <= 1) return;
 
     let idx = Math.max(0, items.findIndex((i) => i.classList.contains("active")));
     if (idx < 0) idx = 0;
@@ -35,10 +46,8 @@
 
     on(prevBtn, "click", () => { prev(); play(); });
     on(nextBtn, "click", () => { next(); play(); });
-
     on(root, "mouseenter", stop);
     on(root, "mouseleave", play);
-
     on(root, "keydown", (e) => {
       if (e.key === "ArrowLeft") { e.preventDefault(); prev(); play(); }
       if (e.key === "ArrowRight") { e.preventDefault(); next(); play(); }
@@ -48,877 +57,672 @@
     root.setAttribute("aria-label", "Carrusel de opiniones de clientes");
 
     let startX = 0, dx = 0, touching = false;
-    on(root, "touchstart", (e) => {
-      touching = true;
-      startX = e.touches[0].clientX;
-      dx = 0;
-      stop();
-    }, { passive: true });
-    on(root, "touchmove", (e) => {
-      if (!touching) return;
-      dx = e.touches[0].clientX - startX;
-    }, { passive: true });
-    on(root, "touchend", () => {
-      touching = false;
-      if (Math.abs(dx) > 40) (dx < 0 ? next : prev)();
-      play();
-    });
+    on(root, "touchstart", (e) => { touching = true; startX = e.touches[0].clientX; dx = 0; stop(); }, { passive: true });
+    on(root, "touchmove", (e) => { if (!touching) return; dx = e.touches[0].clientX - startX; }, { passive: true });
+    on(root, "touchend", () => { touching = false; if (Math.abs(dx) > 40) (dx < 0 ? next : prev)(); play(); });
 
     show(idx);
     play();
   })();
 
-  // Scroll suave + nav activo (sin hash para INICIO)
+  // =================================
+  //  2. NAVEGACIÓN CON SCROLL SUAVE
+  // =================================
   (function smoothScrollAndActiveNav() {
-    const $ = (s, r = document) => r.querySelector(s);
-    const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
-
     const links = $$("nav a[href^='#']");
     if (!links.length) return;
 
     links.forEach((a) => a.addEventListener("click", (e) => {
-      const isHome = a.getAttribute("data-i18n") === "nav_home"; // "Inicio"
+      const isHome = a.getAttribute("data-i18n") === "nav_home";
       const id = a.getAttribute("href");
       const target = id ? $(id) : null;
 
       if (isHome) {
-        // INICIO: scroll al top y URL limpia (sin #)
         e.preventDefault();
         window.scrollTo({ top: 0, behavior: "smooth" });
-        history.replaceState(null, "", location.pathname + location.search);
+        if (history.replaceState) {
+          history.replaceState(null, "", location.pathname + location.search);
+        }
         return;
       }
 
       if (target) {
         e.preventDefault();
         target.scrollIntoView({ behavior: "smooth", block: "start" });
-        history.pushState(null, "", id);
+        if (history.pushState) {
+          history.pushState(null, "", id);
+        }
       }
     }));
 
-    // Mantén el "active" según la sección visible
-    const sections = links
-      .map((a) => a.getAttribute("href"))
-      .filter(Boolean)
-      .map((id) => ({ id, el: $(id) }))
-      .filter((x) => x.el);
-
+    const sections = links.map((a) => a.getAttribute("href")).filter(Boolean).map((id) => ({ id, el: $(id) })).filter((x) => x.el);
     const io = new IntersectionObserver((entries) => {
       entries.forEach((en) => {
-        if (en.isIntersecting) {
-          const id = "#" + en.target.id;
-          links.forEach((l) => l.classList.toggle("active", l.getAttribute("href") === id));
-        }
+        if (!en.isIntersecting) return;
+        const id = "#" + en.target.id;
+        links.forEach((l) => l.classList.toggle("active", l.getAttribute("href") === id));
       });
-    }, { rootMargin: "-40% 0px -50% 0px", threshold: 0.01 });
+    }, { rootMargin: "-35% 0px -55% 0px", threshold: 0.01 });
 
     sections.forEach(({ el }) => io.observe(el));
   })();
 
+  // ===============================================
+  //  3. SISTEMA DE TRADUCCIONES (i18n) - ÚNICO Y CENTRALIZADO
+  // ===============================================
+  (function i18nSystem() {
+    const I18N = {
+      es: {
+        gallery_title: "Galería",
+        hours_title: "Horario",
+        hours_mon: "Lunes: 16:00 – 21:00",
+        hours_week: "Mar–Vie: 9:45 – 14:00 / 16:00 – 21:00",
+        hours_weekend: "Sáb–Dom: Cerrado",
+        hours_quote: "«El tiempo dedicado a ti mismo nunca es tiempo perdido»",
+        contact_title: "Contacto",
+        contact_blurb: "Encuéntranos en San Juan de Mozarrifar, Zaragoza. Llámanos, escríbenos por WhatsApp o ven a visitarnos.",
+        btn_whatsapp: "WhatsApp",
+        btn_directions: "Cómo llegar",
+        footer_copy: "© 2025 Barbería Hugo — Todos los derechos reservados",
+        meta_title: "Barbería Hugo | Cortes, Barba y Estilo en Zaragoza",
+        meta_desc: "Barbería Hugo en Zaragoza. Cortes clásicos y modernos, afeitado a navaja y arreglos de barba. Reserva fácil por WhatsApp.",
+        tagline: "Donde el estilo se convierte en identidad",
+        nav_home: "Inicio",
+        nav_services: "Servicios",
+        nav_gallery: "Galería",
+        nav_hours: "Horario",
+        nav_contact: "Contacto",
+        reviews_title: "Lo que nuestros clientes dicen",
+        svc_when_label: "Fecha y hora preferida",
+        svc_total: "Total:",
+        svc_add: "Añadir",
+        svc_remove: "Quitar",
+        svc_reserve_whatsapp: "Reservar por WhatsApp",
+        svc_no_date: "Sin fecha/hora",
+        svc_msg_header: "Hola, me gustaría reservar:",
+        svc_msg_total: "Total aprox.:",
+        svc_msg_when: "Fecha/hora preferida:",
+        svc_msg_footer: "¿Hay disponibilidad? ¡Gracias!",
+        svc_catalog: {
+          corte: "Corte clásico",
+          fade: "Corte fade",
+          barba: "Arreglo de barba",
+          afeitado: "Afeitado a navaja",
+          combo: "Corte + Barba",
+          nino: "Corte niño",
+        },
+        aria_carousel: "Carrusel de opiniones de clientes",
+        stars_label: (n = 5) => `${n} de 5`,
+      },
+      en: {
+        gallery_title: "Gallery",
+        hours_title: "Hours",
+        hours_mon: "Monday: 16:00 – 21:00",
+        hours_week: "Tue–Fri: 9:45 – 14:00 / 16:00 – 21:00",
+        hours_weekend: "Sat–Sun: Closed",
+        hours_quote: "“Time spent on yourself is never wasted”",
+        contact_title: "Contact",
+        contact_blurb: "Find us in San Juan de Mozarrifar, Zaragoza. Call us, write on WhatsApp or come visit us.",
+        btn_whatsapp: "WhatsApp",
+        btn_directions: "Directions",
+        footer_copy: "© 2025 Hugo Barbershop — All rights reserved",
+        meta_title: "Hugo Barbershop | Cuts, Beard & Style in Zaragoza",
+        meta_desc: "Hugo Barbershop in Zaragoza. Classic and modern cuts, straight-razor shaves and beard trims. Easy booking via WhatsApp.",
+        tagline: "Where style becomes identity",
+        nav_home: "Home",
+        nav_services: "Services",
+        nav_gallery: "Gallery",
+        nav_hours: "Hours",
+        nav_contact: "Contact",
+        reviews_title: "What our clients say",
+        svc_when_label: "Preferred date & time",
+        svc_total: "Total:",
+        svc_add: "Add",
+        svc_remove: "Remove",
+        svc_reserve_whatsapp: "Book via WhatsApp",
+        svc_no_date: "No date/time",
+        svc_msg_header: "Hi, I'd like to book:",
+        svc_msg_total: "Approx. total:",
+        svc_msg_when: "Preferred date/time:",
+        svc_msg_footer: "Is there availability? Thanks!",
+        svc_catalog: {
+          corte: "Classic haircut",
+          fade: "Fade haircut",
+          barba: "Beard trim",
+          afeitado: "Straight-razor shave",
+          combo: "Haircut + Beard",
+          nino: "Kids haircut",
+        },
+        aria_carousel: "Customer reviews carousel",
+        stars_label: (n = 5) => `${n} out of 5`,
+      },
+      fr: {
+        gallery_title: "Galerie",
+        hours_title: "Horaires",
+        hours_mon: "Lundi : 16h00 – 21h00",
+        hours_week: "Mar–Ven : 9h45 – 14h00 / 16h00 – 21h00",
+        hours_weekend: "Sam–Dim : Fermé",
+        hours_quote: "« Le temps consacré à soi-même n’est jamais perdu »",
+        contact_title: "Contact",
+        contact_blurb: "Retrouvez-nous à San Juan de Mozarrifar, Saragosse. Appelez-nous, écrivez sur WhatsApp ou venez nous rendre visite.",
+        btn_whatsapp: "WhatsApp",
+        btn_directions: "Comment y arriver",
+        footer_copy: "© 2025 Barbería Hugo — Tous droits réservés",
+        meta_title: "Barbería Hugo | Coupes, Barbe & Style à Saragosse",
+        meta_desc: "Barbería Hugo à Saragosse. Coupes classiques et modernes, rasage au coupe-chou et taille de barbe. Réservation facile par WhatsApp.",
+        tagline: "Là où le style devient identité",
+        nav_home: "Accueil",
+        nav_services: "Services",
+        nav_gallery: "Galerie",
+        nav_hours: "Horaires",
+        nav_contact: "Contact",
+        reviews_title: "Ce que disent nos clients",
+        svc_when_label: "Date et heure préférées",
+        svc_total: "Total :",
+        svc_add: "Ajouter",
+        svc_remove: "Retirer",
+        svc_reserve_whatsapp: "Réserver via WhatsApp",
+        svc_no_date: "Sans date/heure",
+        svc_msg_header: "Bonjour, j’aimerais réserver :",
+        svc_msg_total: "Total approx. :",
+        svc_msg_when: "Date/heure préférées :",
+        svc_msg_footer: "Y a-t-il de la disponibilité ? Merci !",
+        svc_catalog: {
+          corte: "Coupe classique",
+          fade: "Coupe dégradée",
+          barba: "Taille de barbe",
+          afeitado: "Rasage au coupe-chou",
+          combo: "Coupe + Barbe",
+          nino: "Coupe enfant",
+        },
+        aria_carousel: "Carrousel d’avis clients",
+        stars_label: (n = 5) => `${n} sur 5`,
+      },
+      de: {
+        gallery_title: "Galerie",
+        hours_title: "Öffnungszeiten",
+        hours_mon: "Montag: 16:00 – 21:00",
+        hours_week: "Di–Fr: 9:45 – 14:00 / 16:00 – 21:00",
+        hours_weekend: "Sa–So: Geschlossen",
+        hours_quote: "„Zeit für dich selbst ist nie vergeudet“",
+        contact_title: "Kontakt",
+        contact_blurb: "Besuchen Sie uns in San Juan de Mozarrifar, Saragossa. Rufen Sie uns an, schreiben Sie über WhatsApp oder kommen Sie vorbei.",
+        btn_whatsapp: "WhatsApp",
+        btn_directions: "Anfahrt",
+        footer_copy: "© 2025 Barbería Hugo — Alle Rechte vorbehalten",
+        meta_title: "Hugo Barbershop | Haarschnitt, Bart & Stil in Saragossa",
+        meta_desc: "Hugo Barbershop in Saragossa. Klassische & moderne Schnitte, Rasur mit Klinge und Bartservice. Einfache Buchung per WhatsApp.",
+        tagline: "Wo Stil zur Identität wird",
+        nav_home: "Start",
+        nav_services: "Leistungen",
+        nav_gallery: "Galerie",
+        nav_hours: "Zeiten",
+        nav_contact: "Kontakt",
+        reviews_title: "Was unsere Kund:innen sagen",
+        svc_when_label: "Bevorzugtes Datum & Uhrzeit",
+        svc_total: "Summe:",
+        svc_add: "Hinzufügen",
+        svc_remove: "Entfernen",
+        svc_reserve_whatsapp: "Per WhatsApp buchen",
+        svc_no_date: "Kein Datum/Uhrzeit",
+        svc_msg_header: "Hallo, ich möchte buchen:",
+        svc_msg_total: "Ca. Summe:",
+        svc_msg_when: "Bevorzugte Zeit:",
+        svc_msg_footer: "Gibt es Verfügbarkeit? Danke!",
+        svc_catalog: {
+          corte: "Klassischer Haarschnitt",
+          fade: "Fade-Haarschnitt",
+          barba: "Bart trimmen",
+          afeitado: "Rasur mit Klinge",
+          combo: "Haarschnitt + Bart",
+          nino: "Kinderhaarschnitt",
+        },
+        aria_carousel: "Kundenbewertungen Karussell",
+        stars_label: (n = 5) => `${n} von 5`,
+      }
+    };
 
-  // Servicios dinámicos + total y reserva por WhatsApp
+    let currentLang = (localStorage.getItem("lang") || navigator.language || "es").slice(0, 2);
+    if (!I18N[currentLang]) currentLang = "es";
+
+    const formatEUR = (n) => new Intl.NumberFormat(currentLang, { style: "currency", currency: "EUR" }).format(n);
+    const formatDate = (d) => d.toLocaleDateString(currentLang, { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const formatTime = (d) => d.toLocaleTimeString(currentLang, { hour: "2-digit", minute: "2-digit" });
+
+    function applyI18n(lang) {
+      const dict = I18N[lang] || I18N.es;
+      document.documentElement.lang = lang;
+
+      $$("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key] != null) el.textContent = typeof dict[key] === "function" ? dict[key]() : dict[key];
+      });
+
+      $$("[data-i18n-meta]").forEach(el => {
+        const key = el.getAttribute("data-i18n-meta");
+        if (dict[key] != null) el.setAttribute("content", dict[key]);
+      });
+      const titleEl = $("title[data-i18n='meta_title']");
+      if (titleEl && dict.meta_title) titleEl.textContent = dict.meta_title;
+
+      const carousel = $(".carousel");
+      if (carousel && dict.aria_carousel) carousel.setAttribute("aria-label", dict.aria_carousel);
+      
+      $$(".stars[aria-label]").forEach(st => st.setAttribute("aria-label", dict.stars_label?.(5) || "5/5"));
+      
+      // La sección de servicios se actualiza a través de su propia lógica
+      if (typeof window.renderServicesI18n === 'function') {
+        window.renderServicesI18n(lang);
+      }
+    }
+
+    function updateLangUI(lang) {
+      const toggle = $(".lang-toggle img");
+      const optImg = $(`.lang-menu [data-lang="${lang}"] img`);
+      if (toggle && optImg) {
+        toggle.src = optImg.src;
+        toggle.alt = optImg.alt || lang;
+      }
+      $$(".lang-menu [data-lang]").forEach(btn => {
+        btn.setAttribute("aria-pressed", String(btn.getAttribute("data-lang") === lang));
+      });
+    }
+
+    function bindLangSwitch() {
+      const dd = $(".lang-dropdown");
+      if (!dd) return;
+      const toggle = dd.querySelector(".lang-toggle");
+      const menu = dd.querySelector(".lang-menu");
+
+      const open = () => { dd.classList.add("open"); toggle.setAttribute("aria-expanded", "true"); }
+      const close = () => { dd.classList.remove("open"); toggle.setAttribute("aria-expanded", "false"); }
+      
+      on(toggle, "click", (e) => {
+        e.stopPropagation();
+        dd.classList.contains("open") ? close() : open();
+      });
+
+      on(menu, "click", (e) => {
+        const btn = e.target.closest("[data-lang]");
+        if (!btn) return;
+        const nextLang = btn.getAttribute("data-lang");
+        if (!I18N[nextLang] || nextLang === currentLang) {
+          close();
+          return;
+        }
+        currentLang = nextLang;
+        localStorage.setItem("lang", currentLang);
+        applyI18n(currentLang);
+        updateLangUI(currentLang);
+        close();
+      });
+
+      on(document, "click", (e) => {
+        if (dd.classList.contains("open") && !dd.contains(e.target)) close();
+      });
+      on(document, "keydown", (e) => { if (e.key === "Escape") close(); });
+    }
+    
+    // Hacemos el diccionario accesible globalmente para otros módulos
+    window.I18N = I18N;
+
+    // --- Inicialización ---
+    function init() {
+      bindLangSwitch();
+      applyI18n(currentLang);
+      updateLangUI(currentLang);
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
+
+
+  // ===============================================
+  //  4. SERVICIOS DINÁMICOS Y RESERVA WHATSAPP
+  // ===============================================
   (function services() {
     const host = $("#servicios");
     if (!host) return;
     if (host.querySelector(".svc-wrap")) return;
 
-    const CATALOG = [
-      { id: "corte", name: "Corte clásico", price: 12 },
-      { id: "fade", name: "Corte fade", price: 14 },
-      { id: "barba", name: "Arreglo de barba", price: 10 },
-      { id: "afeitado", name: "Afeitado a navaja", price: 11 },
-      { id: "combo", name: "Corte + Barba", price: 20 },
-      { id: "nino", name: "Corte niño", price: 9 },
+    const CATALOG_DATA = [
+      { id: "corte", price: 12 }, { id: "fade", price: 14 },
+      { id: "barba", price: 10 }, { id: "afeitado", price: 11 },
+      { id: "combo", price: 20 }, { id: "nino", price: 9 },
     ];
+    
+    const selected = new Set();
+    let currentLang = (localStorage.getItem("lang") || "es").slice(0, 2);
 
-    const waCTA = $(".whatsapp-btn.grande");
-    const waHref = waCTA?.getAttribute("href") || "";
-    const waNumber = (waHref.match(/wa\.me\/(\d+)/) || [])[1] || "34123456789";
-
+    // Crear la estructura HTML una sola vez
     const wrap = document.createElement("div");
     wrap.className = "svc-wrap";
     wrap.innerHTML = `
       <div class="svc-grid"></div>
       <div class="svc-bar">
         <div class="svc-when">
-          <label>Fecha y hora preferida</label>
+          <label></label>
           <input type="datetime-local" class="svc-dt">
         </div>
-        <div class="svc-total"><span>Total:</span> <strong class="svc-amount">0 €</strong></div>
-        <button type="button" class="svc-wa">Reservar por WhatsApp</button>
-      </div>
-    `;
+        <div class="svc-total"><span></span> <strong class="svc-amount"></strong></div>
+        <button type="button" class="svc-wa"></button>
+      </div>`;
     host.appendChild(wrap);
-
-    const style = document.createElement("style");
-    style.textContent = `
-      .svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 16px; }
-      .svc-card { border: 2px solid #f6c90e; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 12px rgba(26,34,56,0.06); background: #fff; }
-      .svc-card h3 { margin: 0; font-size: 1.05rem; color: #232946; }
-      .svc-card .price { font-weight: 700; color: #232946; }
-      .svc-card button { align-self: flex-start; background: #232946; color:#fff; border: 2px solid #f6c90e; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-weight: 700; }
-      .svc-card button.active { background: #f6c90e; color:#232946; }
-      .svc-bar { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; border-top: 3px solid #f6c90e; padding-top: 14px; }
-      .svc-when label { display:block; font-weight:700; margin-bottom:6px; color:#232946;}
-      .svc-dt { padding: 10px; border-radius: 6px; border:1.5px solid #232946; background:#f5f6fa; }
-      .svc-total { font-size:1.1rem; }
-      .svc-wa { background: linear-gradient(90deg, #f6c90e 0%, #232946 100%); color:#232946; border: 2px solid #f6c90e; border-radius: 10px; padding: 10px 14px; font-weight: 800; cursor: pointer; }
-      @media (max-width:720px){ .svc-bar { grid-template-columns: 1fr; } .svc-total { justify-self: start; } }
-    `;
-    document.head.appendChild(style);
 
     const grid = $(".svc-grid", wrap);
     const amountEl = $(".svc-amount", wrap);
+    const totalLabel = $(".svc-total span", wrap);
+    const dtLabel = $(".svc-when label", wrap);
     const dtInput = $(".svc-dt", wrap);
     const waBtn = $(".svc-wa", wrap);
 
-    const selected = new Set();
+    const formatEUR = (n, lang) => new Intl.NumberFormat(lang, { style: "currency", currency: "EUR" }).format(n);
 
-    function renderCards() {
+    function updateTotal(lang) {
+      const dict = window.I18N[lang] || window.I18N.es;
+      const total = CATALOG_DATA.filter((s) => selected.has(s.id)).reduce((a, b) => a + b.price, 0);
+      totalLabel.textContent = dict.svc_total;
+      amountEl.textContent = formatEUR(total, lang);
+    }
+
+    // Exponemos la función de renderizado para que el sistema i18n pueda llamarla
+    window.renderServicesI18n = function(lang) {
+      currentLang = lang;
+      const dict = window.I18N[lang] || window.I18N.es;
+      
       grid.innerHTML = "";
-      CATALOG.forEach((svc) => {
+      CATALOG_DATA.forEach((svc) => {
+        const name = dict.svc_catalog[svc.id] || svc.id;
         const card = document.createElement("article");
         card.className = "svc-card";
+        const isSelected = selected.has(svc.id);
+        
         card.innerHTML = `
-          <h3>${svc.name}</h3>
-          <div class="price">${formatEUR(svc.price)}</div>
-          <button type="button" data-id="${svc.id}" aria-pressed="false">Añadir</button>
-        `;
+          <h3>${name}</h3>
+          <div class="price">${formatEUR(svc.price, lang)}</div>
+          <button type="button" data-id="${svc.id}" aria-pressed="${isSelected}">${isSelected ? dict.svc_remove : dict.svc_add}</button>`;
+        
         const btn = $("button", card);
+        if (isSelected) btn.classList.add("active");
+
         on(btn, "click", () => {
           const isActive = btn.classList.toggle("active");
-          btn.textContent = isActive ? "Quitar" : "Añadir";
+          btn.textContent = isActive ? dict.svc_remove : dict.svc_add;
           btn.setAttribute("aria-pressed", String(isActive));
           if (isActive) selected.add(svc.id);
           else selected.delete(svc.id);
-          updateTotal();
+          updateTotal(lang);
         });
         grid.appendChild(card);
       });
-    }
 
-    function updateTotal() {
-      const total = CATALOG.filter((s) => selected.has(s.id)).reduce((a, b) => a + b.price, 0);
-      amountEl.textContent = formatEUR(total);
-    }
-
+      dtLabel.textContent = dict.svc_when_label;
+      waBtn.textContent = dict.svc_reserve_whatsapp;
+      updateTotal(lang);
+    };
+    
     on(waBtn, "click", () => {
-      const chosen = CATALOG.filter((s) => selected.has(s.id));
-      if (!chosen.length) { alert("Selecciona al menos un servicio."); return; }
-      const dtVal = dtInput.value ? new Date(dtInput.value) : null;
-      const whenTxt = dtVal
-        ? `${dtVal.toLocaleDateString("es-ES")} ${dtVal.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`
-        : "Sin fecha/hora";
+        const dict = window.I18N[currentLang] || window.I18N.es;
+        const chosen = CATALOG_DATA.filter((s) => selected.has(s.id));
+        if (!chosen.length) { alert("Selecciona al menos un servicio."); return; }
+        
+        const dtVal = dtInput.value ? new Date(dtInput.value) : null;
+        const whenTxt = dtVal ? `${dtVal.toLocaleDateString(currentLang)} ${dtVal.toLocaleTimeString(currentLang, { hour: "2-digit", minute: "2-digit" })}` : dict.svc_no_date;
 
-      const lines = [
-        "Hola, me gustaría reservar:",
-        ...chosen.map((s) => `• ${s.name} — ${formatEUR(s.price)}`),
-        `Total aprox.: ${formatEUR(chosen.reduce((a, b) => a + b.price, 0))}`,
-        `Fecha/hora preferida: ${whenTxt}`,
-        "",
-        "¿Hay disponibilidad? ¡Gracias!"
-      ];
-      const url = `https://wa.me/${waNumber}?text=${encode(lines.join("\n"))}`;
-      window.open(url, "_blank", "noopener");
+        const total = chosen.reduce((a, b) => a + b.price, 0);
+
+        const lines = [
+            dict.svc_msg_header,
+            ...chosen.map((s) => `• ${dict.svc_catalog[s.id]} — ${formatEUR(s.price, currentLang)}`),
+            `${dict.svc_msg_total} ${formatEUR(total, currentLang)}`,
+            `${dict.svc_msg_when} ${whenTxt}`,
+            "",
+            dict.svc_msg_footer
+        ];
+
+        const waCTA = $(".whatsapp-btn.grande");
+        const waHref = waCTA?.getAttribute("href") || "";
+        const waNumber = (waHref.match(/wa\.me\/(\d+)/) || [])[1] || "34651435444";
+        const url = `https://wa.me/${waNumber}?text=${encode(lines.join("\n"))}`;
+        window.open(url, "_blank", "noopener");
     });
 
-    renderCards();
-    updateTotal();
+    // Renderizado inicial
+    window.renderServicesI18n(currentLang);
   })();
 
-  // ===== Lightbox para galería =====
-  (function galleryLightbox() {
-    function init() {
-      const grid = document.querySelector(".gallery-grid");
-      if (!grid) return;
+  // ===============================================
+  //  5. GALERÍA CON LIGHTBOX (CORREGIDO) Y AUTOPLAY
+  // ===============================================
+  (function galleryFeatures() {
+    // --- Autoplay ---
+    const wrap = $(".gallery-carousel");
+    if (!wrap) return;
+    if (wrap.dataset.init === "1") return;
+    wrap.dataset.init = "1";
 
-      // crear contenedor si no existe
-      let lb = document.querySelector(".lightbox");
-      if (!lb) {
-        lb = document.createElement("div");
-        lb.className = "lightbox";
-        lb.setAttribute("hidden", "");
-        lb.innerHTML = `
-          <button class="lb-close" aria-label="Cerrar">&times;</button>
-          <img class="lb-img" alt="">
-          <button class="lb-prev" aria-label="Anterior">&#10094;</button>
-          <button class="lb-next" aria-label="Siguiente">&#10095;</button>
-        `;
-        document.body.appendChild(lb);
-      }
+    const slides = $$(".g-slide", wrap);
+    if (slides.length <= 1) return;
 
-      const imgEl = lb.querySelector(".lb-img");
-      const btnClose = lb.querySelector(".lb-close");
-      const btnPrev = lb.querySelector(".lb-prev");
-      const btnNext = lb.querySelector(".lb-next");
+    const INTERVAL = Math.max(1000, parseInt(wrap.dataset.interval || "9000", 10));
+    const prevBtn = $(".g-prev", wrap);
+    const nextBtn = $(".g-next", wrap);
+    
+    let i = slides.findIndex(s => s.classList.contains("active"));
+    if (i < 0) { i = 0; slides[0].classList.add("active"); }
 
-      const items = Array.from(grid.querySelectorAll(".gallery-item"));
-      let idx = -1;
+    let timer = null;
 
-      function open(i) {
-        idx = i;
-        const a = items[idx];
-        const full = a.getAttribute("data-full") || a.getAttribute("href");
-        const alt = a.querySelector("img")?.getAttribute("alt") || "";
-        imgEl.src = full;
-        imgEl.alt = alt;
-        lb.hidden = false;
-        document.body.style.overflow = "hidden";
-      }
-      function close() {
-        lb.hidden = true;
-        imgEl.src = "";
-        document.body.style.overflow = "";
-      }
-      const prev = () => open((idx - 1 + items.length) % items.length);
-      const next = () => open((idx + 1) % items.length);
+    function show(n) { slides.forEach((s, idx) => s.classList.toggle("active", idx === n)); i = n; }
+    const next = () => show((i + 1) % slides.length);
+    const prev = () => show((i - 1 + slides.length) % slides.length);
+    const stop = () => { if (timer) clearInterval(timer); timer = null; }
+    const start = () => { stop(); timer = setInterval(next, INTERVAL); }
 
-      grid.addEventListener("click", (e) => {
-        const a = e.target.closest(".gallery-item");
-        if (!a) return;
-        e.preventDefault();
-        const i = items.indexOf(a);
-        if (i >= 0) open(i);
-      });
-      btnClose.addEventListener("click", close);
-      btnPrev.addEventListener("click", prev);
-      btnNext.addEventListener("click", next);
-      lb.addEventListener("click", (e) => { if (e.target === lb) close(); });
+    on(prevBtn, "click", () => { prev(); start(); });
+    on(nextBtn, "click", () => { next(); start(); });
+    on(wrap, "mouseenter", stop);
+    on(wrap, "mouseleave", start);
 
-      window.addEventListener("keydown", (e) => {
-        if (lb.hidden) return;
-        if (e.key === "Escape") close();
-        if (e.key === "ArrowLeft") prev();
-        if (e.key === "ArrowRight") next();
-      });
+    let startX = 0, dx = 0, touching = false;
+    on(wrap, "touchstart", (e) => { touching = true; startX = e.touches[0].clientX; dx = 0; stop(); }, { passive: true });
+    on(wrap, "touchmove", (e) => { if (touching) dx = e.touches[0].clientX - startX; }, { passive: true });
+    on(wrap, "touchend", () => { touching = false; if (Math.abs(dx) > 40) (dx < 0 ? next : prev)(); start(); });
+
+    show(i);
+    start();
+    
+    // --- Lightbox (integrado y corregido) ---
+    let lb = $(".lightbox");
+    if (!lb) {
+      lb = document.createElement("div");
+      lb.className = "lightbox";
+      lb.hidden = true;
+      lb.innerHTML = `
+        <button class="lb-close" aria-label="Cerrar">×</button>
+        <img class="lb-img" alt="">
+        <button class="lb-prev" aria-label="Anterior">❮</button>
+        <button class="lb-next" aria-label="Siguiente">❯</button>`;
+      document.body.appendChild(lb);
     }
 
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", init);
-    } else {
-      init();
+    const imgEl = $(".lb-img", lb);
+    const btnClose = $(".lb-close", lb);
+    const btnLbPrev = $(".lb-prev", lb);
+    const btnLbNext = $(".lb-next", lb);
+    let currentIdx = -1;
+
+    function openLightbox(index) {
+      currentIdx = index;
+      const a = slides[currentIdx];
+      const full = a.getAttribute("data-full") || a.getAttribute("href");
+      const alt = $("img", a)?.getAttribute("alt") || "";
+      imgEl.src = full;
+      imgEl.alt = alt;
+      lb.hidden = false;
+      document.body.style.overflow = "hidden";
     }
+    
+    function closeLightbox() {
+      lb.hidden = true;
+      imgEl.src = ""; // Libera memoria
+      document.body.style.overflow = "";
+    }
+    
+    const prevLightbox = () => openLightbox((currentIdx - 1 + slides.length) % slides.length);
+    const nextLightbox = () => openLightbox((currentIdx + 1) % slides.length);
+
+    on(wrap, "click", (e) => {
+      const a = e.target.closest(".g-slide");
+      if (!a) return;
+      e.preventDefault();
+      const index = slides.indexOf(a);
+      if (index >= 0) openLightbox(index);
+    });
+
+    on(btnClose, "click", closeLightbox);
+    on(btnLbPrev, "click", prevLightbox);
+    on(btnLbNext, "click", nextLightbox);
+    on(lb, "click", (e) => { if (e.target === lb) closeLightbox(); });
+    on(window, "keydown", (e) => {
+      if (lb.hidden) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") prevLightbox();
+      if (e.key === "ArrowRight") nextLightbox();
+    });
   })();
 
-  // Aviso 'síguenos' cuando el usuario llega al final (con retardo robusto)
+
+  // =================================
+  //  6. AVISO 'SÍGUENOS' (CTA)
+  // =================================
   (function followCTA() {
-    function init() {
-      const footer = document.querySelector("footer");
-      if (!footer) return;
+    const footer = $("footer");
+    if (!footer) return;
 
-      // 1) Asegurar que el CTA existe ANTES de usarlo
-      let cta = document.getElementById("follow-cta");
-      if (!cta) {
-        cta = document.createElement("div");
-        cta.className = "follow-cta";
-        cta.id = "follow-cta";
-        cta.hidden = true;
-        cta.innerHTML = `
-        <button class="cta-close" aria-label="Cerrar">&times;</button>
-        <p>¡No te olvides de seguirnos en nuestras RRSS!</p>
-        <div class="cta-actions">
-          <a href="https://www.instagram.com/barberia_hugo_" target="_blank" rel="noopener" class="btn-cta ig">
-            <img src="icons8-instagram.svg" alt="" aria-hidden="true"> Instagram
-          </a>
-          <a href="https://www.facebook.com/p/Hugo-Barberia-Campos-100058625056973/" target="_blank" rel="noopener" class="btn-cta fb">
-            <img src="icons8-facebook-nuevo.svg" alt="" aria-hidden="true"> Facebook
-          </a>
-        </div>
-      `;
-        document.body.appendChild(cta);
-      }
-
-      // 2) Cerrar y recordar el descarte
-      const closeBtn = cta.querySelector(".cta-close");
-      const hideCTA = () => {
-        cta.classList.remove("show");
-        sessionStorage.setItem("ctaDismissed", "1");
-        clearTimeout(timer);
-        setTimeout(() => { cta.hidden = true; }, 200);
-      };
-      closeBtn?.addEventListener("click", hideCTA);
-
-      // 3) Retardo de aparición
-      const DELAY = 3000; // 3s
-      let timer = null;
-
-      const showCTA = () => {
-        if (sessionStorage.getItem("ctaDismissed") || cta.classList.contains("show")) return;
-        cta.hidden = false;
-        requestAnimationFrame(() => cta.classList.add("show"));
-      };
-      const scheduleShow = () => {
-        clearTimeout(timer);
-        timer = setTimeout(showCTA, DELAY);
-      };
-      const cancelShow = () => {
-        clearTimeout(timer);
-        timer = null;
-      };
-
-      // 4) Observar el footer (con retardo y cancelación si se va)
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach((en) => en.isIntersecting ? scheduleShow() : cancelShow());
-      }, { threshold: 0.1 });
-      io.observe(footer);
+    let cta = $("#follow-cta");
+    if (!cta) {
+      cta = document.createElement("div");
+      cta.id = "follow-cta";
+      cta.className = "follow-cta";
+      cta.hidden = true;
+      cta.innerHTML = `
+      <button class="cta-close" aria-label="Cerrar">×</button>
+      <p>¡No te olvides de seguirnos en nuestras RRSS!</p>
+      <div class="cta-actions">
+        <a href="https://www.instagram.com/barberia_hugo_" target="_blank" rel="noopener" class="btn-cta ig"><img src="icons8-instagram.svg" alt="" aria-hidden="true"> Instagram</a>
+        <a href="https://www.facebook.com/p/Hugo-Barberia-Campos-100058625056973/" target="_blank" rel="noopener" class="btn-cta fb"><img src="icons8-facebook-nuevo.svg" alt="" aria-hidden="true"> Facebook</a>
+      </div>`;
+      document.body.appendChild(cta);
     }
 
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", init);
-    } else {
-      init();
-    }
+    const closeBtn = $(".cta-close", cta);
+    let timer = null;
+    const hideCTA = () => {
+      cta.classList.remove("show");
+      sessionStorage.setItem("ctaDismissed", "1");
+      clearTimeout(timer);
+      setTimeout(() => { cta.hidden = true; }, 200);
+    };
+    on(closeBtn, "click", hideCTA);
+
+    const showCTA = () => {
+      if (sessionStorage.getItem("ctaDismissed") || cta.classList.contains("show")) return;
+      cta.hidden = false;
+      requestAnimationFrame(() => cta.classList.add("show"));
+    };
+    const scheduleShow = () => { clearTimeout(timer); timer = setTimeout(showCTA, 3000); };
+    const cancelShow = () => { clearTimeout(timer); timer = null; };
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => en.isIntersecting ? scheduleShow() : cancelShow());
+    }, { threshold: 0.1 });
+    io.observe(footer);
   })();
 
-  // Miscelánea
-  (function misc() {
+  // =================================
+  //  7. ANIMACIONES DE ENTRADA
+  // =================================
+  (function revealAnimations() {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const targets = $$('.reveal, .stagger');
+    if (!targets.length || reduce) {
+      targets.forEach(el => el.classList.add('is-visible'));
+      return;
+    }
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (!en.isIntersecting) return;
+        const el = en.target;
+        if (el.classList.contains('stagger')) {
+          const gap = Number(el.dataset.stagger ?? 80);
+          const base = Number(el.dataset.delay ?? 0);
+          Array.from(el.children).forEach((child, i) => {
+            child.style.transitionDelay = `${base + i * gap}ms`;
+          });
+        } else {
+          el.style.transitionDelay = `${Number(el.dataset.delay ?? 0)}ms`;
+        }
+        el.classList.add('is-visible');
+        io.unobserve(el);
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+    targets.forEach((el) => io.observe(el));
+  })();
+  
+  // =================================
+  //  8. EFECTOS "WOW" Y MISCELÁNEA
+  // =================================
+  (function miscAndWowEffects() {
+    // Rel noopener para enlaces externos
     $$("a[target='_blank']").forEach((a) => {
       if (!/noopener/.test(a.rel)) a.rel = (a.rel ? a.rel + " " : "") + "noopener";
     });
 
-    const map = $(".mapa iframe");
-    if (map) {
-      on(map, "error", () => {
-        const backup = document.createElement("p");
-        backup.innerHTML = `<a href="https://www.google.com/maps?q=41.7171479,-0.8414919" target="_blank">Abrir mapa en Google Maps</a>`;
-        map.replaceWith(backup);
+    // Fallback para mapa de Google
+    on($(".mapa iframe"), "error", (e) => {
+      const backup = document.createElement("p");
+      backup.innerHTML = `<a href="https://www.google.com/maps?q=41.7171479,-0.8414919" target="_blank">Abrir mapa en Google Maps</a>`;
+      e.target.replaceWith(backup);
+    });
+
+    // Efectos que respetan 'prefers-reduced-motion'
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
+
+    // Tilt del logo en hero
+    const hero = $("header");
+    const logo = $(".logo-barber");
+    if (hero && logo) {
+      on(hero, "mousemove", (e) => {
+        const r = hero.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        logo.style.transform = `rotateX(${-y * 6}deg) rotateY(${x * 6}deg) translateZ(0)`;
       });
+      on(hero, "mouseleave", () => { logo.style.transform = "rotateX(0) rotateY(0)"; });
+    }
+
+    // Barra de progreso de scroll
+    const bar = $("#scrollProgress");
+    if (bar) {
+      const updateProgress = () => {
+        const h = document.documentElement;
+        const scrolled = h.scrollTop || document.body.scrollTop;
+        const max = (h.scrollHeight - h.clientHeight) || 1;
+        bar.style.width = `${Math.min(100, (scrolled / max) * 100)}%`;
+      };
+      updateProgress();
+      on(window, "scroll", updateProgress, { passive: true });
+      on(window, "resize", updateProgress);
     }
   })();
+  
+  console.log("%cSitio diseñado por delysz — https://github.com/delysz", "color: #f6c90e; font-size:14px;");
 
 })();
-
-// ===== GALERÍA: autoplay controlado (sin duplicados, con intervalo configurable) =====
-(function galleryAutoplay() {
-  const wrap = document.querySelector(".gallery-carousel");
-  if (!wrap) return;
-
-  // Evitar doble inicialización
-  if (wrap.dataset.autoplayInit === "1") return;
-  wrap.dataset.autoplayInit = "1";
-
-  const slides = Array.from(wrap.querySelectorAll(".g-slide"));
-  if (slides.length <= 1) return;
-
-  // Permite setear <div class="gallery-carousel" data-interval="12000">
-  const INTERVAL = Math.max(1000, parseInt(wrap.dataset.interval || "12000", 10));
-
-  const prevBtn = wrap.querySelector(".g-prev");
-  const nextBtn = wrap.querySelector(".g-next");
-
-  // Si ninguna está activa, activar la primera
-  let i = slides.findIndex(s => s.classList.contains("active"));
-  if (i < 0) { i = 0; slides[0].classList.add("active"); }
-
-  // Guardar el timer en la instancia para poder limpiarlo si se re-ejecuta
-  if (wrap._autoplayTimer) clearInterval(wrap._autoplayTimer);
-  let timer = null;
-
-  function show(n) {
-    slides.forEach((s, idx) => s.classList.toggle("active", idx === n));
-    i = n;
-  }
-  function next() { show((i + 1) % slides.length); }
-  function prev() { show((i - 1 + slides.length) % slides.length); }
-
-  function start() {
-    stop();
-    wrap._autoplayTimer = timer = setInterval(next, INTERVAL);
-  }
-  function stop() {
-    if (timer) clearInterval(timer);
-    timer = null;
-  }
-
-  prevBtn?.addEventListener("click", () => { prev(); start(); });
-  nextBtn?.addEventListener("click", () => { next(); start(); });
-  wrap.addEventListener("mouseenter", stop);
-  wrap.addEventListener("mouseleave", start);
-
-  // Swipe táctil
-  let startX = 0, dx = 0, touching = false;
-  wrap.addEventListener("touchstart", (e) => { touching = true; startX = e.touches[0].clientX; dx = 0; stop(); }, { passive: true });
-  wrap.addEventListener("touchmove", (e) => { if (touching) dx = e.touches[0].clientX - startX; }, { passive: true });
-  wrap.addEventListener("touchend", () => { touching = false; if (Math.abs(dx) > 40) (dx < 0 ? next : prev)(); start(); });
-
-  console.log("Gallery autoplay running at", INTERVAL, "ms");
-  show(i);
-  start();
-})();
-
-
-// Animaciones de entrada (reveal + stagger)
-(function revealAnimations() {
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const targets = Array.from(document.querySelectorAll('.reveal, .stagger'));
-  if (!targets.length) return;
-
-  // Si el usuario prefiere menos movimiento, mostramos todo y salimos
-  if (reduce) {
-    targets.forEach(el => el.classList.add('is-visible'));
-    return;
-  }
-
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((en) => {
-      if (!en.isIntersecting) return;
-      const el = en.target;
-
-      // Activar stagger si procede
-      if (el.classList.contains('stagger')) {
-        const gap = Number(el.dataset.stagger ?? 80);   // ms entre hijos
-        const base = Number(el.dataset.delay ?? 0);     // retraso inicial
-        Array.from(el.children).forEach((child, i) => {
-          child.style.transitionDelay = `${base + i * gap}ms`;
-        });
-      } else {
-        // Elementos reveal individuales
-        const d = Number(el.dataset.delay ?? 0);
-        el.style.transitionDelay = `${d}ms`;
-      }
-
-      el.classList.add('is-visible');
-      io.unobserve(el); // ya no necesita observarse
-    });
-  }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
-
-  targets.forEach((el) => io.observe(el));
-})();
-
-
-// ===== i18n básico (ES/EN/FR/DE) =====
-(() => {
-  const $ = (sel, root = document) => root.querySelector(sel);
-  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-
-  // Tabla de traducciones
-  const I18N = {
-    es: {
-      gallery_title: "Galería",          // en: "Gallery", fr: "Galerie", de: "Galerie"
-      hours_title: "Horario",            // en: "Hours", fr: "Horaires", de: "Zeiten"
-      hours_mon: "Lunes: 16:00 – 21:00",
-      hours_week: "Mar–Vie: 9:45 – 14:00 / 16:00 – 21:00",
-      hours_weekend: "Sáb–Dom: Cerrado",
-      hours_quote: "«El tiempo dedicado a ti mismo nunca es tiempo perdido»",
-      contact_title: "Contacto",         // en: "Contact", fr: "Contact", de: "Kontakt"
-      contact_blurb: "Encuéntranos en San Juan de Mozarrifar, Zaragoza. Llámanos, escríbenos por WhatsApp o ven a visitarnos.",
-      btn_whatsapp: "WhatsApp",
-      btn_directions: "Cómo llegar",
-      footer_copy: "© 2025 Barbería Hugo — Todos los derechos reservados",
-      // Meta / generales
-      meta_title: "Barbería Hugo | Cortes, Barba y Estilo en Zaragoza",
-      meta_desc: "Barbería Hugo en Zaragoza. Cortes clásicos y modernos, afeitado a navaja y arreglos de barba. Reserva fácil por WhatsApp.",
-      tagline: "Donde el estilo se convierte en identidad",
-      // Nav
-      nav_home: "Inicio",
-      nav_services: "Servicios",
-      nav_gallery: "Galería",
-      nav_hours: "Horario",
-      nav_contact: "Contacto",
-      // Secciones
-      reviews_title: "Lo que nuestros clientes dicen",
-      // Servicios UI
-      svc_when_label: "Fecha y hora preferida",
-      svc_total: "Total:",
-      svc_add: "Añadir",
-      svc_remove: "Quitar",
-      svc_reserve_whatsapp: "Reservar por WhatsApp",
-      svc_no_date: "Sin fecha/hora",
-      svc_msg_header: "Hola, me gustaría reservar:",
-      svc_msg_total: "Total aprox.:",
-      svc_msg_when: "Fecha/hora preferida:",
-      svc_msg_footer: "¿Hay disponibilidad? ¡Gracias!",
-      // Catálogo
-      svc_catalog: {
-        corte: "Corte clásico",
-        fade: "Corte fade",
-        barba: "Arreglo de barba",
-        afeitado: "Afeitado a navaja",
-        combo: "Corte + Barba",
-        nino: "Corte niño",
-      },
-      aria_carousel: "Carrusel de opiniones de clientes",
-      stars_label: (n = 5) => `${n} de 5`,
-    },
-    en: {
-      gallery_title: "Gallery",
-      hours_title: "Hours",
-      hours_mon: "Monday: 16:00 – 21:00",
-      hours_week: "Tue–Fri: 9:45 – 14:00 / 16:00 – 21:00",
-      hours_weekend: "Sat–Sun: Closed",
-      hours_quote: "“Time spent on yourself is never wasted”",
-      contact_title: "Contact",
-      contact_blurb: "Find us in San Juan de Mozarrifar, Zaragoza. Call us, write on WhatsApp or come visit us.",
-      btn_whatsapp: "WhatsApp",
-      btn_directions: "Directions",
-      footer_copy: "© 2025 Hugo Barbershop — All rights reserved",
-      meta_title: "Hugo Barbershop | Cuts, Beard & Style in Zaragoza",
-      meta_desc: "Hugo Barbershop in Zaragoza. Classic and modern cuts, straight-razor shaves and beard trims. Easy booking via WhatsApp.",
-      tagline: "Where style becomes identity",
-      nav_home: "Home",
-      nav_services: "Services",
-      nav_gallery: "Gallery",
-      nav_hours: "Hours",
-      nav_contact: "Contact",
-      reviews_title: "What our clients say",
-      svc_when_label: "Preferred date & time",
-      svc_total: "Total:",
-      svc_add: "Add",
-      svc_remove: "Remove",
-      svc_reserve_whatsapp: "Book via WhatsApp",
-      svc_no_date: "No date/time",
-      svc_msg_header: "Hi, I'd like to book:",
-      svc_msg_total: "Approx. total:",
-      svc_msg_when: "Preferred date/time:",
-      svc_msg_footer: "Is there availability? Thanks!",
-      svc_catalog: {
-        corte: "Classic haircut",
-        fade: "Fade haircut",
-        barba: "Beard trim",
-        afeitado: "Straight-razor shave",
-        combo: "Haircut + Beard",
-        nino: "Kids haircut",
-      },
-      aria_carousel: "Customer reviews carousel",
-      stars_label: (n = 5) => `${n} out of 5`,
-    },
-    fr: {
-      hours_title: "Horaires",
-      hours_mon: "Lundi : 16h00 – 21h00",
-      hours_week: "Mar–Ven : 9h45 – 14h00 / 16h00 – 21h00",
-      hours_weekend: "Sam–Dim : Fermé",
-      hours_quote: "« Le temps consacré à soi-même n’est jamais perdu »",
-      gallery_title: "Galerie",
-      hours_title: "Horaires",
-      contact_title: "Contact",
-      contact_blurb: "Retrouvez-nous à San Juan de Mozarrifar, Saragosse. Appelez-nous, écrivez sur WhatsApp ou venez nous rendre visite.",
-      btn_whatsapp: "WhatsApp",
-      btn_directions: "Comment y arriver",
-      footer_copy: "© 2025 Barbería Hugo — Tous droits réservés",
-      tagline: "Là où le style devient identité",
-      nav_home: "Accueil",
-      nav_services: "Services",
-      nav_gallery: "Galerie",
-      nav_hours: "Horaires",
-      nav_contact: "Contact",
-      reviews_title: "Ce que disent nos clients",
-      svc_when_label: "Date et heure souhaitées",
-      svc_total: "Total :",
-      svc_add: "Ajouter",
-      svc_remove: "Retirer",
-      svc_reserve_whatsapp: "Réserver par WhatsApp",
-      meta_title: "Barbería Hugo | Coupes, Barbe & Style à Saragosse",
-      meta_desc: "Barbería Hugo à Saragosse. Coupes classiques et modernes, rasage au coupe-chou et taille de barbe. Réservation facile par WhatsApp.",
-      tagline: "Là où le style devient identité",
-      nav_home: "Accueil",
-      nav_services: "Services",
-      nav_gallery: "Galerie",
-      nav_hours: "Horaires",
-      nav_contact: "Contact",
-      reviews_title: "Ce que disent nos clients",
-      svc_when_label: "Date et heure préférées",
-      svc_total: "Total :",
-      svc_add: "Ajouter",
-      svc_remove: "Retirer",
-      svc_reserve_whatsapp: "Réserver via WhatsApp",
-      svc_no_date: "Sans date/heure",
-      svc_msg_header: "Bonjour, j’aimerais réserver :",
-      svc_msg_total: "Total approx. :",
-      svc_msg_when: "Date/heure préférées :",
-      svc_msg_footer: "Y a-t-il de la disponibilité ? Merci !",
-      svc_catalog: {
-        corte: "Coupe classique",
-        fade: "Coupe dégradée",
-        barba: "Taille de barbe",
-        afeitado: "Rasage au coupe-chou",
-        combo: "Coupe + Barbe",
-        nino: "Coupe enfant",
-      },
-      aria_carousel: "Carrousel d’avis clients",
-      stars_label: (n = 5) => `${n} sur 5`,
-    },
-    de: {
-      hours_title: "Öffnungszeiten",
-      hours_mon: "Montag: 16:00 – 21:00",
-      hours_week: "Di–Fr: 9:45 – 14:00 / 16:00 – 21:00",
-      hours_weekend: "Sa–So: Geschlossen",
-      hours_quote: "„Zeit für dich selbst ist nie vergeudet“",
-      gallery_title: "Galerie",
-      hours_title: "Zeiten",
-      contact_title: "Kontakt",
-      contact_blurb: "Besuchen Sie uns in San Juan de Mozarrifar, Saragossa. Rufen Sie uns an, schreiben Sie über WhatsApp oder kommen Sie vorbei.",
-      btn_whatsapp: "WhatsApp",
-      btn_directions: "Anfahrt",
-      footer_copy: "© 2025 Barbería Hugo — Alle Rechte vorbehalten",
-      tagline: "Wo Stil zur Identität wird",
-      nav_home: "Start",
-      nav_services: "Dienstleistungen",
-      nav_gallery: "Galerie",
-      nav_hours: "Öffnungszeiten",
-      nav_contact: "Kontakt",
-      reviews_title: "Was unsere Kunden sagen",
-      svc_when_label: "Bevorzugtes Datum und Uhrzeit",
-      svc_total: "Gesamt:",
-      svc_add: "Hinzufügen",
-      svc_remove: "Entfernen",
-      svc_reserve_whatsapp: "Über WhatsApp reservieren",
-      meta_title: "Hugo Barbershop | Haarschnitt, Bart & Stil in Saragossa",
-      meta_desc: "Hugo Barbershop in Saragossa. Klassische & moderne Schnitte, Rasur mit Klinge und Bartservice. Einfache Buchung per WhatsApp.",
-      tagline: "Wo Stil zur Identität wird",
-      nav_home: "Start",
-      nav_services: "Leistungen",
-      nav_gallery: "Galerie",
-      nav_hours: "Zeiten",
-      nav_contact: "Kontakt",
-      reviews_title: "Was unsere Kund:innen sagen",
-      svc_when_label: "Bevorzugtes Datum & Uhrzeit",
-      svc_total: "Summe:",
-      svc_add: "Hinzufügen",
-      svc_remove: "Entfernen",
-      svc_reserve_whatsapp: "Per WhatsApp buchen",
-      svc_no_date: "Kein Datum/Uhrzeit",
-      svc_msg_header: "Hallo, ich möchte buchen:",
-      svc_msg_total: "Ca. Summe:",
-      svc_msg_when: "Bevorzugte Zeit:",
-      svc_msg_footer: "Gibt es Verfügbarkeit? Danke!",
-      svc_catalog: {
-        corte: "Klassischer Haarschnitt",
-        fade: "Fade-Haarschnitt",
-        barba: "Bart trimmen",
-        afeitado: "Rasur mit Klinge",
-        combo: "Haarschnitt + Bart",
-        nino: "Kinderhaarschnitt",
-      },
-      aria_carousel: "Kundenbewertungen Karussell",
-      stars_label: (n = 5) => `${n} von 5`,
-    }
-  };
-
-
-
-  // Estado de idioma
-  let currentLang = (localStorage.getItem("lang") || navigator.language || "es").slice(0, 2);
-  if (!I18N[currentLang]) currentLang = "es";
-
-  // Utilidades de formato (moneda / fecha) dependientes de idioma
-  const formatEUR = (n) => new Intl.NumberFormat(currentLang, { style: "currency", currency: "EUR" }).format(n);
-  const formatDate = (d) => d.toLocaleDateString(currentLang);
-  const formatTime = (d) => d.toLocaleTimeString(currentLang, { hour: "2-digit", minute: "2-digit" });
-
-  // Aplicar traducciones a nodos con data-i18n / data-i18n-meta
-  function applyI18n(lang) {
-    const dict = I18N[lang] || I18N.es;
-    document.documentElement.lang = lang;
-
-    // Textos visibles
-    $$("[data-i18n]").forEach(el => {
-      const key = el.getAttribute("data-i18n");
-      if (dict[key] != null) el.textContent = typeof dict[key] === "function" ? dict[key]() : dict[key];
-    });
-
-    // Meta y título
-    $$("[data-i18n-meta]").forEach(el => {
-      const key = el.getAttribute("data-i18n-meta");
-      if (dict[key] != null) el.setAttribute("content", dict[key]);
-    });
-    const titleEl = $("title[data-i18n='meta_title']");
-    if (titleEl && dict.meta_title) titleEl.textContent = dict.meta_title;
-
-    // Carrusel: aria labels de accesibilidad
-    const carousel = document.querySelector(".carousel");
-    if (carousel && dict.aria_carousel) {
-      carousel.setAttribute("aria-label", dict.aria_carousel);
-    }
-    $$(".stars[aria-label]").forEach(st => st.setAttribute("aria-label", dict.stars_label?.(5) || "5/5"));
-
-    // Actualizar botones del selector de idioma (pressed)
-    $$(".lang-switch [data-lang]").forEach(btn => {
-      const isActive = btn.getAttribute("data-lang") === lang;
-      btn.setAttribute("aria-pressed", String(isActive));
-    });
-
-    // Re-render de Servicios para nombres/etiquetas
-    renderServicesI18n();
-  }
-
-  // Inyección/actualización del bloque de “Servicios” con textos traducidos
-  function renderServicesI18n() {
-    const host = document.querySelector("#servicios");
-    if (!host) return;
-
-    // Encontrar contenedor y partes ya creadas por tu lógica original
-    const wrap = host.querySelector(".svc-wrap");
-    if (!wrap) return;
-
-    const dict = I18N[currentLang] || I18N.es;
-    const grid = wrap.querySelector(".svc-grid");
-    const amountEl = wrap.querySelector(".svc-amount");
-    const dtLabel = wrap.querySelector(".svc-when label");
-    const dtInput = wrap.querySelector(".svc-dt");
-    const waBtn = wrap.querySelector(".svc-wa");
-
-    // 1) Reconstruir tarjetas con nombres traducidos + botones "Añadir/Quitar"
-    const CATALOG_KEYS = [
-      { id: "corte", price: 12 },
-      { id: "fade", price: 14 },
-      { id: "barba", price: 10 },
-      { id: "afeitado", price: 11 },
-      { id: "combo", price: 20 },
-      { id: "nino", price: 9 },
-    ];
-
-    // Recuperar selección actual si existe
-    const selected = new Set(
-      Array.from(grid.querySelectorAll("button.active")).map(btn => btn.getAttribute("data-id"))
-    );
-
-    grid.innerHTML = "";
-    CATALOG_KEYS.forEach((svc) => {
-      const name = dict.svc_catalog[svc.id] || svc.id;
-      const card = document.createElement("article");
-      card.className = "svc-card";
-      card.innerHTML = `
-        <h3>${name}</h3>
-        <div class="price">${formatEUR(svc.price)}</div>
-        <button type="button" data-id="${svc.id}" aria-pressed="false">${dict.svc_add}</button>
-      `;
-      const btn = card.querySelector("button");
-      if (selected.has(svc.id)) {
-        btn.classList.add("active");
-        btn.textContent = dict.svc_remove;
-        btn.setAttribute("aria-pressed", "true");
-      }
-      btn.addEventListener("click", () => {
-        const isActive = btn.classList.toggle("active");
-        btn.textContent = isActive ? dict.svc_remove : dict.svc_add;
-        btn.setAttribute("aria-pressed", String(isActive));
-        if (isActive) selected.add(svc.id); else selected.delete(svc.id);
-        updateTotal();
-      });
-      grid.appendChild(card);
-    });
-
-    function updateTotal() {
-      const total = CATALOG_KEYS
-        .filter(s => selected.has(s.id))
-        .reduce((a, b) => a + b.price, 0);
-      amountEl.textContent = formatEUR(total);
-    }
-    updateTotal();
-
-    // 2) Etiquetas inferiores traducidas
-    if (dtLabel) dtLabel.textContent = dict.svc_when_label;
-    if (waBtn) waBtn.textContent = dict.svc_reserve_whatsapp;
-
-    // 3) Click de WhatsApp (único y limpio)
-    if (waBtn) {
-      // eliminar posibles listeners previos clonando el botón
-      const cleanBtn = waBtn.cloneNode(true);
-      waBtn.replaceWith(cleanBtn);
-
-      cleanBtn.addEventListener("click", () => {
-        const chosen = CATALOG_KEYS.filter((s) => selected.has(s.id));
-        if (!chosen.length) { alert("Selecciona al menos un servicio."); return; }
-
-        const dtVal = dtInput?.value ? new Date(dtInput.value) : null;
-        const whenTxt = dtVal ? `${formatDate(dtVal)} ${formatTime(dtVal)}`
-          : (I18N[currentLang]?.svc_no_date || "—");
-
-        const lines = [
-          dict.svc_msg_header,
-          ...chosen.map((s) => `• ${(dict.svc_catalog[s.id] || s.id)} — ${formatEUR(s.price)}`),
-          `${dict.svc_msg_total} ${formatEUR(chosen.reduce((a, b) => a + b.price, 0))}`,
-          `${dict.svc_msg_when} ${whenTxt}`,
-          "",
-          dict.svc_msg_footer
-        ];
-
-        const waCTA = document.querySelector(".whatsapp-btn.grande");
-        const waHref = waCTA?.getAttribute("href") || "";
-        const waNumber = (waHref.match(/wa\.me\/(\d+)/) || [])[1] || "34123456789";
-
-        const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(lines.join("\n"))}`;
-        window.open(url, "_blank", "noopener");
-      });
-    }
-
-    // Tomamos el número actual desde el enlace existente (si lo tienes en tu HTML)
-    const waCTA = document.querySelector(".whatsapp-btn.grande");
-    const waHref = waCTA?.getAttribute("href") || "";
-    const waNumber = (waHref.match(/wa\.me\/(\d+)/) || [])[1] || "34123456789";
-
-    // (El resto del código de WhatsApp click handler ya está gestionado arriba)
-  }
-
-  // Eventos de la UI de idiomas (delegación robusta)
-  function bindLangSwitch() {
-    const wrap = document.querySelector(".lang-switch");
-    if (!wrap) return;
-
-    wrap.addEventListener("click", (e) => {
-      const btn = e.target.closest("[data-lang]");
-      if (!btn || !wrap.contains(btn)) return;
-      const next = btn.getAttribute("data-lang");
-      if (!I18N[next]) return;
-
-      currentLang = next;
-      localStorage.setItem("lang", currentLang);
-      applyI18n(currentLang);
-    });
-  }
-
-
-  // Inicializar
-  function initI18n() {
-    // Si tu JS previo creó el bloque de servicios, aplicamos traducciones después de DOM ready
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () => {
-        bindLangSwitch();
-        applyI18n(currentLang);
-      });
-    } else {
-      bindLangSwitch();
-      applyI18n(currentLang);
-    }
-  }
-
-  initI18n();
-})();
-
-// WOW: tilt suave del logo en el hero (respeta reduced-motion)
-(function tiltHero() {
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduce) return;
-  const hero = document.querySelector("header");
-  const logo = document.querySelector(".logo-barber");
-  if (!hero || !logo) return;
-
-  hero.addEventListener("mousemove", (e) => {
-    const r = hero.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width - .5;
-    const y = (e.clientY - r.top) / r.height - .5;
-    logo.style.transform = `rotateX(${(-y * 6)}deg) rotateY(${x * 6}deg) translateZ(0)`;
-  });
-  hero.addEventListener("mouseleave", () => {
-    logo.style.transform = "rotateX(0) rotateY(0)";
-  });
-})();
-
-// WOW: scroll progress (respeta reduced-motion)
-(function scrollProgress() {
-  const bar = document.getElementById("scrollProgress");
-  if (!bar) return;
-  const update = () => {
-    const h = document.documentElement;
-    const scrolled = h.scrollTop || document.body.scrollTop;
-    const max = (h.scrollHeight - h.clientHeight) || 1;
-    const pct = Math.min(100, Math.max(0, (scrolled / max) * 100));
-    bar.style.width = pct + "%";
-  };
-  update();
-  window.addEventListener("scroll", update, { passive: true });
-  window.addEventListener("resize", update);
-})();
-
-
-console.log("%cSitio diseñado por delysz — https://github.com/delysz", "color: #f6c90e; font-size:14px;");
