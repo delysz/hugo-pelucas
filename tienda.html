@@ -12,20 +12,42 @@
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="canonical" href="https://barberiahugo.vercel.app/tienda.html">
   <link rel="stylesheet" href="tienda.css" />
   <link rel="icon" type="image/png" href="icons8-bigote-16.png" />
 </head>
 
 <body>
   <header class="shop-header">
-    <a href="index.html" class="brand">
+    <a href="index.html" class="brand" aria-label="Volver al inicio">
       <img src="logo-hugo.png" alt="Barbería Hugo logo">
       <span>Barbería Hugo</span>
     </a>
-    <nav class="shop-nav">
-      <a href="index.html#servicios">Servicios</a>
-      <a href="index.html#galeria">Galería</a>
-      <a href="index.html#contacto">Contacto</a>
+
+    <nav class="shop-nav" aria-label="Navegación principal">
+      <a href="index.html#carrusel" data-i18n="nav_home">Inicio</a>
+      <a href="index.html#servicios" data-i18n="nav_services">Servicios</a>
+      <a href="index.html#galeria" data-i18n="nav_gallery">Galería</a>
+      <a href="index.html#horario" data-i18n="nav_hours">Horario</a>
+      <a href="index.html#contacto" data-i18n="nav_contact">Contacto</a>
+      <a href="tienda.html" class="active" aria-current="page">Tienda</a>
+
+      <!-- Selector de idioma (mismo de index) -->
+      <div class="lang-switch" aria-label="Cambiar idioma">
+        <button type="button" data-lang="es" aria-pressed="true">
+          <img src="4x3/es.svg" alt="Español">
+        </button>
+        <button type="button" data-lang="en" aria-pressed="false">
+          <img src="4x3/gb.svg" alt="English">
+        </button>
+        <button type="button" data-lang="fr" aria-pressed="false">
+          <img src="4x3/fr.svg" alt="Français">
+        </button>
+        <button type="button" data-lang="de" aria-pressed="false">
+          <img src="4x3/de.svg" alt="Deutsch">
+        </button>
+      </div>
+
       <button class="cart-btn" aria-label="Abrir carrito" id="openCart">
         <i class="fa-solid fa-bag-shopping"></i>
         <span class="cart-count" id="cartCount">0</span>
@@ -75,8 +97,10 @@
           <span>Total</span><strong id="cartTotal">0 €</strong>
         </div>
         <div class="checkout">
-          <button id="checkoutWhatsApp" class="btn wa"><img src="icons8-whatsapp-48.png" alt="" aria-hidden="true">
-            Finalizar por WhatsApp</button>
+          <button id="checkoutWhatsApp" class="btn wa">
+            <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+            <span>Finalizar por WhatsApp</span>
+          </button>
           <button id="checkoutCard" class="btn disabled" title="Próximamente">Pagar con tarjeta</button>
           <label class="pickup">
             <input type="checkbox" id="pickup"> Recogida en tienda (gratis)
@@ -88,11 +112,54 @@
   </aside>
 
   <footer class="shop-footer">
-    <p>© 2025 Barbería Hugo — Todos los derechos reservados</p>
+    <p data-i18n="footer_copy">© 2025 Barbería Hugo — Todos los derechos reservados</p>
     <p class="credits">Design by <a href="https://github.com/delysz" target="_blank" rel="noopener">delysz</a></p>
   </footer>
 
+  <script src="carousel.js" defer></script>
   <script src="tienda.js" defer></script>
+
+  <!-- ===== Chat Hugo (solo tienda) ===== -->
+  <button id="chat-launcher" class="chat-launcher" aria-label="Abrir chat">
+    <img src="tienda/caraHugo.png" alt="Hugo" class="chat-avatar">
+    <span class="chat-bubble">¿Necesitas ayuda?</span>
+  </button>
+
+  <section id="chat-box" class="chat-box" aria-live="polite" aria-hidden="true">
+    <header class="chat-head">
+      <div class="chat-head-left">
+        <img src="tienda/caraHugo.png" alt="Hugo" class="chat-avatar sm">
+        <div>
+          <strong>Hugo (online)</strong>
+          <div class="chat-sub">Asistente de la tienda</div>
+        </div>
+      </div>
+      <button class="chat-close" aria-label="Cerrar chat">×</button>
+    </header>
+
+    <div id="chat-stream" class="chat-stream">
+      <!-- Mensaje de bienvenida -->
+      <div class="msg msg-hugo">
+        <img src="tienda/caraHugo.png" alt="Hugo" class="msg-avatar">
+        <div class="msg-bubble">
+          ¡Hola! Soy Hugo 👋 ¿En qué te ayudo?
+          <div class="quick">
+            <button data-intent="horario">Horario</button>
+            <button data-intent="como-llegar">Cómo llegar</button>
+            <button data-intent="whatsapp">WhatsApp</button>
+            <button data-intent="abrir-carrito">Abrir carrito</button>
+            <button data-intent="buscar">Buscar productos</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form id="chat-form" class="chat-form" autocomplete="off">
+      <input id="chat-input" type="text" placeholder="Escribe tu pregunta… (Enter para enviar)" />
+      <button class="chat-send" aria-label="Enviar">➤</button>
+    </form>
+  </section>
+  
 </body>
 
 </html>
