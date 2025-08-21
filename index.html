@@ -4,6 +4,7 @@
 <head>
   <meta http-equiv="content-language" content="es">
   <link rel="alternate" hreflang="es" href="https://barberiahugo.vercel.app/">
+  <link rel="alternate" hreflang="x-default" href="https://barberiahugo.vercel.app/">
   <meta name="google-site-verification" content="C8gEzQg9NqTpSCpZEwbPKLA5ONNr-3dnIG_6Ws7Wu14" />
   <meta name="designer" content="Diseño web por delysz (https://github.com/delysz)">
   <meta charset="UTF-8" />
@@ -12,6 +13,8 @@
   <meta name="description" data-i18n-meta="meta_desc"
     content="Barbería Hugo en Zaragoza. Cortes clásicos y modernos, afeitado a navaja y arreglos de barba. Reserva fácil por WhatsApp.">
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Lato:wght@400;700&display=swap"
     rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Ephesis&family=Grand+Hotel&family=Rubik&display=swap"
@@ -26,9 +29,13 @@
     content="Cortes clásicos y modernos, arreglos de barba y afeitado a navaja. Reserva fácil por WhatsApp o llamada.">
   <meta property="og:url" content="https://barberiahugo.vercel.app/">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Barbería Hugo">
   <meta property="og:image" content="https://barberiahugo.vercel.app/og/og-hero.jpg">
   <meta property="og:image:alt" content="Interior de Barbería Hugo con sillón de barbero">
   <meta property="og:locale" content="es_ES">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:locale:alternate" content="fr_FR">
+  <meta property="og:locale:alternate" content="de_DE">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Barbería Hugo | Cortes, Barba y Estilo en Zaragoza">
@@ -46,6 +53,7 @@
   <link rel="stylesheet" href="styles.css" />
 
   <link rel="icon" type="image/png" href="icons8-bigote-16.png" />
+  <link rel="preload" as="image" href="logo-hugo.png" type="image/png" fetchpriority="high">
 
   <script type="application/ld+json">
 {
@@ -56,6 +64,7 @@
   "alternateName": "Barberia Hugo",
   "url": "https://barberiahugo.vercel.app/",
   "image": "https://barberiahugo.vercel.app/og/og-hero.jpg",
+  "logo": "https://barberiahugo.vercel.app/logo-hugo.png",
   "telephone": "+34 651 435 444",
   "priceRange": "€€",
   "address": {
@@ -107,7 +116,16 @@
     }
   ],
   "acceptsReservations": true,
-  "areaServed": "Zaragoza"
+  "areaServed": "Zaragoza",
+  "availableLanguage": ["es", "en", "fr", "de"],
+  "contactPoint": [
+    {
+      "@type": "ContactPoint",
+      "telephone": "+34 651 435 444",
+      "contactType": "customer service",
+      "availableLanguage": ["es", "en"]
+    }
+  ]
 }
 </script>
 </head>
@@ -115,7 +133,7 @@
 <body>
   <div id="scrollProgress" aria-hidden="true"></div>
   <header id="top" class="reveal pop" data-delay="120">
-    <img class="logo-barber" src="logo-hugo.png" alt="Barbería Hugo, peluquería masculina en Zaragoza" loading="lazy" />
+    <img class="logo-barber" src="logo-hugo.png" alt="Barbería Hugo, peluquería masculina en Zaragoza" fetchpriority="high" decoding="async" />
     <h1 class="titulo-principal">Barbería Hugo</h1>
     <p class="slogan" data-i18n="tagline">Donde el estilo se convierte en identidad</p>
   </header>
@@ -367,7 +385,7 @@
               </svg></div>
           </div>
           <p class="review-text">“Qué gran profesional. Mi corte era sencillo, pero al llegar antes pude ver cómo
-            trabajaba con otros clientes y quedé impresionado por el resultado.”</p<span class="review-author">- Agencia
+            trabajaba con otros clientes y quedé impresionado por el resultado.”</p><span class="review-author">- Agencia
             Lemar</span>
         </article>
       </div>
@@ -495,6 +513,9 @@
         width="100%" height="300" style="border:0; border-radius:10px;" allowfullscreen="" loading="lazy"
         referrerpolicy="no-referrer-when-downgrade">
       </iframe>
+      <noscript>
+        <p>Ver el mapa en <a href="https://www.google.com/maps?q=41.7171032,-0.8416875" rel="nofollow noopener" target="_blank">Google Maps</a>.</p>
+      </noscript>
       <figcaption data-i18n="map_caption">Calle Dr. Alejandro Palomar, 50820 San Juan de Mozarrifar, Zaragoza
       </figcaption>
     </figure>
@@ -512,6 +533,8 @@
   <a href="https://www.facebook.com/p/Hugo-Barberia-Campos-100058625056973/" class="social-float facebook"
     target="_blank" aria-label="Facebook"><img src="icons8-facebook-nuevo.svg" alt="Facebook" /></a>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="carousel.js"></script>
 </body>
 

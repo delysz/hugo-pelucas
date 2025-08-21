@@ -705,17 +705,65 @@
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) return;
 
-    // Tilt del logo en hero
+    // Tilt del logo en hero + GSAP hover avanzado
     const hero = $("header");
     const logo = $(".logo-barber");
     if (hero && logo) {
-      on(hero, "mousemove", (e) => {
-        const r = hero.getBoundingClientRect();
-        const x = (e.clientX - r.left) / r.width - 0.5;
-        const y = (e.clientY - r.top) / r.height - 0.5;
-        logo.style.transform = `rotateX(${-y * 6}deg) rotateY(${x * 6}deg) translateZ(0)`;
-      });
-      on(hero, "mouseleave", () => { logo.style.transform = "rotateX(0) rotateY(0)"; });
+      // Fallback destello CSS
+      on(logo, "mouseenter", () => logo.classList.add("hover-shine"));
+      on(logo, "animationend", (e) => { if (e.animationName === "logoShine") logo.classList.remove("hover-shine"); });
+
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const hasGSAP = typeof window.gsap !== 'undefined' && !reduce;
+
+      if (hasGSAP) {
+        const tlHover = gsap.timeline({ paused: true });
+        tlHover.to(logo, { duration: 0.35, scale: 1.04, filter: "drop-shadow(0 16px 36px rgba(246,201,14,0.55))" }, 0)
+               .to(logo, { duration: 0.35, rotateZ: -2 }, 0)
+               .to(document.documentElement, { duration: 0.35, "--ring-opacity": 0.95, "--ring-scale": 1, ease: "power2.out" }, 0);
+
+        // Rotación continua del anillo mientras hover
+        let ringTween = null;
+
+        const activate = () => {
+          tlHover.play();
+          ringTween = gsap.to(document.documentElement, { "--ring-angle": "+=1turn", duration: 4, ease: "none", repeat: -1 });
+        };
+        const deactivate = () => {
+          tlHover.reverse();
+          if (ringTween) { ringTween.kill(); ringTween = null; }
+          gsap.to(document.documentElement, { duration: 0.4, "--ring-opacity": 0, "--ring-scale": 0.92, overwrite: true });
+        };
+
+        on(logo, "mouseenter", activate);
+        on(logo, "mouseleave", deactivate);
+
+        // Soporte táctil: tap activa animación 1.5s
+        on(logo, "touchstart", () => {
+          activate();
+          setTimeout(deactivate, 1500);
+        }, { passive: true });
+
+        // Tilt 3D suave con GSAP
+        on(hero, "mousemove", (e) => {
+          const r = hero.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width - 0.5;
+          const y = (e.clientY - r.top) / r.height - 0.5;
+          gsap.to(logo, { duration: 0.2, rotateX: -y * 10, rotateY: x * 10, transformPerspective: 800, transformOrigin: "50% 50%" });
+        });
+        on(hero, "mouseleave", () => {
+          gsap.to(logo, { duration: 0.35, rotateX: 0, rotateY: 0, rotateZ: 0, scale: 1, filter: "drop-shadow(0 4px 12px rgba(0,0,0,.4))" });
+        });
+      } else {
+        // Fallback sin GSAP (CSS transforms directos)
+        on(hero, "mousemove", (e) => {
+          const r = hero.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width - 0.5;
+          const y = (e.clientY - r.top) / r.height - 0.5;
+          logo.style.transform = `rotateX(${-y * 8}deg) rotateY(${x * 8}deg) translateZ(0)`;
+        });
+        on(hero, "mouseleave", () => { logo.style.transform = "rotateX(0) rotateY(0)"; });
+      }
     }
 
     // Barra de progreso de scroll
@@ -734,5 +782,189 @@
   })();
 
   console.log("%cSitio diseñado por delysz — https://github.com/delysz", "color: #f6c90e; font-size:14px;");
+
+
+  // =================================
+  //  9. GSAP EXTRAS — detalles finos
+  // =================================
+  (function gsapCandy() {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!window.gsap || reduce) return;
+    const gsap = window.gsap;
+
+    // --- Split text utility (no plugin needed) ---
+    function split(el, mode = 'chars') {
+      if (!el) return [];
+      const text = el.textContent;
+      const parts = mode === 'words' ? text.split(/(\s+)/) : Array.from(text);
+      el.textContent = "";
+      const nodes = [];
+      parts.forEach((p) => {
+        const span = document.createElement('span');
+        span.textContent = p;
+        span.className = (mode === 'words' ? 'word' : 'char') + (p.trim() === '' ? ' spacer' : '');
+        el.appendChild(span);
+        nodes.push(span);
+      });
+      return nodes;
+    }
+
+    // Hero: letras que aparecen desde abajo + ligero overshoot
+    const h1 = document.querySelector('.titulo-principal');
+    if (h1) {
+      const chars = split(h1, 'chars');
+      gsap.from(chars, {
+        yPercent: 120,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+        stagger: { each: 0.02, from: 'start' }
+      });
+    }
+
+    // Slogan: por palabras, con olita
+    const sl = document.querySelector('.slogan');
+    if (sl) {
+      const words = split(sl, 'words');
+      gsap.from(words, {
+        y: 20,
+        rotateZ: -2,
+        opacity: 0,
+        duration: 0.7,
+        ease: 'power2.out',
+        stagger: { each: 0.05, from: 'center' },
+        delay: 0.2
+      });
+    }
+
+    // Stagger en Servicios (si existe grid)
+    const grid = document.querySelector('#servicios .svc-grid');
+    if (grid) {
+      const cards = Array.from(grid.children);
+      gsap.set(cards, { y: 16, opacity: 0 });
+      const onEnter = () => {
+        gsap.to(cards, { y: 0, opacity: 1, duration: 0.55, ease: 'power2.out', stagger: 0.07 });
+        window.removeEventListener('scroll', onEnter);
+      };
+      // simple viewport check without extra plugins
+      const check = () => {
+        const r = grid.getBoundingClientRect();
+        if (r.top < window.innerHeight * 0.85) onEnter();
+      };
+      const onEnterOnce = () => { check(); };
+      window.addEventListener('scroll', onEnterOnce, { passive: true });
+      window.addEventListener('load', onEnterOnce);
+      setTimeout(onEnterOnce, 250);
+    }
+
+    // Botones magnéticos (float + CTAs)
+    const magnets = document.querySelectorAll('.whatsapp-float, .social-float, .whatsapp-btn.grande, .call-btn.grande');
+    magnets.forEach((btn) => {
+      let qx = gsap.quickTo(btn, 'x', { duration: 0.25, ease: 'power3' });
+      let qy = gsap.quickTo(btn, 'y', { duration: 0.25, ease: 'power3' });
+      btn.addEventListener('mousemove', (e) => {
+        const r = btn.getBoundingClientRect();
+        const dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+        const dy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+        qx(dx * 8);
+        qy(dy * 8);
+      });
+      btn.addEventListener('mouseleave', () => { qx(0); qy(0); });
+      btn.addEventListener('touchstart', () => { qx(0); qy(0); }, { passive: true });
+    });
+
+    // Estrellas del review: respiración sutil
+    document.querySelectorAll('.review-card .star.filled').forEach((star, i) => {
+      gsap.to(star, {
+        opacity: 0.75,
+        duration: 1.2 + Math.random(),
+        yoyo: true,
+        repeat: -1,
+        ease: 'sine.inOut',
+        delay: Math.random() * 1.5
+      });
+    });
+  })();
+
+
+  // =================================
+  // 10. GSAP TURBO — parallax, pin, tilt
+  // =================================
+  (function gsapTurbo() {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!window.gsap || reduce) return;
+    const gsap = window.gsap;
+    const ST = window.ScrollTrigger;
+    if (ST) gsap.registerPlugin(ST);
+
+    // Header parallax glow + logo float
+    const header = document.querySelector('header#top');
+    if (header && ST) {
+      gsap.to(header, {
+        '--gy': '120px',
+        scrollTrigger: { trigger: header, start: 'top top', end: 'bottom top', scrub: true }
+      });
+      const logo = header.querySelector('.logo-barber');
+      if (logo) {
+        gsap.to(logo, {
+          y: -12,
+          scale: 1.03,
+          scrollTrigger: { trigger: header, start: 'top top', end: 'bottom top', scrub: true }
+        });
+      }
+    }
+
+    // Section headings: soft reveal on scroll (no pin to avoid layout shifts)
+    document.querySelectorAll('.section-card > h2').forEach((h2) => {
+      gsap.from(h2, {
+        y: 24, opacity: 0,
+        duration: 0.6, ease: 'power2.out',
+        scrollTrigger: { trigger: h2, start: 'top 80%' }
+      });
+    });
+
+    // Ken Burns en la Galería (loop suave, no intrusivo)
+    document.querySelectorAll('.gallery-carousel .g-slide img').forEach((img, i) => {
+      gsap.fromTo(img, { scale: 1, xPercent: -2 }, {
+        scale: 1.1, xPercent: 2,
+        duration: 12 + (i % 3) * 2,
+        ease: 'sine.inOut',
+        yoyo: true, repeat: -1
+      });
+    });
+
+    // Servicio grid: stagger ya se activa al entrar; añadimos tilt 3D al hover
+    document.querySelectorAll('#servicios .svc-card').forEach((card) => {
+      let rx = gsap.quickTo(card, 'rotateX', { duration: 0.25, ease: 'power2' });
+      let ry = gsap.quickTo(card, 'rotateY', { duration: 0.25, ease: 'power2' });
+      let tz = gsap.quickTo(card, 'z',       { duration: 0.25, ease: 'power2' });
+      card.addEventListener('mousemove', (e) => {
+        const r = card.getBoundingClientRect();
+        const dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+        const dy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+        ry(dx * 8); rx(-dy * 8); tz(20);
+      });
+      card.addEventListener('mouseleave', () => { rx(0); ry(0); tz(0); });
+      card.addEventListener('touchstart', () => { rx(0); ry(0); tz(0); }, { passive: true });
+    });
+
+    // Flotantes con vaivén sutil
+    gsap.utils.toArray(['.whatsapp-float', '.social-float']).forEach((sel, i) => {
+      const el = document.querySelector(sel);
+      if (!el) return;
+      gsap.to(el, { y: -6, duration: 2 + i * 0.3, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+    });
+
+    // Parallax simple por data-speed (opcional si hay elementos con data-speed)
+    document.querySelectorAll('[data-speed]').forEach((el) => {
+      const speed = parseFloat(el.getAttribute('data-speed')) || 0.2;
+      if (!ST) return;
+      gsap.to(el, {
+        yPercent: -speed * 100,
+        ease: 'none',
+        scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true }
+      });
+    });
+  })();
 
 })();
