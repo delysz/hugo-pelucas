@@ -3,7 +3,7 @@
 
 <head>
   <meta name="google-site-verification" content="C8gEzQg9NqTpSCpZEwbPKLA5ONNr-3dnIG_6Ws7Wu14" />
-  <meta name="google-site-verification" content="s7OL3-PQ88gOaQrGPulekylgclTAmyhTOvgTcG1la_I" />
+  
   <meta name="designer" content="Diseño web por delysz (https://github.com/delysz)">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -49,11 +49,12 @@
   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": ["Barbershop","HairSalon"],
-  "name": "Barbería Hugo",
-  "image": "https://barberiahugo.vercel.app/og/og-hero.jpg",
+  "@type": "HairSalon",
   "@id": "https://barberiahugo.vercel.app/#barberia-hugo",
+  "name": "Barbería Hugo",
+  "alternateName": "Barberia Hugo",
   "url": "https://barberiahugo.vercel.app/",
+  "image": "https://barberiahugo.vercel.app/og/og-hero.jpg",
   "telephone": "+34 651 435 444",
   "priceRange": "€€",
   "address": {
@@ -73,12 +74,39 @@
     "https://www.instagram.com/barberia_hugo_/",
     "https://www.facebook.com/p/Hugo-Barberia-Campos-100058625056973/"
   ],
+  "hasMap": "https://www.google.com/maps?q=41.7171032,-0.8416875",
   "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": "Monday", "opens": "16:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday","Wednesday","Thursday","Friday"], "opens": "09:45", "closes": "21:00" }
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": "Monday",
+      "opens": "16:00",
+      "closes": "21:00"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "opens": "09:45",
+      "closes": "14:00"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "opens": "16:00",
+      "closes": "21:00"
+    }
   ],
-  "areaServed": "Zaragoza",
-  "acceptsReservations": "True"
+  "acceptsReservations": true,
+  "areaServed": "Zaragoza"
 }
 </script>
 </head>
@@ -88,6 +116,7 @@
   <header id="top" class="reveal pop" data-delay="120">
     <img class="logo-barber" src="logo-hugo.png" alt="Barbería Hugo, peluquería masculina en Zaragoza" loading="lazy" />
     <h1 class="titulo-principal">Barbería Hugo</h1>
+<p class="microcopy">También conocida como “Barberia Hugo” en San Juan de Mozarrifar (Zaragoza).</p>
     <p class="slogan" data-i18n="tagline">Donde el estilo se convierte en identidad</p>
   </header>
 
