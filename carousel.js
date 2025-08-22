@@ -143,14 +143,27 @@
         svc_msg_total: "Total aprox.:",
         svc_msg_when: "Fecha/hora preferida:",
         svc_msg_footer: "¿Hay disponibilidad? ¡Gracias!",
-        svc_catalog: {
-          corte: "Corte clásico",
-          fade: "Corte fade",
-          barba: "Arreglo de barba",
-          afeitado: "Afeitado a navaja",
-          combo: "Corte + Barba",
-          nino: "Corte niño",
+        svc_categories: {
+          haircuts: "✂️ Cortes de pelo",
+          combos: "💇‍♂️ Corte + barba",
+          beard: "🧔 Servicios de barba",
+          treatments: "🌟 Tratamientos",
+          extras: "👁 Extras"
         },
+        svc_catalog: {
+          corte_normal: "Corte normal",
+          corte_fade: "Corte Skin Fade",
+          corte_nino_jubilado: "Niño o jubilado",
+          combo_normal: "Corte normal + barba",
+          combo_fade: "Skin Fade + barba",
+          barba_arreglo: "Arreglo de barba",
+          barba_afeitado: "Afeitado a navaja con vapor",
+          trat_decoloracion: "Decoloración + color",
+          trat_mechas: "Mechas",
+          trat_peeling: "Peeling facial con vapor",
+          extra_cejas: "Cejas"
+        },
+
         aria_carousel: "Carrusel de opiniones de clientes",
         stars_label: (n = 5) => `${n} de 5`,
       },
@@ -185,13 +198,25 @@
         svc_msg_total: "Approx. total:",
         svc_msg_when: "Preferred date/time:",
         svc_msg_footer: "Is there availability? Thanks!",
+        svc_categories: {
+          haircuts: "✂️ Haircuts",
+          combos: "💇‍♂️ Cut + beard",
+          beard: "🧔 Beard services",
+          treatments: "🌟 Treatments",
+          extras: "👁 Extras"
+        },
         svc_catalog: {
-          corte: "Classic haircut",
-          fade: "Fade haircut",
-          barba: "Beard trim",
-          afeitado: "Straight-razor shave",
-          combo: "Haircut + Beard",
-          nino: "Kids haircut",
+          corte_normal: "Standard haircut",
+          corte_fade: "Skin fade",
+          corte_nino_jubilado: "Kids/Seniors haircut",
+          combo_normal: "Standard cut + beard",
+          combo_fade: "Skin fade + beard",
+          barba_arreglo: "Beard trim",
+          barba_afeitado: "Straight-razor shave with steam",
+          trat_decoloracion: "Bleach + color",
+          trat_mechas: "Highlights",
+          trat_peeling: "Facial peeling with steam",
+          extra_cejas: "Eyebrows"
         },
         aria_carousel: "Customer reviews carousel",
         stars_label: (n = 5) => `${n} out of 5`,
@@ -227,13 +252,25 @@
         svc_msg_total: "Total approx. :",
         svc_msg_when: "Date/heure préférées :",
         svc_msg_footer: "Y a-t-il de la disponibilité ? Merci !",
+        svc_categories: {
+          haircuts: "✂️ Coupes de cheveux",
+          combos: "💇‍♂️ Coupe + barbe",
+          beard: "🧔 Services de barbe",
+          treatments: "🌟 Soins",
+          extras: "👁 Extras"
+        },
         svc_catalog: {
-          corte: "Coupe classique",
-          fade: "Coupe dégradée",
-          barba: "Taille de barbe",
-          afeitado: "Rasage au coupe-chou",
-          combo: "Coupe + Barbe",
-          nino: "Coupe enfant",
+          corte_normal: "Coupe classique",
+          corte_fade: "Dégradé américain (Skin Fade)",
+          corte_nino_jubilado: "Enfant ou retraité",
+          combo_normal: "Coupe classique + barbe",
+          combo_fade: "Dégradé + barbe",
+          barba_arreglo: "Taille de barbe",
+          barba_afeitado: "Rasage à la lame avec vapeur",
+          trat_decoloracion: "Décoloration + couleur",
+          trat_mechas: "Mèches",
+          trat_peeling: "Gommage facial à la vapeur",
+          extra_cejas: "Sourcils"
         },
         aria_carousel: "Carrousel d’avis clients",
         stars_label: (n = 5) => `${n} sur 5`,
@@ -269,13 +306,25 @@
         svc_msg_total: "Ca. Summe:",
         svc_msg_when: "Bevorzugte Zeit:",
         svc_msg_footer: "Gibt es Verfügbarkeit? Danke!",
+        svc_categories: {
+          haircuts: "✂️ Haarschnitte",
+          combos: "💇‍♂️ Schnitt + Bart",
+          beard: "🧔 Bartpflege",
+          treatments: "🌟 Behandlungen",
+          extras: "👁 Extras"
+        },
         svc_catalog: {
-          corte: "Klassischer Haarschnitt",
-          fade: "Fade-Haarschnitt",
-          barba: "Bart trimmen",
-          afeitado: "Rasur mit Klinge",
-          combo: "Haarschnitt + Bart",
-          nino: "Kinderhaarschnitt",
+          corte_normal: "Klassischer Haarschnitt",
+          corte_fade: "Skin Fade",
+          corte_nino_jubilado: "Kinder/Senioren Haarschnitt",
+          combo_normal: "Klassischer Schnitt + Bart",
+          combo_fade: "Skin Fade + Bart",
+          barba_arreglo: "Bart trimmen",
+          barba_afeitado: "Rasur mit Klinge und Dampf",
+          trat_decoloracion: "Blondierung + Farbe",
+          trat_mechas: "Strähnchen",
+          trat_peeling: "Gesichtspeeling mit Dampf",
+          extra_cejas: "Augenbrauen"
         },
         aria_carousel: "Kundenbewertungen Karussell",
         stars_label: (n = 5) => `${n} von 5`,
@@ -390,9 +439,21 @@
     if (host.querySelector(".svc-wrap")) return;
 
     const CATALOG_DATA = [
-      { id: "corte", price: 12 }, { id: "fade", price: 14 },
-      { id: "barba", price: 10 }, { id: "afeitado", price: 11 },
-      { id: "combo", price: 20 }, { id: "nino", price: 9 },
+      { id: "corte_normal", price: 13, category: 'haircuts' },
+      { id: "corte_fade", price: 15, category: 'haircuts' },
+      { id: "corte_nino_jubilado", price: 13, category: 'haircuts' },
+      // Corte + barba
+      { id: "combo_normal", price: 18, category: 'combos' },
+      { id: "combo_fade", price: 20, category: 'combos' },
+      // Servicios de barba
+      { id: "barba_arreglo", price: 8, category: 'beard' },
+      { id: "barba_afeitado", price: 12, category: 'beard' },
+      // Tratamientos
+      { id: "trat_decoloracion", price: 28, category: 'treatments' },
+      { id: "trat_mechas", price: 20, category: 'treatments' },
+      { id: "trat_peeling", price: 9, category: 'treatments' },
+      // Extras
+      { id: "extra_cejas", price: 4, category: 'extras' },
     ];
 
     const selected = new Set();
@@ -719,8 +780,8 @@
       if (hasGSAP) {
         const tlHover = gsap.timeline({ paused: true });
         tlHover.to(logo, { duration: 0.35, scale: 1.04, filter: "drop-shadow(0 16px 36px rgba(246,201,14,0.55))" }, 0)
-               .to(logo, { duration: 0.35, rotateZ: -2 }, 0)
-               .to(document.documentElement, { duration: 0.35, "--ring-opacity": 0.95, "--ring-scale": 1, ease: "power2.out" }, 0);
+          .to(logo, { duration: 0.35, rotateZ: -2 }, 0)
+          .to(document.documentElement, { duration: 0.35, "--ring-opacity": 0.95, "--ring-scale": 1, ease: "power2.out" }, 0);
 
         // Rotación continua del anillo mientras hover
         let ringTween = null;
@@ -937,7 +998,7 @@
     document.querySelectorAll('#servicios .svc-card').forEach((card) => {
       let rx = gsap.quickTo(card, 'rotateX', { duration: 0.25, ease: 'power2' });
       let ry = gsap.quickTo(card, 'rotateY', { duration: 0.25, ease: 'power2' });
-      let tz = gsap.quickTo(card, 'z',       { duration: 0.25, ease: 'power2' });
+      let tz = gsap.quickTo(card, 'z', { duration: 0.25, ease: 'power2' });
       card.addEventListener('mousemove', (e) => {
         const r = card.getBoundingClientRect();
         const dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
