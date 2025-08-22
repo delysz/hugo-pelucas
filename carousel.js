@@ -496,40 +496,61 @@
       currentLang = lang;
       const dict = window.I18N[lang] || window.I18N.es;
 
-      // Asegura animación por stagger en la cuadrícula
-      grid.classList.add("stagger");
-      grid.dataset.stagger = "90";   // gap entre hijos (ms)
-      grid.dataset.delay = "120";    // retardo base (ms)
+      // Agrupa los servicios por categoría para poder mostrarlos ordenados
+      const servicesByCategory = CATALOG_DATA.reduce((acc, service) => {
+        const category = service.category || 'general';
+        if (!acc[category]) {
+          acc[category] = [];
+        }
+        acc[category].push(service);
+        return acc;
+      }, {});
 
+      // Limpia el contenido anterior
       grid.innerHTML = "";
-      CATALOG_DATA.forEach((svc) => {
-        const name = dict.svc_catalog[svc.id] || svc.id;
-        const card = document.createElement("article");
-        card.className = "svc-card";
-        const isSelected = selected.has(svc.id);
 
-        card.innerHTML = `
-      <h3>${name}</h3>
-      <div class="price">${formatEUR(svc.price, lang)}</div>
-      <button type="button" data-id="${svc.id}" aria-pressed="${isSelected}">
-        ${isSelected ? dict.svc_remove : dict.svc_add}
-      </button>`;
+      const categoryOrder = ['haircuts', 'combos', 'beard', 'treatments', 'extras'];
 
-        const btn = $("button", card);
-        if (isSelected) btn.classList.add("active");
+      // Dibuja cada categoría y sus servicios en orden
+      categoryOrder.forEach(categoryId => {
+        if (!servicesByCategory[categoryId]) return;
 
-        on(btn, "click", () => {
-          const isActive = btn.classList.toggle("active");
-          btn.textContent = isActive ? dict.svc_remove : dict.svc_add;
-          btn.setAttribute("aria-pressed", String(isActive));
-          if (isActive) selected.add(svc.id); else selected.delete(svc.id);
-          updateTotal(lang);
+        // Añade el título de la categoría
+        const categoryTitle = document.createElement('h3');
+        categoryTitle.className = 'svc-category-title';
+        categoryTitle.textContent = dict.svc_categories[categoryId] || categoryId;
+        grid.appendChild(categoryTitle);
+
+        // Dibuja las tarjetas de servicio para esta categoría
+        servicesByCategory[categoryId].forEach((svc) => {
+          const name = dict.svc_catalog[svc.id] || svc.id;
+          const card = document.createElement("article");
+          card.className = "svc-card";
+          const isSelected = selected.has(svc.id);
+
+          card.innerHTML = `
+            <h3>${name}</h3>
+            <div class="price">${formatEUR(svc.price, lang)}</div>
+            <button type="button" data-id="${svc.id}" aria-pressed="${isSelected}">
+              ${isSelected ? dict.svc_remove : dict.svc_add}
+            </button>`;
+
+          const btn = $("button", card);
+          if (isSelected) btn.classList.add("active");
+
+          on(btn, "click", () => {
+            const isActive = btn.classList.toggle("active");
+            btn.textContent = isActive ? dict.svc_remove : dict.svc_add;
+            btn.setAttribute("aria-pressed", String(isActive));
+            if (isActive) selected.add(svc.id); else selected.delete(svc.id);
+            updateTotal(lang);
+          });
+
+          grid.appendChild(card);
         });
-
-        grid.appendChild(card);
       });
 
-      // Textos barra inferior + total
+      // Actualiza los textos de la barra inferior y el total
       $(".svc-when label", wrap).textContent = dict.svc_when_label;
       $(".svc-wa", wrap).textContent = dict.svc_reserve_whatsapp;
       updateTotal(lang);

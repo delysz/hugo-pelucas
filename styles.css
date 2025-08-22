@@ -1424,3 +1424,20 @@ header::after {
 @media (prefers-reduced-motion: reduce) {
   .gallery-carousel .g-slide img, .social-float, .whatsapp-float, #servicios .svc-card { transition: none !important; animation: none !important; }
 }
+
+/* --- Estilos para los Títulos de Categorías de Servicios --- */
+.svc-category-title {
+  grid-column: 1 / -1; /* Hace que el título ocupe todo el ancho de la rejilla */
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.6rem, 2.2vw, 1.8rem);
+  color: var(--accent);
+  margin: 24px 0 8px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: 1px;
+}
+
+/* Ajuste para el primer título, para que no tenga tanto margen superior */
+.svc-category-title:first-of-type {
+  margin-top: 8px;
+}
