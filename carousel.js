@@ -515,15 +515,19 @@
       categoryOrder.forEach(categoryId => {
         if (!servicesByCategory[categoryId]) return;
 
-        // Añade el título de la categoría
+        // Quitar TODOS los emojis del título de la categoría
         const categoryTitle = document.createElement('h3');
         categoryTitle.className = 'svc-category-title';
-        categoryTitle.textContent = dict.svc_categories[categoryId] || categoryId;
+        let catLabel = dict.svc_categories[categoryId] || categoryId;
+        catLabel = catLabel.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim();
+        categoryTitle.textContent = catLabel;
         grid.appendChild(categoryTitle);
 
         // Dibuja las tarjetas de servicio para esta categoría
         servicesByCategory[categoryId].forEach((svc) => {
-          const name = dict.svc_catalog[svc.id] || svc.id;
+          // Quitar TODOS los emojis del nombre del servicio
+          let name = dict.svc_catalog[svc.id] || svc.id;
+          name = name.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim();
           const card = document.createElement("article");
           card.className = "svc-card";
           const isSelected = selected.has(svc.id);
@@ -582,6 +586,31 @@
       const url = `https://wa.me/${waNumber}?text=${encode(lines.join("\n"))}`;
       window.open(url, "_blank", "noopener");
     });
+
+    // Validación de fecha y habilitación del botón de WhatsApp
+    if (dtInput) {
+      dtInput.addEventListener('input', function () {
+        if (!this.value) return;
+        const dt = new Date(this.value);
+        const day = dt.getDay(); // 0=Domingo, 6=Sábado
+
+        // Sábado o domingo: cerrado
+        if (day === 0 || day === 6) {
+          alert('No se pueden reservar citas los sábados ni domingos.');
+          this.value = '';
+          return;
+        }
+      });
+    }
+
+    // Deshabilita el botón de WhatsApp si no hay fecha seleccionada
+    if (waBtn && dtInput) {
+      const toggleBtn = () => {
+        waBtn.disabled = !dtInput.value;
+      };
+      dtInput.addEventListener('input', toggleBtn);
+      toggleBtn();
+    }
 
     // Renderizado inicial
     window.renderServicesI18n(currentLang);
