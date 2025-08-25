@@ -36,7 +36,34 @@
     const DURATION = 9000;
 
     function show(i) {
-      items.forEach((el, k) => el.classList.toggle("active", k === i));
+      if (idx === i) return; // No hacer nada si es el mismo slide
+
+      const currentItem = items[idx];
+      const nextItem = items[i];
+
+      // Ocultar el texto del slide actual
+      if (currentItem) {
+        const currentText = currentItem.querySelector('.review-text');
+        gsap.to(currentText, { opacity: 0, y: 10, duration: 0.3 });
+      }
+
+      // Preparar el siguiente slide
+      items.forEach(el => el.classList.remove('active'));
+      nextItem.classList.add('active');
+
+      const nextText = nextItem.querySelector('.review-text');
+      const nextAuthor = nextItem.querySelector('.review-author');
+
+      // Animar la entrada del nuevo texto y autor
+      gsap.fromTo(nextText,
+        { opacity: 0, y: -15 },
+        { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.3 }
+      );
+      gsap.fromTo(nextAuthor,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.5, delay: 0.5 }
+      );
+
       idx = i;
     }
     function next() { show((idx + 1) % items.length); }
@@ -902,7 +929,20 @@
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!window.gsap || reduce) return;
     const gsap = window.gsap;
-
+    // Hero: Animación de entrada para el logo
+    const logo = document.querySelector('.logo-barber');
+    if (logo) {
+      // Replicamos la animación 'logoIntro' con GSAP
+      gsap.from(logo, {
+        duration: 1.8,
+        delay: 0.12,
+        opacity: 0,
+        y: 10,
+        scale: 0.92,
+        rotation: -2,
+        ease: 'cubic-bezier(0.2, 0.65, 0.25, 1)',
+      });
+    }
     // --- Split text utility (no plugin needed) ---
     function split(el, mode = 'chars') {
       if (!el) return [];
@@ -933,18 +973,16 @@
       });
     }
 
-    // Slogan: por palabras, con olita
+    // Slogan: animación sencilla para mostrar sin dividir en palabras
     const sl = document.querySelector('.slogan');
     if (sl) {
-      const words = split(sl, 'words');
-      gsap.from(words, {
+      gsap.from(sl, {
         y: 20,
         rotateZ: -2,
         opacity: 0,
-        duration: 0.7,
+        duration: 0.8,
         ease: 'power2.out',
-        stagger: { each: 0.05, from: 'center' },
-        delay: 0.2
+        delay: 0.3
       });
     }
 
@@ -1046,17 +1084,25 @@
 
     // Servicio grid: stagger ya se activa al entrar; añadimos tilt 3D al hover
     document.querySelectorAll('#servicios .svc-card').forEach((card) => {
-      let rx = gsap.quickTo(card, 'rotateX', { duration: 0.25, ease: 'power2' });
-      let ry = gsap.quickTo(card, 'rotateY', { duration: 0.25, ease: 'power2' });
-      let tz = gsap.quickTo(card, 'z', { duration: 0.25, ease: 'power2' });
       card.addEventListener('mousemove', (e) => {
-        const r = card.getBoundingClientRect();
-        const dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
-        const dy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
-        ry(dx * 8); rx(-dy * 8); tz(20);
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = (y - centerY) / centerY * -8; // Inclinación vertical
+        const rotateY = (x - centerX) / centerX * 8;   // Inclinación horizontal
+
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+        card.style.setProperty('--rotX', `${rotateX}deg`);
+        card.style.setProperty('--rotY', `${rotateY}deg`);
       });
-      card.addEventListener('mouseleave', () => { rx(0); ry(0); tz(0); });
-      card.addEventListener('touchstart', () => { rx(0); ry(0); tz(0); }, { passive: true });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.setProperty('--rotX', '0deg');
+        card.style.setProperty('--rotY', '0deg');
+      });
     });
 
     // Flotantes con vaivén sutil
@@ -1077,5 +1123,19 @@
       });
     });
   })();
+
+  function hidePreloader() {
+    const preloader = document.getElementById("preloader");
+    if (preloader) {
+      preloader.classList.add("hide");
+      setTimeout(() => preloader.remove(), 600);
+    }
+  }
+
+  if (document.readyState === "complete") {
+    hidePreloader();
+  } else {
+    window.addEventListener("load", hidePreloader);
+  }
 
 })();

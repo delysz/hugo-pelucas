@@ -93,6 +93,9 @@ p {
 header {
   position: relative;
   text-align: center;
+  /* Ocultamos el desbordamiento para evitar barras de scroll horizontal causadas
+     por elementos decorativos. El espacio vertical para descendentes de la
+     fuente ya se maneja en `.slogan` mediante `line-height` y `margin-bottom`. */
   overflow: hidden;
   border-bottom: 1px solid var(--border);
   padding: 64px 16px 36px;
@@ -115,7 +118,7 @@ header::after {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: 
+  background-image:
     radial-gradient(var(--particle-size) var(--particle-size) at 20% 30%, rgba(246, 201, 14, 0.6) 50%, transparent 50%),
     radial-gradient(var(--particle-size) var(--particle-size) at 80% 70%, rgba(255, 219, 77, 0.4) 50%, transparent 50%),
     radial-gradient(var(--particle-size) var(--particle-size) at 40% 80%, rgba(246, 201, 14, 0.3) 50%, transparent 50%),
@@ -137,7 +140,6 @@ header::after {
   transform-style: preserve-3d;
   position: relative;
   will-change: transform;
-  animation: logoIntro 1.8s cubic-bezier(.2,.65,.25,1) .12s both;
 }
 
 /* Shine sutil al cargar */
@@ -146,7 +148,7 @@ header::after {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,.5) 40%, transparent 80%);
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, .5) 40%, transparent 80%);
   transform: translateX(-150%);
   pointer-events: none;
   mix-blend-mode: screen;
@@ -191,12 +193,48 @@ header h1 {
 
 header .slogan {
   font-family: 'Imperial Script', cursive;
-  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  /* Reducimos el tamaño aún más para garantizar que el eslogan no se salga
+     del ancho de la página. Esto ayuda a que el texto se ajuste
+     correctamente, incluso en pantallas pequeñas. */
+  /* Ajuste fino del tamaño: un poco más grande sin perder ajuste horizontal */
+  font-size: clamp(1.5rem, 3.2vw, 2.2rem);
   font-weight: 400;
   color: var(--accent);
-  letter-spacing: 0.75px;
-  line-height: 1.2;
+  /* Reducimos el espaciado entre letras para que el texto ocupe menos
+     espacio horizontal y evitar que se corte el último carácter. */
+  letter-spacing: 0.25px;
+  /*
+    El script Imperial tiene unos descendentes pronunciados, por lo que un
+    line‑height demasiado reducido puede provocar que la última letra se
+    recorte visualmente. Aumentamos el interlineado y añadimos un margen
+    inferior para asegurar que la "d" final de la palabra "identidad"
+    aparezca completa en todas las resoluciones.
+  */
+  line-height: 1.35;
+  margin-bottom: 0.5rem;
+
+  /* Forzamos que el texto largo pueda pasar a la siguiente línea
+     cuando no haya espacio suficiente. Esto evita que la última
+     letra de la palabra "identidad" se corte si la pantalla es
+     estrecha. La propiedad `overflow-wrap: anywhere` permite
+     dividir palabras largas en cualquier punto si es necesario. */
+  overflow-wrap: anywhere;
+
+  /* Limitar el ancho del eslogan a un valor razonable asegura que el texto
+     pueda dividirse en varias líneas y se mantenga centrado. Esto previene
+     que palabras largas se salgan del área visible del encabezado. */
+  max-width: min(90vw, 680px);
+  margin-left: auto;
+  margin-right: auto;
+
+  /* Añadimos un pequeño relleno lateral para limitar el ancho efectivo y
+     favorecer que el texto se divida en dos líneas cuando sea necesario. */
+  padding-left: 1rem;
+  padding-right: 1rem;
+
+  /* Mantenemos la estructura simple para evitar recortes de texto */
 }
+
 
 /* --- Navegación --- */
 nav {
@@ -262,7 +300,12 @@ nav a.active::after {
 header {
   padding-top: 120px;
 }
-#carrusel, #servicios, #galeria, #horario, #contacto {
+
+#carrusel,
+#servicios,
+#galeria,
+#horario,
+#contacto {
   scroll-margin-top: 90px;
 }
 
@@ -407,7 +450,8 @@ footer p {
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 8px;
-  display: flex !important; /* Safety net against JS conflicts */
+  display: flex !important;
+  /* Safety net against JS conflicts */
   gap: 8px;
   box-shadow: 0 14px 34px rgba(0, 0, 0, .45);
   opacity: 0;
@@ -445,7 +489,9 @@ footer p {
 }
 
 /* --- Botones Principales --- */
-.whatsapp-btn.grande, .call-btn.grande, .btn-sec {
+.whatsapp-btn.grande,
+.call-btn.grande,
+.btn-sec {
   padding: 14px 22px;
   border-radius: 14px;
   display: inline-flex;
@@ -461,7 +507,9 @@ footer p {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.whatsapp-btn.grande:hover, .call-btn.grande:hover, .btn-sec:hover {
+.whatsapp-btn.grande:hover,
+.call-btn.grande:hover,
+.btn-sec:hover {
   transform: var(--hover-lift) scale(1.05);
   filter: brightness(1.1);
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
@@ -576,6 +624,7 @@ footer p {
   fill: var(--accent);
   opacity: .5;
 }
+
 .star.filled {
   opacity: 1;
 }
@@ -628,8 +677,13 @@ footer p {
   color: #111;
 }
 
-.carousel-btn.prev { left: 10px; }
-.carousel-btn.next { right: 10px; }
+.carousel-btn.prev {
+  left: 10px;
+}
+
+.carousel-btn.next {
+  right: 10px;
+}
 
 
 /* --- 4.2. Servicios (#servicios) --- */
@@ -669,7 +723,7 @@ footer p {
   border-radius: 8px;
   font-weight: 700;
   border: 1px solid var(--border);
-  background: rgba(255,255,255, .05);
+  background: rgba(255, 255, 255, .05);
   color: var(--text);
   cursor: pointer;
   transition: .2s;
@@ -677,7 +731,7 @@ footer p {
 }
 
 #servicios .svc-card button:hover {
-    background: rgba(255,255,255, .1);
+  background: rgba(255, 255, 255, .1);
 }
 
 #servicios .svc-card button.active {
@@ -835,8 +889,13 @@ footer p {
   color: #111;
 }
 
-.g-prev { left: 10px; }
-.g-next { right: 10px; }
+.g-prev {
+  left: 10px;
+}
+
+.g-next {
+  right: 10px;
+}
 
 
 /* --- 4.4. Horario y Contacto --- */
@@ -1080,9 +1139,22 @@ footer p {
   transition: transform .2s, background .2s;
 }
 
-.lb-close { top: 18px; right: 18px; }
-.lb-prev { left: 18px; top: 50%; transform: translateY(-50%); }
-.lb-next { right: 18px; top: 50%; transform: translateY(-50%); }
+.lb-close {
+  top: 18px;
+  right: 18px;
+}
+
+.lb-prev {
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.lb-next {
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+}
 
 .lb-prev:hover,
 .lb-next:hover,
@@ -1092,6 +1164,7 @@ footer p {
   transform: translateY(-50%) scale(1.1);
   box-shadow: 0 10px 30px rgba(246, 201, 14, 0.4);
 }
+
 .lb-close:hover {
   transform: scale(1.1);
   box-shadow: 0 10px 30px rgba(246, 201, 14, 0.4);
@@ -1104,47 +1177,97 @@ footer p {
 
 /* --- Keyframes consolidados --- */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
+
 @keyframes slideInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
+
 @keyframes popIn {
-  from { opacity: 0; transform: scale(.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* --- Logo: animación de entrada y brillo --- */
 @keyframes logoIntro {
-  0% { opacity: 0; transform: translateY(10px) scale(.92) rotate(-2deg); }
-  60% { opacity: 1; transform: translateY(-6px) scale(1.03) rotate(1.2deg); }
-  100% { opacity: 1; transform: none; }
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(.92) rotate(-2deg);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translateY(-6px) scale(1.03) rotate(1.2deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @keyframes logoShine {
-  0% { transform: translateX(-150%); opacity: .0; }
-  20% { opacity: .0; }
-  50% { opacity: .8; }
-  100% { transform: translateX(150%); opacity: 0; }
+  0% {
+    transform: translateX(-150%);
+    opacity: .0;
+  }
+
+  20% {
+    opacity: .0;
+  }
+
+  50% {
+    opacity: .8;
+  }
+
+  100% {
+    transform: translateX(150%);
+    opacity: 0;
+  }
 }
 
 /* Animación de partículas flotantes */
 @keyframes particleFloat {
-  0%, 100% { 
+
+  0%,
+  100% {
     transform: translateY(0px) translateX(0px) rotate(0deg);
     opacity: 0.6;
   }
-  25% { 
+
+  25% {
     transform: translateY(-20px) translateX(10px) rotate(90deg);
     opacity: 0.8;
   }
-  50% { 
+
+  50% {
     transform: translateY(-10px) translateX(-15px) rotate(180deg);
     opacity: 0.4;
   }
-  75% { 
+
+  75% {
     transform: translateY(-30px) translateX(5px) rotate(270deg);
     opacity: 0.7;
   }
@@ -1152,18 +1275,20 @@ footer p {
 
 /* Animación de entrada más elaborada para secciones */
 @keyframes slideInUpEnhanced {
-  0% { 
-    opacity: 0; 
+  0% {
+    opacity: 0;
     transform: translateY(40px) scale(0.95) rotateX(-10deg);
     filter: blur(5px);
   }
-  50% { 
-    opacity: 0.7; 
+
+  50% {
+    opacity: 0.7;
     transform: translateY(20px) scale(0.98) rotateX(-5deg);
     filter: blur(2px);
   }
-  100% { 
-    opacity: 1; 
+
+  100% {
+    opacity: 1;
     transform: translateY(0) scale(1) rotateX(0deg);
     filter: blur(0px);
   }
@@ -1175,6 +1300,7 @@ footer p {
     transform: scale(0);
     opacity: 1;
   }
+
   100% {
     transform: scale(4);
     opacity: 0;
@@ -1197,7 +1323,12 @@ footer p {
   opacity: .45;
   pointer-events: none;
 }
-@keyframes spinBorder { to { --angle: 1turn; } }
+
+@keyframes spinBorder {
+  to {
+    --angle: 1turn;
+  }
+}
 
 /* --- WOW: Glow y blobs en el hero --- */
 header::after {
@@ -1212,13 +1343,25 @@ header::after {
   animation: heroFloat 16s ease-in-out infinite;
   pointer-events: none;
 }
+
 @keyframes heroFloat {
-  0%, 100% { transform: translateY(0) scale(1); opacity: .45; }
-  50% { transform: translateY(10px) scale(1.04); opacity: .6; }
+
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: .45;
+  }
+
+  50% {
+    transform: translateY(10px) scale(1.04);
+    opacity: .6;
+  }
 }
 
 /* --- WOW: Brillo en botones --- */
-.whatsapp-btn.grande::after, .call-btn.grande::after, .btn-sec::after {
+.whatsapp-btn.grande::after,
+.call-btn.grande::after,
+.btn-sec::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -1226,7 +1369,10 @@ header::after {
   transform: translateX(-150%);
   transition: transform .7s ease;
 }
-.whatsapp-btn.grande:hover::after, .call-btn.grande:hover::after, .btn-sec:hover::after {
+
+.whatsapp-btn.grande:hover::after,
+.call-btn.grande:hover::after,
+.btn-sec:hover::after {
   transform: translateX(150%);
 }
 
@@ -1250,14 +1396,27 @@ header::after {
   transition: opacity .6s ease, transform .6s ease;
   will-change: opacity, transform;
 }
+
 .reveal.is-visible {
   opacity: 1;
   transform: none;
 }
-.reveal.slide-up { transform: translateY(18px); }
-.reveal.slide-left { transform: translateX(-24px); }
-.reveal.slide-right { transform: translateX(24px); }
-.reveal.pop { transform: scale(.96); }
+
+.reveal.slide-up {
+  transform: translateY(18px);
+}
+
+.reveal.slide-left {
+  transform: translateX(-24px);
+}
+
+.reveal.slide-right {
+  transform: translateX(24px);
+}
+
+.reveal.pop {
+  transform: scale(.96);
+}
 
 /* Animaciones mejoradas para reveal */
 .reveal.slide-up.is-visible {
@@ -1290,13 +1449,14 @@ header::after {
 }
 
 /* Stagger (hijos se animan uno a uno) */
-.stagger > * {
+.stagger>* {
   opacity: 0;
   transform: translateY(12px);
   transition: opacity .5s ease, transform .5s ease;
   will-change: opacity, transform;
 }
-.stagger.is-visible > * {
+
+.stagger.is-visible>* {
   opacity: 1;
   transform: none;
 }
@@ -1304,11 +1464,14 @@ header::after {
 
 
 /* === GSAP split helpers === */
-.titulo-principal .char, .titulo-principal .word,
-.slogan .char, .slogan .word {
+.titulo-principal .char,
+.titulo-principal .word,
+.slogan .char,
+.slogan .word {
   display: inline-block;
   will-change: transform, opacity;
 }
+
 /* ===================================
    8. Media Queries (Responsividad)
    =================================== */
@@ -1322,48 +1485,85 @@ header::after {
 
 /* Dispositivos Pequeños (móviles grandes) */
 @media (max-width: 680px) {
+
   /* Nav */
   nav {
     row-gap: 6px;
     justify-content: center;
     padding: 8px 10px 6px;
   }
-  header { padding-top: 160px; }
-  #carrusel, #servicios, #galeria, #horario, #contacto { scroll-margin-top: 140px; }
+
+  header {
+    padding-top: 160px;
+  }
+
+  #carrusel,
+  #servicios,
+  #galeria,
+  #horario,
+  #contacto {
+    scroll-margin-top: 140px;
+  }
 
   /* Lang dropdown */
   .lang-menu {
     right: 50%;
     transform: translateX(50%) translateY(-6px);
   }
+
   .lang-dropdown.open .lang-menu {
-     transform: translateX(50%) translateY(0);
+    transform: translateX(50%) translateY(0);
   }
-  
+
   /* Servicios */
   #servicios .svc-bar {
     grid-template-columns: 1fr;
     gap: 10px;
   }
-  #servicios .svc-total { text-align: left; }
-  #servicios .svc-when { flex-wrap: wrap; }
-  #servicios .svc-when input { width: 100%; min-width: 0; }
-  
+
+  #servicios .svc-total {
+    text-align: left;
+  }
+
+  #servicios .svc-when {
+    flex-wrap: wrap;
+  }
+
+  #servicios .svc-when input {
+    width: 100%;
+    min-width: 0;
+  }
+
   /* Follow CTA */
-  .follow-cta { bottom: 92px; }
+  .follow-cta {
+    bottom: 92px;
+  }
 }
 
-/* Dispositivos Muy Pequeños (móviles) */
 @media (max-width: 560px) {
+
   /* Servicios */
   #servicios .svc-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
-  #servicios .svc-card { padding: 10px; }
-  #servicios .svc-card h3 { font-size: .95rem; }
-  #servicios .svc-card .price { font-size: .9rem; }
-  #servicios .svc-card button { padding: 6px 8px; font-size: .85rem; }
+
+  #servicios .svc-card {
+    padding: 10px;
+  }
+
+  #servicios .svc-card h3 {
+    font-size: .95rem;
+  }
+
+  #servicios .svc-card .price {
+    font-size: .9rem;
+  }
+
+  #servicios .svc-card button {
+    padding: 6px 8px;
+    font-size: .85rem;
+  }
 
   /* Galería */
   .gallery-carousel img {
@@ -1373,20 +1573,31 @@ header::after {
 }
 
 @media (max-width: 480px) {
-    .gallery-carousel img {
-        max-height: 260px;
-    }
+  .gallery-carousel img {
+    max-height: 260px;
+  }
 }
 
 @media (max-width: 420px) {
+
   /* Nav */
   nav a {
     padding: 7px 9px;
     font-size: .9rem;
     letter-spacing: .3px;
   }
-  header { padding-top: 170px; }
-  #carrusel, #servicios, #galeria, #horario, #contacto { scroll-margin-top: 150px; }
+
+  header {
+    padding-top: 170px;
+  }
+
+  #carrusel,
+  #servicios,
+  #galeria,
+  #horario,
+  #contacto {
+    scroll-margin-top: 150px;
+  }
 }
 
 @media (max-width: 380px) {
@@ -1397,38 +1608,93 @@ header::after {
 
 /* Respeto a usuarios con reducción de movimiento */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+
+  *,
+  *::before,
+  *::after {
     animation: none !important;
     transition: none !important;
   }
-  .reveal, .stagger > * {
+
+  .reveal,
+  .stagger>* {
     opacity: 1 !important;
     transform: none !important;
   }
-  .logo-barber::after, .logo-barber::before { display: none !important; }
-  header::after { display: none !important; }
-  .container.section-card:hover { transform: none !important; }
-  .carousel:hover, .gallery-carousel:hover { transform: none !important; }
-  .review-card:hover { transform: none !important; }
-  .whatsapp-float:hover, .social-float:hover { transform: none !important; }
-  .follow-cta:hover { transform: translateX(-50%) translateY(0) !important; }
+
+  .logo-barber::after,
+  .logo-barber::before {
+    display: none !important;
+  }
+
+  header::after {
+    display: none !important;
+  }
+
+  .container.section-card:hover {
+    transform: none !important;
+  }
+
+  .carousel:hover,
+  .gallery-carousel:hover {
+    transform: none !important;
+  }
+
+  .review-card:hover {
+    transform: none !important;
+  }
+
+  .whatsapp-float:hover,
+  .social-float:hover {
+    transform: none !important;
+  }
+
+  .follow-cta:hover {
+    transform: translateX(-50%) translateY(0) !important;
+  }
 }
 
 /* === GSAP Turbo: Tilt y Parallax === */
-#servicios { perspective: 700px; }
-#servicios .svc-card { transform-style: preserve-3d; will-change: transform; }
-#servicios .svc-card .svc-media, #servicios .svc-card img { transform: translateZ(30px); }
-.gallery-carousel .g-slide img { will-change: transform; transform-origin: 50% 50%; }
-.social-float, .whatsapp-float { will-change: transform; }
+#servicios {
+  perspective: 700px;
+}
+
+#servicios .svc-card {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+#servicios .svc-card .svc-media,
+#servicios .svc-card img {
+  transform: translateZ(30px);
+}
+
+.gallery-carousel .g-slide img {
+  will-change: transform;
+  transform-origin: 50% 50%;
+}
+
+.social-float,
+.whatsapp-float {
+  will-change: transform;
+}
 
 /* Reduce motion accessibility */
 @media (prefers-reduced-motion: reduce) {
-  .gallery-carousel .g-slide img, .social-float, .whatsapp-float, #servicios .svc-card { transition: none !important; animation: none !important; }
+
+  .gallery-carousel .g-slide img,
+  .social-float,
+  .whatsapp-float,
+  #servicios .svc-card {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
 /* --- Estilos para los Títulos de Categorías de Servicios --- */
 .svc-category-title {
-  grid-column: 1 / -1; /* Hace que el título ocupe todo el ancho de la rejilla */
+  grid-column: 1 / -1;
+  /* Hace que el título ocupe todo el ancho de la rejilla */
   font-family: 'Bebas Neue', sans-serif;
   font-size: clamp(1.6rem, 2.2vw, 1.8rem);
   color: var(--accent);
@@ -1441,4 +1707,185 @@ header::after {
 /* Ajuste para el primer título, para que no tenga tanto margen superior */
 .svc-category-title:first-of-type {
   margin-top: 8px;
+}
+
+@media (max-width: 680px),
+(max-width: 900px) and (pointer: coarse) {
+
+  .container.section-card,
+  .carousel,
+  .gallery-carousel,
+  .review-card,
+  .lightbox {
+    backdrop-filter: none !important;
+    background: var(--bg-soft) !important;
+  }
+}
+
+/* Preloader styles */
+#preloader {
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  background: var(--bg, #0f1220);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s;
+  /* Auto-ocultación con animación para casos en los que el JS falle */
+  animation: preloaderFadeOut 0.6s ease 5.5s forwards;
+}
+
+#preloader .loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Anillo giratorio del preloader */
+#preloader .spinner {
+  width: 64px;
+  height: 64px;
+  border: 6px solid var(--accent, #f6c90e);
+  border-top: 6px solid transparent;
+  border-radius: 50%;
+  animation: spinner-rotate 0.9s linear infinite;
+}
+
+/* Título del preloader */
+#preloader .preloader-title {
+  margin-top: 14px;
+  font-family: 'Bebas Neue', 'Lato', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+  color: var(--accent, #f6c90e);
+  text-transform: uppercase;
+  opacity: 0;
+  animation: fadeInUp 0.8s forwards;
+  animation-delay: 0.4s;
+}
+
+/* Subtítulo del preloader */
+#preloader .preloader-subtitle {
+  margin-top: 6px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.25;
+  text-align: center;
+  max-width: 320px;
+  color: var(--text-light, #dcdce6);
+  opacity: 0;
+  animation: fadeInUp 0.8s forwards;
+  animation-delay: 0.6s;
+}
+
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#preloader.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes preloaderFadeOut {
+  to {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+  }
+}
+
+/* ===================================
+   9. ESTILOS IMPRESIONANTES (NUEVO)
+   =================================== */
+
+/* --- Tarjetas de Servicios Mejoradas --- */
+#servicios {
+  /* Activa un contexto de perspectiva para los hijos */
+  perspective: 1000px;
+}
+
+.svc-card {
+  position: relative;
+  /* Necesario para el pseudo-elemento del borde */
+  transform-style: preserve-3d;
+  /* Permite que los hijos tengan profundidad 3D */
+  transition: transform 0.4s ease-out, box-shadow 0.4s ease-out;
+  will-change: transform, box-shadow;
+}
+
+/* Contenido de la tarjeta con efecto de profundidad */
+.svc-card>* {
+  transform: translateZ(25px);
+  /* Eleva el contenido hacia el espectador */
+  transition: transform 0.4s ease-out;
+}
+
+.svc-card:hover {
+  box-shadow: 0px 30px 50px -20px rgba(0, 0, 0, 0.6);
+  transform: scale(1.05) rotateX(var(--rotX)) rotateY(var(--rotY));
+}
+
+/* Borde luminoso interactivo */
+.svc-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-sm);
+  background: radial-gradient(circle at var(--mouse-x) var(--mouse-y),
+      rgba(246, 201, 14, 0.4),
+      transparent 40%);
+  opacity: 0;
+  transition: opacity 0.4s;
+  z-index: 0;
+}
+
+.svc-card:hover::before {
+  opacity: 1;
+}
+
+/* --- Fondo de estrellas animado --- */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(1px, rgba(255, 255, 255, 0.2) 1px, transparent 0),
+    radial-gradient(1px, rgba(255, 255, 255, 0.15) 1px, transparent 0);
+  background-size: 40px 40px, 80px 80px;
+  background-position: 0 0, 30px 30px;
+  animation: move-stars 90s linear infinite;
+  z-index: -1;
+  will-change: background-position;
+}
+
+@keyframes move-stars {
+  from {
+    background-position: 0 0, 30px 30px;
+  }
+  to {
+    background-position: -1000px 500px, -1030px 530px;
+  }
 }
