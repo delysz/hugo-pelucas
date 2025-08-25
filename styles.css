@@ -1889,3 +1889,34 @@ body::before {
     background-position: -1000px 500px, -1030px 530px;
   }
 }
+
+.titulo-principal .char { will-change: transform, opacity; }
+
+/* Estado general mientras carga (opcional) */
+html.is-loading, html.is-loading body {
+  overflow: hidden;
+}
+
+/* Preloader como overlay */
+#preloader{
+  position: fixed;
+  inset: 0;
+  z-index: 99999; /* bien arriba de todo */
+  background: #0b0b0b;           /* o el color que usabas */
+  display: grid;
+  place-items: center;
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity .45s ease; /* fade-out suave */
+}
+
+/* contenido interno opcional (logo, spinner…) */
+#preloader .spinner, #preloader .logo{
+  will-change: transform, opacity;
+}
+
+/* Al ocultar */
+#preloader.hide{
+  opacity: 0;
+  pointer-events: none;
+}

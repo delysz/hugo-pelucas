@@ -12,10 +12,48 @@
   "use strict";
 
   // --- Utilidades comunes ---
-  const $ = (sel, root = document) => root.querySelector(sel);
-  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  const $ = (sel, root = document) => {
+    if (!sel || typeof sel !== 'string') return null;
+    // Evita pasar URLs o HTML a querySelector
+    if (/^https?:\/\//i.test(sel) || /</.test(sel)) return null;
+    try { return root.querySelector(sel); } catch { return null; }
+  };
+
+  const $$ = (sel, root = document) => {
+    if (!sel || typeof sel !== 'string') return [];
+    if (/^https?:\/\//i.test(sel) || /</.test(sel)) return [];
+    try { return Array.from(root.querySelectorAll(sel)); } catch { return []; }
+  };
+
   const on = (el, ev, fn, opts) => el && el.addEventListener(ev, fn, opts);
   const encode = (s) => encodeURIComponent(String(s ?? ""));
+
+  // Tilt util compartido (disponible para todos los módulos)
+  function attachTiltEffect(card) {
+    if (!card) return;
+
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const rotateX = (y - centerY) / centerY * -10;
+      const rotateY = (x - centerX) / centerX * 10;
+
+      card.style.setProperty('--rotX', `${rotateX}deg`);
+      card.style.setProperty('--rotY', `${rotateY}deg`);
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.setProperty('--rotX', '0deg');
+      card.style.setProperty('--rotY', '0deg');
+    });
+  }
+
 
   // =================================
   //  1. CARRUSEL DE RESEÑAS
@@ -578,6 +616,7 @@
           });
 
           grid.appendChild(card);
+          attachTiltEffect(card);
         });
       });
 
@@ -927,7 +966,8 @@
   // =================================
   (function gsapCandy() {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!window.gsap || reduce) return;
+    // if (reduce) return;  // ← comenta o elimina esta línea SOLO si quieres forzar el hero
+    if (!window.gsap) return;
     const gsap = window.gsap;
     // Hero: Animación de entrada para el logo
     const logo = document.querySelector('.logo-barber');
@@ -1082,33 +1122,47 @@
       });
     });
 
-    // Servicio grid: stagger ya se activa al entrar; añadimos tilt 3D al hover
-    document.querySelectorAll('#servicios .svc-card').forEach((card) => {
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const rotateX = (y - centerY) / centerY * -8; // Inclinación vertical
-        const rotateY = (x - centerX) / centerX * 8;   // Inclinación horizontal
+    // ===============================================
+    //  FUNCIÓN PARA EFECTO TILT 3D EN TARJETAS
+    // ===============================================
 
-        card.style.setProperty('--mouse-x', `${x}px`);
-        card.style.setProperty('--mouse-y', `${y}px`);
-        card.style.setProperty('--rotX', `${rotateX}deg`);
-        card.style.setProperty('--rotY', `${rotateY}deg`);
+    function applyTilt3D(selector, options = {}) {
+      const elements = document.querySelectorAll(selector);
+      if (!elements.length) return;
+      const defaults = { maxRotate: 8, perspective: 800, scale: 1.04, ease: 'power3.out', duration: 0.3 };
+      const opts = { ...defaults, ...options };
+      elements.forEach((el) => {
+        let qx = gsap.quickTo(el, 'rotateX', { duration: opts.duration, ease: opts.ease });
+        let qy = gsap.quickTo(el, 'rotateY', { duration: opts.duration, ease: opts.ease });
+        let qs = gsap.quickTo(el, 'scale', { duration: opts.duration, ease: opts.ease });
+
+        el.style.transformStyle = 'preserve-3d';
+        el.style.transformPerspective = `${opts.perspective}px`;
+
+        el.addEventListener('mousemove', (e) => {
+          const r = el.getBoundingClientRect();
+          const x = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+          const y = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+          qx(-y * opts.maxRotate);
+          qy(x * opts.maxRotate);
+          qs(opts.scale);
+        });
+        el.addEventListener('mouseleave', () => {
+          qx(0);
+          qy(0);
+          qs(1);
+        });
+        el.addEventListener('touchstart', () => {
+          qx(0);
+          qy(0);
+          qs(1);
+        }, { passive: true });
       });
+    }
 
-      card.addEventListener('mouseleave', () => {
-        card.style.setProperty('--rotX', '0deg');
-        card.style.setProperty('--rotY', '0deg');
-      });
-    });
-
-    // Flotantes con vaivén sutil
-    gsap.utils.toArray(['.whatsapp-float', '.social-float']).forEach((sel, i) => {
-      const el = document.querySelector(sel);
-      if (!el) return;
+    // Flotantes con vaivén sutil (versión segura)
+    document.querySelectorAll('.whatsapp-float, .social-float').forEach((el, i) => {
+      if (!el || !window.gsap) return;
       gsap.to(el, { y: -6, duration: 2 + i * 0.3, ease: 'sine.inOut', yoyo: true, repeat: -1 });
     });
 
@@ -1124,18 +1178,90 @@
     });
   })();
 
+  // Tiempo mínimo visible del preloader (en ms)
+  const PRELOADER_MIN_SHOW = 900;
+  const __preloaderStart = performance.now();
+
   function hidePreloader() {
     const preloader = document.getElementById("preloader");
-    if (preloader) {
-      preloader.classList.add("hide");
-      setTimeout(() => preloader.remove(), 600);
-    }
-  }
+    if (!preloader) return;
+    const elapsed = performance.now() - __preloaderStart;
+    const wait = Math.max(0, PRELOADER_MIN_SHOW - elapsed);
 
+    const doHide = () => {
+      preloader.classList.add("hide");
+
+      const remove = () => {
+        preloader.remove();
+        // ⬇️ AVISA AL RESTO DE QUE YA PODEMOS ANIMAR LA PÁGINA
+        window.dispatchEvent(new Event('app:ready'));
+      };
+      preloader.addEventListener("transitionend", remove, { once: true });
+      setTimeout(remove, 700);
+
+      document.documentElement.classList.remove("is-loading");
+    };
+
+    setTimeout(doHide, wait);
+  }
   if (document.readyState === "complete") {
-    hidePreloader();
+    setTimeout(hidePreloader, 3000); // 3 segundos
   } else {
-    window.addEventListener("load", hidePreloader);
+    window.addEventListener("load", () => setTimeout(hidePreloader, 3000));
   }
 
 })();
+
+
+// Animación del H1 (Barbería Hugo) sincronizada con preloader
+(function heroTitleAnim() {
+  function startHeroTitle() {
+    const gsap = window.gsap;
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    if (!gsap || reduce) return;
+
+    const h1 = document.querySelector('.titulo-principal');
+    if (!h1) return;
+
+    // Split a caracteres (evita duplicarlo si ya se hizo)
+    let chars = Array.from(h1.querySelectorAll('.char'));
+    if (!chars.length) {
+      const text = h1.textContent;
+      h1.textContent = '';
+      chars = Array.from(text).map(ch => {
+        const span = document.createElement('span');
+        span.className = 'char';
+        span.textContent = ch;
+        h1.appendChild(span);
+        return span;
+      });
+      h1.style.display = 'inline-block';
+    }
+
+    gsap.set(chars, { display: 'inline-block' });
+    gsap.from(chars, {
+      yPercent: 120,
+      opacity: 0,
+      duration: 0.72,
+      ease: 'power3.out',
+      stagger: { each: 0.02, from: 'start' }
+    });
+  }
+
+  // Arrancamos en el momento adecuado:
+  const run = () => startHeroTitle();
+
+  // Si el preloader ya no está o nunca existió, corre tras DOM listo.
+  const readyNow = () => {
+    const pre = document.getElementById('preloader');
+    if (!pre || pre.classList.contains('hide')) run();
+    else window.addEventListener('app:ready', run, { once: true });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', readyNow, { once: true });
+  } else {
+    readyNow();
+  }
+})();
+
