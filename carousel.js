@@ -523,6 +523,7 @@
 
     const selected = new Set();
     let currentLang = (localStorage.getItem("lang") || "es").slice(0, 2);
+    if (!I18N[currentLang]) currentLang = "es";
 
     // Crear la estructura HTML una sola vez
     const wrap = document.createElement("div");
@@ -540,88 +541,88 @@
     host.appendChild(wrap);
 
     // === Reglas para fecha/hora: min mañana, step 15', y solo horario abierto ===
-const dtEl = $(".svc-dt", wrap); // si ya lo declaraste antes, reutilízalo (no lo redeclares)
+    const dtEl = $(".svc-dt", wrap); // si ya lo declaraste antes, reutilízalo (no lo redeclares)
 
-(function applyDateRules(input){
-  if (!input) return;
+    (function applyDateRules(input) {
+      if (!input) return;
 
-  // --- Config: horario de apertura (JS: 0=Dom,1=Lun,...,6=Sáb) ---
-  const OPEN_SCHEDULE = {
-    1: [[16, 0, 21, 0]],                  // Lunes: 16:00–21:00
-    2: [[9, 45, 14, 0], [16, 0, 21, 0]],  // Mar–Vie: 9:45–14:00 y 16:00–21:00
-    3: [[9, 45, 14, 0], [16, 0, 21, 0]],
-    4: [[9, 45, 14, 0], [16, 0, 21, 0]],
-    5: [[9, 45, 14, 0], [16, 0, 21, 0]],
-    6: [],                                // Sábado: cerrado
-    0: []                                 // Domingo: cerrado
-  };
+      // --- Config: horario de apertura (JS: 0=Dom,1=Lun,...,6=Sáb) ---
+      const OPEN_SCHEDULE = {
+        1: [[16, 0, 21, 0]],                  // Lunes: 16:00–21:00
+        2: [[9, 45, 14, 0], [16, 0, 21, 0]],  // Mar–Vie: 9:45–14:00 y 16:00–21:00
+        3: [[9, 45, 14, 0], [16, 0, 21, 0]],
+        4: [[9, 45, 14, 0], [16, 0, 21, 0]],
+        5: [[9, 45, 14, 0], [16, 0, 21, 0]],
+        6: [],                                // Sábado: cerrado
+        0: []                                 // Domingo: cerrado
+      };
 
-  // --- Utilidades ---
-  const pad = (n) => String(n).padStart(2, "0");
-  const fmtDT = (d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  const roundUp15 = (d) => {
-    const add = (15 - (d.getMinutes() % 15)) % 15;
-    d.setMinutes(d.getMinutes() + add, 0, 0);
-    return d;
-  };
-  const inOpenRange = (d, ranges) => {
-    const mins = d.getHours()*60 + d.getMinutes();
-    return ranges?.some(([sh, sm, eh, em]) => mins >= sh*60+sm && mins < eh*60+em);
-  };
-  const nextOpenSlot = (from) => {
-    let d = roundUp15(new Date(from));
-    for (let i = 0; i < 30*24*4; i++) { // busca hasta 30 días, de 15 en 15 min
-      const ranges = OPEN_SCHEDULE[d.getDay()];
-      if (ranges?.length) {
-        if (inOpenRange(d, ranges)) return d;
-        // si estamos antes del primer rango del día, saltamos a su inicio
-        const mins = d.getHours()*60 + d.getMinutes();
-        for (const [sh, sm, eh, em] of ranges) {
-          const start = sh*60 + sm;
-          const end   = eh*60 + em;
-          if (mins < start) { d.setHours(sh, sm, 0, 0); return d; }
-          if (mins >= start && mins < end) return d; // ya dentro
+      // --- Utilidades ---
+      const pad = (n) => String(n).padStart(2, "0");
+      const fmtDT = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      const roundUp15 = (d) => {
+        const add = (15 - (d.getMinutes() % 15)) % 15;
+        d.setMinutes(d.getMinutes() + add, 0, 0);
+        return d;
+      };
+      const inOpenRange = (d, ranges) => {
+        const mins = d.getHours() * 60 + d.getMinutes();
+        return ranges?.some(([sh, sm, eh, em]) => mins >= sh * 60 + sm && mins < eh * 60 + em);
+      };
+      const nextOpenSlot = (from) => {
+        let d = roundUp15(new Date(from));
+        for (let i = 0; i < 30 * 24 * 4; i++) { // busca hasta 30 días, de 15 en 15 min
+          const ranges = OPEN_SCHEDULE[d.getDay()];
+          if (ranges?.length) {
+            if (inOpenRange(d, ranges)) return d;
+            // si estamos antes del primer rango del día, saltamos a su inicio
+            const mins = d.getHours() * 60 + d.getMinutes();
+            for (const [sh, sm, eh, em] of ranges) {
+              const start = sh * 60 + sm;
+              const end = eh * 60 + em;
+              if (mins < start) { d.setHours(sh, sm, 0, 0); return d; }
+              if (mins >= start && mins < end) return d; // ya dentro
+            }
+          }
+          d.setMinutes(d.getMinutes() + 15, 0, 0);
         }
-      }
-      d.setMinutes(d.getMinutes() + 15, 0, 0);
-    }
-    return null;
-  };
+        return null;
+      };
 
-  // --- Min: mañana 00:00 (hoy deshabilitado completo) ---
-  const minDate = new Date();
-  minDate.setDate(minDate.getDate() + 1);
-  minDate.setHours(0, 0, 0, 0);
-  input.min = fmtDT(minDate);
+      // --- Min: mañana 00:00 (hoy deshabilitado completo) ---
+      const minDate = new Date();
+      minDate.setDate(minDate.getDate() + 1);
+      minDate.setHours(0, 0, 0, 0);
+      input.min = fmtDT(minDate);
 
-  // --- Paso de 15' ---
-  input.step = 900; // 900 segundos = 15 minutos
+      // --- Paso de 15' ---
+      input.step = 900; // 900 segundos = 15 minutos
 
-  // --- Normaliza cualquier entrada a un slot válido de apertura ---
-  const ensureValid = () => {
-    if (!input.value) return;
-    const [dateStr, timeStr] = input.value.split("T");
-    const [Y, M, D] = dateStr.split("-").map(Number);
-    const [h, m]    = timeStr.split(":").map(Number);
-    let picked = new Date(Y, M-1, D, h, m, 0, 0);
+      // --- Normaliza cualquier entrada a un slot válido de apertura ---
+      const ensureValid = () => {
+        if (!input.value) return;
+        const [dateStr, timeStr] = input.value.split("T");
+        const [Y, M, D] = dateStr.split("-").map(Number);
+        const [h, m] = timeStr.split(":").map(Number);
+        let picked = new Date(Y, M - 1, D, h, m, 0, 0);
 
-    // nunca por debajo del mínimo
-    if (picked < minDate) picked = new Date(minDate);
+        // nunca por debajo del mínimo
+        if (picked < minDate) picked = new Date(minDate);
 
-    // redondeo a 15 y ajuste a horario abierto
-    picked = roundUp15(picked);
-    const ranges = OPEN_SCHEDULE[picked.getDay()];
-    if (!inOpenRange(picked, ranges)) {
-      const next = nextOpenSlot(picked);
-      if (next) picked = next;
-    }
+        // redondeo a 15 y ajuste a horario abierto
+        picked = roundUp15(picked);
+        const ranges = OPEN_SCHEDULE[picked.getDay()];
+        if (!inOpenRange(picked, ranges)) {
+          const next = nextOpenSlot(picked);
+          if (next) picked = next;
+        }
 
-    input.value = fmtDT(picked);
-  };
+        input.value = fmtDT(picked);
+      };
 
-  input.addEventListener("change", ensureValid);
-  input.addEventListener("blur", ensureValid);
-})(dtEl);
+      input.addEventListener("change", ensureValid);
+      input.addEventListener("blur", ensureValid);
+    })(dtEl);
     // === Fin reglas fecha/hora ===
 
     const grid = $(".svc-grid", wrap);
