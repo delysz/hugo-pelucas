@@ -7,6 +7,8 @@
 //  otras interacciones para evitar conflictos y mejorar el
 //  rendimiento.
 // =================================================================
+// Línea 1
+import { db, collection, addDoc, query, where, getDocs } from './firebase-config.js';
 
 (() => {
   "use strict";
@@ -546,59 +548,63 @@
     (function applyDateRules(input) {
       if (!input) return;
 
-      // --- Config: horario de apertura (JS: 0=Dom,1=Lun,...,6=Sáb) ---
       const OPEN_SCHEDULE = {
-        1: [[16, 0, 21, 0]],                  // Lunes: 16:00–21:00
-        2: [[9, 45, 14, 0], [16, 0, 21, 0]],  // Mar–Vie: 9:45–14:00 y 16:00–21:00
+        1: [[16, 0, 21, 0]],
+        2: [[9, 45, 14, 0], [16, 0, 21, 0]],
         3: [[9, 45, 14, 0], [16, 0, 21, 0]],
         4: [[9, 45, 14, 0], [16, 0, 21, 0]],
         5: [[9, 45, 14, 0], [16, 0, 21, 0]],
-        6: [],                                // Sábado: cerrado
-        0: []                                 // Domingo: cerrado
+        6: [],
+        0: []
       };
 
       // --- Utilidades ---
       const pad = (n) => String(n).padStart(2, "0");
       const fmtDT = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-      const roundUp15 = (d) => {
-        const add = (15 - (d.getMinutes() % 15)) % 15;
-        d.setMinutes(d.getMinutes() + add, 0, 0);
+
+      // CAMBIO CLAVE: Redondear a 20 minutos
+      const roundUp20 = (d) => {
+        const mins = d.getMinutes();
+        const remainder = mins % 20;
+        if (remainder === 0) return d;
+
+        // Si son las 10:05, pasamos a 10:20
+        d.setMinutes(mins + (20 - remainder), 0, 0);
         return d;
       };
+
       const inOpenRange = (d, ranges) => {
         const mins = d.getHours() * 60 + d.getMinutes();
         return ranges?.some(([sh, sm, eh, em]) => mins >= sh * 60 + sm && mins < eh * 60 + em);
       };
+
       const nextOpenSlot = (from) => {
-        let d = roundUp15(new Date(from));
-        for (let i = 0; i < 30 * 24 * 4; i++) { // busca hasta 30 días, de 15 en 15 min
+        let d = roundUp20(new Date(from)); // Usamos roundUp20
+        for (let i = 0; i < 30 * 24 * 3; i++) {
           const ranges = OPEN_SCHEDULE[d.getDay()];
           if (ranges?.length) {
             if (inOpenRange(d, ranges)) return d;
-            // si estamos antes del primer rango del día, saltamos a su inicio
             const mins = d.getHours() * 60 + d.getMinutes();
             for (const [sh, sm, eh, em] of ranges) {
               const start = sh * 60 + sm;
               const end = eh * 60 + em;
               if (mins < start) { d.setHours(sh, sm, 0, 0); return d; }
-              if (mins >= start && mins < end) return d; // ya dentro
+              if (mins >= start && mins < end) return d;
             }
           }
-          d.setMinutes(d.getMinutes() + 15, 0, 0);
+          d.setMinutes(d.getMinutes() + 20, 0, 0); // Saltos de 20 min
         }
         return null;
       };
 
-      // --- Min: mañana 00:00 (hoy deshabilitado completo) ---
       const minDate = new Date();
       minDate.setDate(minDate.getDate() + 1);
       minDate.setHours(0, 0, 0, 0);
       input.min = fmtDT(minDate);
 
-      // --- Paso de 15' ---
-      input.step = 900; // 900 segundos = 15 minutos
+      // CAMBIO CLAVE: 1200 segundos = 20 minutos
+      input.step = 1200;
 
-      // --- Normaliza cualquier entrada a un slot válido de apertura ---
       const ensureValid = () => {
         if (!input.value) return;
         const [dateStr, timeStr] = input.value.split("T");
@@ -606,17 +612,14 @@
         const [h, m] = timeStr.split(":").map(Number);
         let picked = new Date(Y, M - 1, D, h, m, 0, 0);
 
-        // nunca por debajo del mínimo
         if (picked < minDate) picked = new Date(minDate);
 
-        // redondeo a 15 y ajuste a horario abierto
-        picked = roundUp15(picked);
+        picked = roundUp20(picked); // Usamos roundUp20
         const ranges = OPEN_SCHEDULE[picked.getDay()];
         if (!inOpenRange(picked, ranges)) {
           const next = nextOpenSlot(picked);
           if (next) picked = next;
         }
-
         input.value = fmtDT(picked);
       };
 
@@ -713,47 +716,72 @@
     };
 
 
-    on(waBtn, "click", () => {
-      const dict = window.I18N[currentLang] || window.I18N.es;
+    // --- NUEVO SISTEMA DE RESERVAS (Conectado a Firebase) ---
+    on(waBtn, "click", async () => {
+      const waBtnEl = $(".svc-wa");
+      const originalText = waBtnEl.textContent;
+
+      // 1. Validaciones UI
+      const dtVal = dtInput.value;
+      if (!dtVal) { alert("Por favor, selecciona una fecha y hora."); return; }
       const chosen = CATALOG_DATA.filter((s) => selected.has(s.id));
       if (!chosen.length) { alert("Selecciona al menos un servicio."); return; }
 
-      const dtVal = dtInput.value ? new Date(dtInput.value) : null;
-      const whenTxt = dtVal ? `${dtVal.toLocaleDateString(currentLang)} ${dtVal.toLocaleTimeString(currentLang, { hour: "2-digit", minute: "2-digit" })}` : dict.svc_no_date;
+      waBtnEl.textContent = "Comprobando disponibilidad...";
+      waBtnEl.disabled = true;
 
-      const total = chosen.reduce((a, b) => a + b.price, 0);
+      try {
+        // 2. EL DETECTIVE: Consultar si ya existe esa hora
+        // Buscamos en la colección "citas" donde "fecha_texto" sea igual a la elegida
+        const q = query(collection(db, "citas"), where("fecha_texto", "==", dtVal));
+        const querySnapshot = await getDocs(q);
 
-      const lines = [
-        dict.svc_msg_header,
-        ...chosen.map((s) => `• ${dict.svc_catalog[s.id]} — ${formatEUR(s.price, currentLang)}`),
-        `${dict.svc_msg_total} ${formatEUR(total, currentLang)}`,
-        `${dict.svc_msg_when} ${whenTxt}`,
-        "",
-        dict.svc_msg_footer
-      ];
-
-      const waCTA = $(".whatsapp-btn.grande");
-      const waHref = waCTA?.getAttribute("href") || "";
-      const waNumber = (waHref.match(/wa\.me\/(\d+)/) || [])[1] || "34651435444";
-      const url = `https://wa.me/${waNumber}?text=${encode(lines.join("\n"))}`;
-      window.open(url, "_blank", "noopener");
-    });
-
-    // Validación de fecha y habilitación del botón de WhatsApp
-    if (dtInput) {
-      dtInput.addEventListener('input', function () {
-        if (!this.value) return;
-        const dt = new Date(this.value);
-        const day = dt.getDay(); // 0=Domingo, 6=Sábado
-
-        // Sábado o domingo: cerrado
-        if (day === 0 || day === 6) {
-          alert('No se pueden reservar citas los sábados ni domingos.');
-          this.value = '';
-          return;
+        // Si querySnapshot NO está vacío, es que ya hay una cita
+        if (!querySnapshot.empty) {
+          alert("⚠️ Lo sentimos, esa hora (20 min) YA ESTÁ RESERVADA por otro cliente.\n\nPor favor, elige otra hora.");
+          waBtnEl.textContent = originalText;
+          waBtnEl.disabled = false;
+          return; // STOP: No guardamos nada
         }
-      });
-    }
+
+        // 3. Si llegamos aquí, está libre. GUARDAMOS.
+        const total = chosen.reduce((a, b) => a + b.price, 0);
+        const serviciosNombres = chosen.map(s => {
+           const dict = window.I18N[currentLang] || window.I18N.es;
+           return dict.svc_catalog[s.id] || s.id;
+        }).join(", ");
+
+        waBtnEl.textContent = "Confirmando cita...";
+
+        await addDoc(collection(db, "citas"), {
+          fecha: new Date(dtVal),
+          fecha_texto: dtVal, // Clave para detectar duplicados
+          servicios: serviciosNombres,
+          total: total,
+          cliente: "Cliente Web",
+          estado: "pendiente",
+          timestamp: new Date()
+        });
+
+        alert("🎉 ¡Cita confirmada! Te esperamos.");
+        
+        // Limpiar
+        selected.clear();
+        dtInput.value = "";
+        $(".svc-card button.active").forEach(b => {
+          b.classList.remove("active");
+          b.textContent = "Añadir"; 
+        });
+        updateTotal(currentLang);
+
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Error de conexión. Inténtalo de nuevo.");
+      } finally {
+        waBtnEl.textContent = originalText;
+        waBtnEl.disabled = false;
+      }
+    });
 
     // Deshabilita el botón de WhatsApp si no hay fecha seleccionada
     if (waBtn && dtInput) {
