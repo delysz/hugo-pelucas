@@ -496,7 +496,7 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
     }
   })();
 
-  
+
 // ===============================================
   //  4. SERVICIOS Y RESERVAS (CON VISUALIZACIÓN DE HUECOS)
   // ===============================================
@@ -730,44 +730,48 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
       updateTotal(lang);
     };
 
-    // --- CLICK RESERVAR FINAL ---
+    // --- CLICK RESERVAR (NOTIFICACIÓN AL CLIENTE VÍA CALENDARIO) ---
     on(waBtn, "click", async () => {
+        // 1. RECOGER DATOS
         const nombre = cliName.value.trim();
         const telefono = cliPhone.value.trim();
         const email = cliEmail.value.trim();
 
+        // 2. VALIDACIONES
         if (nombre.length < 3) { alert("⚠️ Falta tu nombre."); cliName.focus(); return; }
         const phoneRegex = /^[6789]\d{8}$/;
         if (!phoneRegex.test(telefono)) { alert("⚠️ Teléfono incorrecto."); cliPhone.focus(); return; }
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) { alert("⚠️ Email incorrecto."); cliEmail.focus(); return; }
+        // Validación Email (opcional si no vas a enviar correo, pero bueno para guardar)
+        // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        // if (!emailRegex.test(email)) { alert("⚠️ Email incorrecto."); cliEmail.focus(); return; }
 
-        if (!finalDateTime) { alert("⚠️ Debes tocar una hora disponible (botón verde)."); return; }
-        
+        if (!finalDateTime) { alert("⚠️ Toca una hora verde."); return; }
         const chosen = CATALOG_DATA.filter((s) => selected.has(s.id));
-        if (!chosen.length) { alert("⚠️ Elige al menos un servicio."); return; }
+        if (!chosen.length) { alert("⚠️ Elige un servicio."); return; }
 
-        waBtn.textContent = "Reservando...";
+        // 3. BLOQUEAR BOTÓN
+        waBtn.textContent = "Guardando...";
         waBtn.disabled = true;
 
         try {
-            // Doble chequeo final (por si alguien reservó hace 1 segundo)
+            // A) Chequeo de seguridad
             const q = query(collection(db, "citas"), where("fecha_texto", "==", finalDateTime));
             const snap = await getDocs(q);
             if (!snap.empty) {
-                alert("⛔ ¡Vaya! Alguien acaba de quitarte ese hueco hace un segundo. Elige otro.");
-                // Recargar huecos
+                alert("⛔ ¡Vaya! Te han quitado el hueco. Elige otro.");
                 const datePart = finalDateTime.split('T')[0];
-                generateSlots(datePart);
+                generateSlots(datePart); 
                 return;
             }
 
+            // B) Calcular totales
             const total = chosen.reduce((a, b) => a + b.price, 0);
             const serviciosTexto = chosen.map(s => {
                const dict = window.I18N[currentLang] || window.I18N.es;
                return dict.svc_catalog[s.id] || s.id; 
             }).join(", ");
 
+            // C) GUARDAR EN FIREBASE
             await addDoc(collection(db, "citas"), {
                 fecha: new Date(finalDateTime),
                 fecha_texto: finalDateTime,
@@ -781,8 +785,29 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
                 timestamp: new Date()
             });
 
-            alert(`✅ ¡RESERVA CONFIRMADA!\n\nTe esperamos el ${new Date(finalDateTime).toLocaleString()}`);
-            location.reload(); // Recargar para limpiar todo
+            // D) GENERAR ENLACE DE CALENDARIO (La Notificación Gratis) 📅
+            // Formato de fecha para Google: YYYYMMDDTHHMMSS
+            const fechaObj = new Date(finalDateTime);
+            const finObj = new Date(fechaObj.getTime() + 20*60000); // +20 minutos
+
+            const fmt = (date) => {
+                return date.toISOString().replace(/-|:|\.\d\d\d/g, "").split("Z")[0]; // Truco para formato Google local
+            };
+            
+            // Construir URL de Google Calendar
+            const gCalUrl = new URL("https://calendar.google.com/calendar/render");
+            gCalUrl.searchParams.append("action", "TEMPLATE");
+            gCalUrl.searchParams.append("text", "💈 Cita Barbería Hugo");
+            gCalUrl.searchParams.append("dates", `${fmt(fechaObj)}/${fmt(finObj)}`);
+            gCalUrl.searchParams.append("details", `Servicios: ${serviciosTexto}\nPrecio: ${total}€\nCliente: ${nombre}`);
+            gCalUrl.searchParams.append("location", "Barbería Hugo, Zaragoza");
+
+            // E) MENSAJE FINAL
+            if(confirm(`✅ ¡RESERVA CONFIRMADA!\n\nTe esperamos el ${fechaObj.toLocaleString()}.\n\n¿Quieres guardar el recordatorio en tu calendario ahora?`)) {
+                window.open(gCalUrl.toString(), '_blank');
+            }
+            
+            location.reload(); 
 
         } catch (error) {
             console.error(error);
