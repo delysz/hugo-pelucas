@@ -9,8 +9,8 @@
 
 ---
 
-## 🔗 Demo en Vivo
-👉 **[Ver el proyecto online aquí](https://barberiahugo.vercel.app/)**
+## 🔗 Barbería Hugo
+👉 **[Ver el proyecto aquí](https://barberiahugo.vercel.app/)**
 
 ---
 
