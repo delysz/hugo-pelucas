@@ -495,8 +495,10 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
       init();
     }
   })();
+
+  
 // ===============================================
-  //  4. SERVICIOS, FORMULARIO Y RESERVAS (CON HORARIOS)
+  //  4. SERVICIOS Y RESERVAS (CON VISUALIZACIÓN DE HUECOS)
   // ===============================================
   (function services() {
     const host = $("#servicios");
@@ -528,97 +530,161 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
       <div class="svc-grid"></div>
       
       <div class="client-form" style="margin-top:20px; padding:20px; background:rgba(20, 25, 55, 0.6); border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
-        <h3 style="font-size:1.1rem; color:#f6c90e; margin-top:0; margin-bottom:15px; font-family:'Bebas Neue'; letter-spacing:1px;">Tus Datos (Obligatorio)</h3>
-        <div style="display:grid; gap:15px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-            <input type="text" id="cli-name" placeholder="Nombre y Apellido *" style="width:100%; padding:12px; border-radius:8px; border:1px solid #444; background:#0f1220; color:white;">
-            <input type="tel" id="cli-phone" placeholder="Teléfono Móvil *" style="width:100%; padding:12px; border-radius:8px; border:1px solid #444; background:#0f1220; color:white;">
-            <input type="email" id="cli-email" placeholder="Email (para recordatorios) *" style="width:100%; padding:12px; border-radius:8px; border:1px solid #444; background:#0f1220; color:white; grid-column: 1 / -1;">
+        <h3 style="font-size:1.1rem; color:#f6c90e; margin:0 0 15px 0; font-family:'Bebas Neue'; letter-spacing:1px;">1. Tus Datos</h3>
+        <div style="display:grid; gap:10px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+            <input type="text" id="cli-name" placeholder="Nombre *" style="padding:10px; border-radius:6px; border:1px solid #444; background:#0f1220; color:white;">
+            <input type="tel" id="cli-phone" placeholder="Teléfono *" style="padding:10px; border-radius:6px; border:1px solid #444; background:#0f1220; color:white;">
+            <input type="email" id="cli-email" placeholder="Email *" style="padding:10px; border-radius:6px; border:1px solid #444; background:#0f1220; color:white; grid-column: 1 / -1;">
         </div>
       </div>
 
-      <div class="svc-bar">
-        <div class="svc-when">
-          <label>Fecha:</label>
-          <input type="datetime-local" class="svc-dt" step="1200">
+      <div class="svc-bar" style="display:block; margin-top:15px;">
+        <h3 style="font-size:1.1rem; color:#f6c90e; margin:0 0 10px 0; font-family:'Bebas Neue'; letter-spacing:1px;">2. Elige Día y Hora</h3>
+        
+        <input type="date" id="date-picker" style="width:100%; padding:12px; background:#fff; color:#000; border-radius:6px; font-weight:bold; cursor:pointer;">
+        
+        <div id="slots-container" class="slots-grid">
+            <p style="grid-column:1/-1; text-align:center; opacity:0.6; font-size:0.9rem;">👈 Selecciona un día primero</p>
         </div>
-        <div class="svc-total"><span>Total:</span> <strong class="svc-amount">0€</strong></div>
-        <button type="button" class="svc-wa">Confirmar Reserva</button>
+
+        <div class="svc-total" style="margin-top:20px; border-top:1px solid #333; padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
+             <span>Total:</span> <strong class="svc-amount" style="font-size:1.4rem; color:#f6c90e">0€</strong>
+        </div>
+        <button type="button" class="svc-wa" style="width:100%; margin-top:10px;">Confirmar Reserva</button>
       </div>`;
     host.appendChild(wrap);
 
     const grid = $(".svc-grid", wrap);
     const amountEl = $(".svc-amount", wrap);
-    const totalLabel = $(".svc-total span", wrap);
-    const dtInput = $(".svc-dt", wrap);
     const waBtn = $(".svc-wa", wrap);
     const cliName = $("#cli-name", wrap);
     const cliPhone = $("#cli-phone", wrap);
     const cliEmail = $("#cli-email", wrap);
+    const datePicker = $("#date-picker", wrap);
+    const slotsContainer = $("#slots-container", wrap);
 
-    // --- EL PORTERO DE HORARIOS 👮‍♂️ ---
-    function checkShopHours(date) {
-        const day = date.getDay(); // 0=Domingo, 1=Lunes...
-        const minutes = date.getHours() * 60 + date.getMinutes(); // Hora en minutos (ej: 10:00 = 600)
+    // Variable para guardar la selección final (YYYY-MM-DDTHH:MM)
+    let finalDateTime = null;
 
-        // Definición de Horarios (Minutos desde las 00:00)
-        // 09:45 = 585 | 14:00 = 840 | 16:00 = 960 | 21:00 = 1260
-        
-        // Domingo (0) y Sábado (6) -> CERRADO
-        if (day === 0 || day === 6) return false;
+    // --- GENERADOR DE HORARIOS ---
+    async function generateSlots(dateStr) {
+        slotsContainer.innerHTML = '<p style="grid-column:1/-1; text-align:center;">Cargando disponibilidad...</p>';
+        finalDateTime = null; // Reset
+        waBtn.textContent = "Elige una hora...";
+        waBtn.disabled = true;
 
-        // Lunes (1) -> Solo tarde (16:00 - 21:00)
-        if (day === 1) {
-            return (minutes >= 960 && minutes < 1260);
+        const dateObj = new Date(dateStr);
+        const day = dateObj.getDay(); // 0=Dom, 1=Lun...
+
+        // 1. Definir rango de apertura según día
+        let ranges = [];
+        if (day === 0 || day === 6) {
+            slotsContainer.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#ff6b6b">⛔ Cerrado los fines de semana.</p>';
+            return;
+        } else if (day === 1) { // Lunes tarde
+            ranges = [[16, 21]]; 
+        } else { // Mar-Vie
+            ranges = [[10, 14], [16, 21]]; // Empezamos a las 10:00 para cuadrar el :00, :20, :40
         }
 
-        // Martes(2) a Viernes(5) -> Mañana y Tarde
-        if (day >= 2 && day <= 5) {
-            const manana = (minutes >= 585 && minutes < 840); // 9:45 - 14:00
-            const tarde = (minutes >= 960 && minutes < 1260); // 16:00 - 21:00
-            return (manana || tarde);
+        // 2. Generar lista de horas teóricas (ej: 10:00, 10:20...)
+        const slots = [];
+        ranges.forEach(([startH, endH]) => {
+            for (let h = startH; h < endH; h++) {
+                for (let m = 0; m < 60; m += 20) {
+                    // Excepción cierre: Si es el turno de mañana y son las 13:40, es la última. A las 14:00 cierran.
+                    slots.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+                }
+            }
+        });
+
+        // 3. CONSULTAR FIREBASE (Lo que ya está ocupado)
+        // Buscamos todas las citas que empiecen por esa fecha "YYYY-MM-DD"
+        try {
+            const q = query(
+                collection(db, "citas"),
+                where("fecha_texto", ">=", dateStr),
+                where("fecha_texto", "<=", dateStr + "\uf8ff")
+            );
+            const snapshot = await getDocs(q);
+            const busyTimes = new Set();
+            snapshot.forEach(doc => {
+                const ft = doc.data().fecha_texto; // "2023-10-20T10:20"
+                if(ft) busyTimes.add(ft.split('T')[1]); // Guardamos solo la hora "10:20"
+            });
+
+            // 4. PINTAR BOTONES
+            slotsContainer.innerHTML = "";
+            
+            // Filtrar pasado (si eliges hoy, no mostrar horas pasadas)
+            const now = new Date();
+            const isToday = (dateStr === now.toISOString().split('T')[0]);
+            const currentMins = now.getHours() * 60 + now.getMinutes();
+
+            if (slots.length === 0) {
+                slotsContainer.innerHTML = '<p>No hay horas disponibles.</p>';
+                return;
+            }
+
+            slots.forEach(time => {
+                const [h, m] = time.split(':').map(Number);
+                const slotMins = h * 60 + m;
+
+                const btn = document.createElement("div");
+                btn.className = "time-btn";
+                btn.textContent = time;
+
+                // Bloquear si está ocupado
+                if (busyTimes.has(time)) {
+                    btn.classList.add("taken");
+                    btn.title = "Ocupado";
+                }
+                // Bloquear si ya pasó la hora (solo si es hoy)
+                else if (isToday && slotMins < currentMins) {
+                    btn.classList.add("taken");
+                    btn.style.opacity = "0.3";
+                    btn.title = "Hora pasada";
+                } 
+                // Si está libre
+                else {
+                    btn.onclick = () => selectSlot(btn, dateStr, time);
+                }
+
+                slotsContainer.appendChild(btn);
+            });
+
+        } catch (e) {
+            console.error(e);
+            slotsContainer.innerHTML = '<p style="color:red">Error cargando disponibilidad.</p>';
         }
-        
-        return false;
     }
 
-    // --- EVENTO DE CAMBIO DE FECHA ---
-    dtInput.addEventListener('change', function() {
-        if (!this.value) return;
-        const d = new Date(this.value);
+    function selectSlot(btn, dateStr, time) {
+        // Quitar selección previa
+        $$(".time-btn.selected", slotsContainer).forEach(b => b.classList.remove("selected"));
+        // Marcar nuevo
+        btn.classList.add("selected");
         
-        // 1. Bloqueo 20 min
-        const m = d.getMinutes();
-        if (m % 20 !== 0) {
-            const rounded = Math.round(m / 20) * 20;
-            d.setMinutes(rounded, 0, 0); 
-            const pad = n => String(n).padStart(2, '0');
-            this.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-        }
+        // Guardar valor
+        finalDateTime = `${dateStr}T${time}`;
+        waBtn.textContent = "Confirmar Reserva";
+        waBtn.disabled = false;
+    }
 
-        // 2. Validar Pasado
-        if (d < new Date()) {
-            alert("⚠️ La fecha debe ser futura.");
-            this.value = "";
-            return;
-        }
-
-        // 3. VALIDAR HORARIO APERTURA
-        if (!checkShopHours(d)) {
-            alert("⛔ EL LOCAL ESTÁ CERRADO A ESA HORA.\n\nHorario:\nLunes: 16-21h\nMar-Vie: 9:45-14h y 16-21h\nSáb-Dom: Cerrado");
-            this.value = ""; // Borrar fecha inválida
-        }
+    // Evento al cambiar fecha
+    datePicker.addEventListener('change', (e) => {
+        if(e.target.value) generateSlots(e.target.value);
     });
 
+    // --- CÁLCULO TOTAL Y RENDERIZADO (Igual que antes) ---
     const formatEUR = (n, lang) => new Intl.NumberFormat(lang, { style: "currency", currency: "EUR" }).format(n);
-
     function updateTotal(lang) {
       const dict = window.I18N[lang] || window.I18N.es;
       const total = CATALOG_DATA.filter((s) => selected.has(s.id)).reduce((a, b) => a + b.price, 0);
-      totalLabel.textContent = dict.svc_total;
+      $(".svc-total span", wrap).textContent = dict.svc_total;
       amountEl.textContent = formatEUR(total, lang);
     }
 
-    // Renderizar
     window.renderServicesI18n = function (lang) {
       currentLang = lang;
       const dict = window.I18N[lang] || window.I18N.es;
@@ -657,56 +723,45 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
             updateTotal(lang);
           });
           grid.appendChild(card);
-          try { if(typeof attachTiltEffect === 'function') attachTiltEffect(card); } catch(e){}
         });
       });
-      $(".svc-when label", wrap).textContent = dict.svc_when_label;
-      waBtn.textContent = (lang === 'en') ? "Confirm Booking" : "Confirmar Reserva";
+      waBtn.textContent = "Elige una hora...";
+      waBtn.disabled = true;
       updateTotal(lang);
     };
 
-    // --- CLICK RESERVAR ---
+    // --- CLICK RESERVAR FINAL ---
     on(waBtn, "click", async () => {
         const nombre = cliName.value.trim();
         const telefono = cliPhone.value.trim();
         const email = cliEmail.value.trim();
 
-        // VALIDACIONES
-        if (nombre.length < 3) { alert("⚠️ Escribe tu nombre completo."); cliName.focus(); return; }
-        
+        if (nombre.length < 3) { alert("⚠️ Falta tu nombre."); cliName.focus(); return; }
         const phoneRegex = /^[6789]\d{8}$/;
-        if (!phoneRegex.test(telefono)) { alert("⚠️ Teléfono móvil incorrecto (9 dígitos)."); cliPhone.focus(); return; }
-
+        if (!phoneRegex.test(telefono)) { alert("⚠️ Teléfono incorrecto."); cliPhone.focus(); return; }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) { alert("⚠️ Email incorrecto."); cliEmail.focus(); return; }
 
-        const dtVal = dtInput.value;
-        if (!dtVal) { alert("⚠️ Selecciona fecha y hora."); dtInput.focus(); return; }
+        if (!finalDateTime) { alert("⚠️ Debes tocar una hora disponible (botón verde)."); return; }
         
-        // DOBLE CHECK DE HORARIO (Por seguridad)
-        if (!checkShopHours(new Date(dtVal))) {
-            alert("⛔ El local está cerrado a esa hora."); return;
-        }
-
         const chosen = CATALOG_DATA.filter((s) => selected.has(s.id));
         if (!chosen.length) { alert("⚠️ Elige al menos un servicio."); return; }
 
-        const originalText = waBtn.textContent;
-        waBtn.textContent = "Verificando...";
+        waBtn.textContent = "Reservando...";
         waBtn.disabled = true;
 
         try {
-            const q = query(collection(db, "citas"), where("fecha_texto", "==", dtVal));
-            const querySnapshot = await getDocs(q);
-
-            if (!querySnapshot.empty) {
-                alert("⛔ Ese horario ya está ocupado. Prueba otro.");
-                waBtn.textContent = originalText;
-                waBtn.disabled = false;
+            // Doble chequeo final (por si alguien reservó hace 1 segundo)
+            const q = query(collection(db, "citas"), where("fecha_texto", "==", finalDateTime));
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+                alert("⛔ ¡Vaya! Alguien acaba de quitarte ese hueco hace un segundo. Elige otro.");
+                // Recargar huecos
+                const datePart = finalDateTime.split('T')[0];
+                generateSlots(datePart);
                 return;
             }
 
-            waBtn.textContent = "Reservando...";
             const total = chosen.reduce((a, b) => a + b.price, 0);
             const serviciosTexto = chosen.map(s => {
                const dict = window.I18N[currentLang] || window.I18N.es;
@@ -714,8 +769,8 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
             }).join(", ");
 
             await addDoc(collection(db, "citas"), {
-                fecha: new Date(dtVal),
-                fecha_texto: dtVal,
+                fecha: new Date(finalDateTime),
+                fecha_texto: finalDateTime,
                 servicios: serviciosTexto,
                 total: total,
                 cliente: nombre,
@@ -726,20 +781,12 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
                 timestamp: new Date()
             });
 
-            alert(`✅ ¡Confirmado!\nTe esperamos el ${new Date(dtVal).toLocaleString()}`);
-            
-            selected.clear();
-            dtInput.value = "";
-            cliName.value = "";
-            cliPhone.value = "";
-            cliEmail.value = "";
-            window.renderServicesI18n(currentLang);
+            alert(`✅ ¡RESERVA CONFIRMADA!\n\nTe esperamos el ${new Date(finalDateTime).toLocaleString()}`);
+            location.reload(); // Recargar para limpiar todo
 
         } catch (error) {
             console.error(error);
             alert("❌ Error de conexión.");
-        } finally {
-            waBtn.textContent = originalText;
             waBtn.disabled = false;
         }
     });
