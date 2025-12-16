@@ -495,10 +495,8 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
       init();
     }
   })();
-
-
-  // ===============================================
-  //  4. SERVICIOS DINÁMICOS Y RESERVA WHATSAPP
+// ===============================================
+  //  4. SERVICIOS, FORMULARIO Y RESERVAS (CON HORARIOS)
   // ===============================================
   (function services() {
     const host = $("#servicios");
@@ -509,131 +507,107 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
       { id: "corte_normal", price: 13, category: 'haircuts' },
       { id: "corte_fade", price: 15, category: 'haircuts' },
       { id: "corte_nino_jubilado", price: 13, category: 'haircuts' },
-      // Corte + barba
       { id: "combo_normal", price: 18, category: 'combos' },
       { id: "combo_fade", price: 20, category: 'combos' },
-      // Servicios de barba
       { id: "barba_arreglo", price: 8, category: 'beard' },
       { id: "barba_afeitado", price: 12, category: 'beard' },
-      // Tratamientos
       { id: "trat_decoloracion", price: 28, category: 'treatments' },
       { id: "trat_mechas", price: 20, category: 'treatments' },
       { id: "trat_peeling", price: 9, category: 'treatments' },
-      // Extras
       { id: "extra_cejas", price: 4, category: 'extras' },
     ];
 
     const selected = new Set();
     let currentLang = (localStorage.getItem("lang") || "es").slice(0, 2);
-    if (!I18N[currentLang]) currentLang = "es";
+    if (!window.I18N || !window.I18N[currentLang]) currentLang = "es";
 
-    // Crear la estructura HTML una sola vez
+    // --- HTML ---
     const wrap = document.createElement("div");
     wrap.className = "svc-wrap";
     wrap.innerHTML = `
       <div class="svc-grid"></div>
+      
+      <div class="client-form" style="margin-top:20px; padding:20px; background:rgba(20, 25, 55, 0.6); border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
+        <h3 style="font-size:1.1rem; color:#f6c90e; margin-top:0; margin-bottom:15px; font-family:'Bebas Neue'; letter-spacing:1px;">Tus Datos (Obligatorio)</h3>
+        <div style="display:grid; gap:15px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+            <input type="text" id="cli-name" placeholder="Nombre y Apellido *" style="width:100%; padding:12px; border-radius:8px; border:1px solid #444; background:#0f1220; color:white;">
+            <input type="tel" id="cli-phone" placeholder="Teléfono Móvil *" style="width:100%; padding:12px; border-radius:8px; border:1px solid #444; background:#0f1220; color:white;">
+            <input type="email" id="cli-email" placeholder="Email (para recordatorios) *" style="width:100%; padding:12px; border-radius:8px; border:1px solid #444; background:#0f1220; color:white; grid-column: 1 / -1;">
+        </div>
+      </div>
+
       <div class="svc-bar">
         <div class="svc-when">
-          <label></label>
-          <input type="datetime-local" class="svc-dt">
+          <label>Fecha:</label>
+          <input type="datetime-local" class="svc-dt" step="1200">
         </div>
-        <div class="svc-total"><span></span> <strong class="svc-amount"></strong></div>
-        <button type="button" class="svc-wa"></button>
+        <div class="svc-total"><span>Total:</span> <strong class="svc-amount">0€</strong></div>
+        <button type="button" class="svc-wa">Confirmar Reserva</button>
       </div>`;
     host.appendChild(wrap);
-
-    // === Reglas para fecha/hora: min mañana, step 15', y solo horario abierto ===
-    const dtEl = $(".svc-dt", wrap); // si ya lo declaraste antes, reutilízalo (no lo redeclares)
-
-    (function applyDateRules(input) {
-      if (!input) return;
-
-      const OPEN_SCHEDULE = {
-        1: [[16, 0, 21, 0]],
-        2: [[9, 45, 14, 0], [16, 0, 21, 0]],
-        3: [[9, 45, 14, 0], [16, 0, 21, 0]],
-        4: [[9, 45, 14, 0], [16, 0, 21, 0]],
-        5: [[9, 45, 14, 0], [16, 0, 21, 0]],
-        6: [],
-        0: []
-      };
-
-      // --- Utilidades ---
-      const pad = (n) => String(n).padStart(2, "0");
-      const fmtDT = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-
-      // CAMBIO CLAVE: Redondear a 20 minutos
-      const roundUp20 = (d) => {
-        const mins = d.getMinutes();
-        const remainder = mins % 20;
-        if (remainder === 0) return d;
-
-        // Si son las 10:05, pasamos a 10:20
-        d.setMinutes(mins + (20 - remainder), 0, 0);
-        return d;
-      };
-
-      const inOpenRange = (d, ranges) => {
-        const mins = d.getHours() * 60 + d.getMinutes();
-        return ranges?.some(([sh, sm, eh, em]) => mins >= sh * 60 + sm && mins < eh * 60 + em);
-      };
-
-      const nextOpenSlot = (from) => {
-        let d = roundUp20(new Date(from)); // Usamos roundUp20
-        for (let i = 0; i < 30 * 24 * 3; i++) {
-          const ranges = OPEN_SCHEDULE[d.getDay()];
-          if (ranges?.length) {
-            if (inOpenRange(d, ranges)) return d;
-            const mins = d.getHours() * 60 + d.getMinutes();
-            for (const [sh, sm, eh, em] of ranges) {
-              const start = sh * 60 + sm;
-              const end = eh * 60 + em;
-              if (mins < start) { d.setHours(sh, sm, 0, 0); return d; }
-              if (mins >= start && mins < end) return d;
-            }
-          }
-          d.setMinutes(d.getMinutes() + 20, 0, 0); // Saltos de 20 min
-        }
-        return null;
-      };
-
-      const minDate = new Date();
-      minDate.setDate(minDate.getDate() + 1);
-      minDate.setHours(0, 0, 0, 0);
-      input.min = fmtDT(minDate);
-
-      // CAMBIO CLAVE: 1200 segundos = 20 minutos
-      input.step = 1200;
-
-      const ensureValid = () => {
-        if (!input.value) return;
-        const [dateStr, timeStr] = input.value.split("T");
-        const [Y, M, D] = dateStr.split("-").map(Number);
-        const [h, m] = timeStr.split(":").map(Number);
-        let picked = new Date(Y, M - 1, D, h, m, 0, 0);
-
-        if (picked < minDate) picked = new Date(minDate);
-
-        picked = roundUp20(picked); // Usamos roundUp20
-        const ranges = OPEN_SCHEDULE[picked.getDay()];
-        if (!inOpenRange(picked, ranges)) {
-          const next = nextOpenSlot(picked);
-          if (next) picked = next;
-        }
-        input.value = fmtDT(picked);
-      };
-
-      input.addEventListener("change", ensureValid);
-      input.addEventListener("blur", ensureValid);
-    })(dtEl);
-    // === Fin reglas fecha/hora ===
 
     const grid = $(".svc-grid", wrap);
     const amountEl = $(".svc-amount", wrap);
     const totalLabel = $(".svc-total span", wrap);
-    const dtLabel = $(".svc-when label", wrap);
     const dtInput = $(".svc-dt", wrap);
     const waBtn = $(".svc-wa", wrap);
+    const cliName = $("#cli-name", wrap);
+    const cliPhone = $("#cli-phone", wrap);
+    const cliEmail = $("#cli-email", wrap);
+
+    // --- EL PORTERO DE HORARIOS 👮‍♂️ ---
+    function checkShopHours(date) {
+        const day = date.getDay(); // 0=Domingo, 1=Lunes...
+        const minutes = date.getHours() * 60 + date.getMinutes(); // Hora en minutos (ej: 10:00 = 600)
+
+        // Definición de Horarios (Minutos desde las 00:00)
+        // 09:45 = 585 | 14:00 = 840 | 16:00 = 960 | 21:00 = 1260
+        
+        // Domingo (0) y Sábado (6) -> CERRADO
+        if (day === 0 || day === 6) return false;
+
+        // Lunes (1) -> Solo tarde (16:00 - 21:00)
+        if (day === 1) {
+            return (minutes >= 960 && minutes < 1260);
+        }
+
+        // Martes(2) a Viernes(5) -> Mañana y Tarde
+        if (day >= 2 && day <= 5) {
+            const manana = (minutes >= 585 && minutes < 840); // 9:45 - 14:00
+            const tarde = (minutes >= 960 && minutes < 1260); // 16:00 - 21:00
+            return (manana || tarde);
+        }
+        
+        return false;
+    }
+
+    // --- EVENTO DE CAMBIO DE FECHA ---
+    dtInput.addEventListener('change', function() {
+        if (!this.value) return;
+        const d = new Date(this.value);
+        
+        // 1. Bloqueo 20 min
+        const m = d.getMinutes();
+        if (m % 20 !== 0) {
+            const rounded = Math.round(m / 20) * 20;
+            d.setMinutes(rounded, 0, 0); 
+            const pad = n => String(n).padStart(2, '0');
+            this.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+
+        // 2. Validar Pasado
+        if (d < new Date()) {
+            alert("⚠️ La fecha debe ser futura.");
+            this.value = "";
+            return;
+        }
+
+        // 3. VALIDAR HORARIO APERTURA
+        if (!checkShopHours(d)) {
+            alert("⛔ EL LOCAL ESTÁ CERRADO A ESA HORA.\n\nHorario:\nLunes: 16-21h\nMar-Vie: 9:45-14h y 16-21h\nSáb-Dom: Cerrado");
+            this.value = ""; // Borrar fecha inválida
+        }
+    });
 
     const formatEUR = (n, lang) => new Intl.NumberFormat(lang, { style: "currency", currency: "EUR" }).format(n);
 
@@ -644,156 +618,133 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
       amountEl.textContent = formatEUR(total, lang);
     }
 
-    // Exponemos la función de renderizado para que el sistema i18n pueda llamarla
-    // Exponemos la función de renderizado para que el sistema i18n pueda llamarla
+    // Renderizar
     window.renderServicesI18n = function (lang) {
       currentLang = lang;
       const dict = window.I18N[lang] || window.I18N.es;
-
-      // Agrupa los servicios por categoría para poder mostrarlos ordenados
-      const servicesByCategory = CATALOG_DATA.reduce((acc, service) => {
-        const category = service.category || 'general';
-        if (!acc[category]) {
-          acc[category] = [];
-        }
-        acc[category].push(service);
+      const servicesByCategory = CATALOG_DATA.reduce((acc, svc) => {
+        const cat = svc.category || 'general';
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(svc);
         return acc;
       }, {});
 
-      // Limpia el contenido anterior
       grid.innerHTML = "";
+      ['haircuts', 'combos', 'beard', 'treatments', 'extras'].forEach(catId => {
+        if (!servicesByCategory[catId]) return;
+        const h3 = document.createElement('h3');
+        h3.className = 'svc-category-title';
+        h3.textContent = (dict.svc_categories[catId] || catId).replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim();
+        grid.appendChild(h3);
 
-      const categoryOrder = ['haircuts', 'combos', 'beard', 'treatments', 'extras'];
-
-      // Dibuja cada categoría y sus servicios en orden
-      categoryOrder.forEach(categoryId => {
-        if (!servicesByCategory[categoryId]) return;
-
-        // Quitar TODOS los emojis del título de la categoría
-        const categoryTitle = document.createElement('h3');
-        categoryTitle.className = 'svc-category-title';
-        let catLabel = dict.svc_categories[categoryId] || categoryId;
-        catLabel = catLabel.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim();
-        categoryTitle.textContent = catLabel;
-        grid.appendChild(categoryTitle);
-
-        // Dibuja las tarjetas de servicio para esta categoría
-        servicesByCategory[categoryId].forEach((svc) => {
-          // Quitar TODOS los emojis del nombre del servicio
-          let name = dict.svc_catalog[svc.id] || svc.id;
-          name = name.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim();
+        servicesByCategory[catId].forEach((svc) => {
           const card = document.createElement("article");
           card.className = "svc-card";
           const isSelected = selected.has(svc.id);
-
           card.innerHTML = `
-            <h3>${name}</h3>
+            <h3>${(dict.svc_catalog[svc.id] || svc.id).replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim()}</h3>
             <div class="price">${formatEUR(svc.price, lang)}</div>
             <button type="button" data-id="${svc.id}" aria-pressed="${isSelected}">
               ${isSelected ? dict.svc_remove : dict.svc_add}
             </button>`;
-
+          
           const btn = $("button", card);
           if (isSelected) btn.classList.add("active");
-
           on(btn, "click", () => {
-            const isActive = btn.classList.toggle("active");
-            btn.textContent = isActive ? dict.svc_remove : dict.svc_add;
-            btn.setAttribute("aria-pressed", String(isActive));
-            if (isActive) selected.add(svc.id); else selected.delete(svc.id);
+            const active = btn.classList.toggle("active");
+            btn.textContent = active ? dict.svc_remove : dict.svc_add;
+            if (active) selected.add(svc.id); else selected.delete(svc.id);
             updateTotal(lang);
           });
-
           grid.appendChild(card);
-          attachTiltEffect(card);
+          try { if(typeof attachTiltEffect === 'function') attachTiltEffect(card); } catch(e){}
         });
       });
-
-      // Actualiza los textos de la barra inferior y el total
       $(".svc-when label", wrap).textContent = dict.svc_when_label;
-      $(".svc-wa", wrap).textContent = dict.svc_reserve_whatsapp;
+      waBtn.textContent = (lang === 'en') ? "Confirm Booking" : "Confirmar Reserva";
       updateTotal(lang);
     };
 
-
-    // --- NUEVO SISTEMA DE RESERVAS (Conectado a Firebase) ---
+    // --- CLICK RESERVAR ---
     on(waBtn, "click", async () => {
-      const waBtnEl = $(".svc-wa");
-      const originalText = waBtnEl.textContent;
+        const nombre = cliName.value.trim();
+        const telefono = cliPhone.value.trim();
+        const email = cliEmail.value.trim();
 
-      // 1. Validaciones UI
-      const dtVal = dtInput.value;
-      if (!dtVal) { alert("Por favor, selecciona una fecha y hora."); return; }
-      const chosen = CATALOG_DATA.filter((s) => selected.has(s.id));
-      if (!chosen.length) { alert("Selecciona al menos un servicio."); return; }
+        // VALIDACIONES
+        if (nombre.length < 3) { alert("⚠️ Escribe tu nombre completo."); cliName.focus(); return; }
+        
+        const phoneRegex = /^[6789]\d{8}$/;
+        if (!phoneRegex.test(telefono)) { alert("⚠️ Teléfono móvil incorrecto (9 dígitos)."); cliPhone.focus(); return; }
 
-      waBtnEl.textContent = "Comprobando disponibilidad...";
-      waBtnEl.disabled = true;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) { alert("⚠️ Email incorrecto."); cliEmail.focus(); return; }
 
-      try {
-        // 2. EL DETECTIVE: Consultar si ya existe esa hora
-        // Buscamos en la colección "citas" donde "fecha_texto" sea igual a la elegida
-        const q = query(collection(db, "citas"), where("fecha_texto", "==", dtVal));
-        const querySnapshot = await getDocs(q);
-
-        // Si querySnapshot NO está vacío, es que ya hay una cita
-        if (!querySnapshot.empty) {
-          alert("⚠️ Lo sentimos, esa hora (20 min) YA ESTÁ RESERVADA por otro cliente.\n\nPor favor, elige otra hora.");
-          waBtnEl.textContent = originalText;
-          waBtnEl.disabled = false;
-          return; // STOP: No guardamos nada
+        const dtVal = dtInput.value;
+        if (!dtVal) { alert("⚠️ Selecciona fecha y hora."); dtInput.focus(); return; }
+        
+        // DOBLE CHECK DE HORARIO (Por seguridad)
+        if (!checkShopHours(new Date(dtVal))) {
+            alert("⛔ El local está cerrado a esa hora."); return;
         }
 
-        // 3. Si llegamos aquí, está libre. GUARDAMOS.
-        const total = chosen.reduce((a, b) => a + b.price, 0);
-        const serviciosNombres = chosen.map(s => {
-           const dict = window.I18N[currentLang] || window.I18N.es;
-           return dict.svc_catalog[s.id] || s.id;
-        }).join(", ");
+        const chosen = CATALOG_DATA.filter((s) => selected.has(s.id));
+        if (!chosen.length) { alert("⚠️ Elige al menos un servicio."); return; }
 
-        waBtnEl.textContent = "Confirmando cita...";
+        const originalText = waBtn.textContent;
+        waBtn.textContent = "Verificando...";
+        waBtn.disabled = true;
 
-        await addDoc(collection(db, "citas"), {
-          fecha: new Date(dtVal),
-          fecha_texto: dtVal, // Clave para detectar duplicados
-          servicios: serviciosNombres,
-          total: total,
-          cliente: "Cliente Web",
-          estado: "pendiente",
-          timestamp: new Date()
-        });
+        try {
+            const q = query(collection(db, "citas"), where("fecha_texto", "==", dtVal));
+            const querySnapshot = await getDocs(q);
 
-        alert("🎉 ¡Cita confirmada! Te esperamos.");
-        
-        // Limpiar
-        selected.clear();
-        dtInput.value = "";
-        $(".svc-card button.active").forEach(b => {
-          b.classList.remove("active");
-          b.textContent = "Añadir"; 
-        });
-        updateTotal(currentLang);
+            if (!querySnapshot.empty) {
+                alert("⛔ Ese horario ya está ocupado. Prueba otro.");
+                waBtn.textContent = originalText;
+                waBtn.disabled = false;
+                return;
+            }
 
-      } catch (error) {
-        console.error("Error:", error);
-        alert("Error de conexión. Inténtalo de nuevo.");
-      } finally {
-        waBtnEl.textContent = originalText;
-        waBtnEl.disabled = false;
-      }
+            waBtn.textContent = "Reservando...";
+            const total = chosen.reduce((a, b) => a + b.price, 0);
+            const serviciosTexto = chosen.map(s => {
+               const dict = window.I18N[currentLang] || window.I18N.es;
+               return dict.svc_catalog[s.id] || s.id; 
+            }).join(", ");
+
+            await addDoc(collection(db, "citas"), {
+                fecha: new Date(dtVal),
+                fecha_texto: dtVal,
+                servicios: serviciosTexto,
+                total: total,
+                cliente: nombre,
+                telefono: telefono,
+                email: email,
+                origen: "App Web",
+                estado: "pendiente",
+                timestamp: new Date()
+            });
+
+            alert(`✅ ¡Confirmado!\nTe esperamos el ${new Date(dtVal).toLocaleString()}`);
+            
+            selected.clear();
+            dtInput.value = "";
+            cliName.value = "";
+            cliPhone.value = "";
+            cliEmail.value = "";
+            window.renderServicesI18n(currentLang);
+
+        } catch (error) {
+            console.error(error);
+            alert("❌ Error de conexión.");
+        } finally {
+            waBtn.textContent = originalText;
+            waBtn.disabled = false;
+        }
     });
 
-    // Deshabilita el botón de WhatsApp si no hay fecha seleccionada
-    if (waBtn && dtInput) {
-      const toggleBtn = () => {
-        waBtn.disabled = !dtInput.value;
-      };
-      dtInput.addEventListener('input', toggleBtn);
-      toggleBtn();
-    }
-
-    // Renderizado inicial
-    window.renderServicesI18n(currentLang);
+    if (window.I18N) window.renderServicesI18n(currentLang);
   })();
 
   // ===============================================
@@ -1378,4 +1329,3 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
     readyNow();
   }
 })();
-

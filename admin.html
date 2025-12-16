@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Hugo - Gestión Total</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ESTILOS ESPECÍFICOS DEL ADMIN --- */
+        :root {
+            --admin-bg: #0f1220;
+            --admin-card: #1a1f3c;
+            --gold: #f6c90e;
+            --danger: #ff4757;
+            --success: #2ed573;
+        }
+        
+        body {
+            background-color: var(--admin-bg);
+            color: white;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            font-family: 'Lato', sans-serif;
+        }
+
+        /* Cabecera */
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .admin-header h1 {
+            font-family: 'Bebas Neue';
+            font-size: 2.5rem;
+            color: var(--gold);
+            margin: 0;
+            letter-spacing: 1px;
+        }
+
+        .stats-box {
+            background: rgba(246, 201, 14, 0.1);
+            border: 1px solid var(--gold);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stats-box span { display: block; font-size: 0.8rem; text-transform: uppercase; opacity: 0.8; }
+        .stats-box strong { font-size: 1.5rem; color: var(--gold); }
+
+        /* Botón Nueva Cita */
+        .btn-add {
+            background: var(--gold);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(246, 201, 14, 0.3);
+        }
+        .btn-add:hover { transform: scale(1.05); }
+
+        /* Formulario Manual (Oculto por defecto) */
+        #form-manual {
+            display: none; /* Se activa con JS */
+            background: var(--admin-card);
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        input, select {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            font-family: inherit;
+        }
+        input:focus { outline: 2px solid var(--gold); border-color: transparent; }
+
+        /* Grid de Citas */
+        .citas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .cita-card {
+            background: var(--admin-card);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            border-left: 4px solid var(--gold);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        .cita-card:hover { transform: translateY(-3px); }
+
+        .cita-hora {
+            font-size: 2rem;
+            font-family: 'Bebas Neue';
+            color: white;
+            line-height: 1;
+        }
+        .cita-dia { font-size: 0.9rem; color: #a5b4fc; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block;}
+        
+        .cita-cliente { font-size: 1.2rem; font-weight: bold; margin: 10px 0 5px; color: var(--gold); }
+        .cita-servicios { font-size: 0.95rem; color: #ccc; margin-bottom: 15px; line-height: 1.4; }
+        
+        .cita-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+        }
+        
+        .precio-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .btn-delete {
+            background: transparent;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+        .btn-delete:hover { background: var(--danger); color: white; }
+
+        /* Responsive */
+        @media(max-width: 600px) {
+            .admin-header { flex-direction: column; text-align: center; }
+            .btn-add { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="admin-header">
+        <div>
+            <h1>PANEL DE CONTROL</h1>
+            <span style="opacity: 0.7;">Barbería Hugo</span>
+        </div>
+        
+        <div class="stats-box">
+            <span>Citas Pendientes</span>
+            <strong id="contador-citas">0</strong>
+        </div>
+
+        <button class="btn-add" onclick="toggleForm()">
+            <span>+</span> Nueva Cita Manual
+        </button>
+    </header>
+
+    <div id="form-manual">
+        <h3 style="color:var(--gold); margin-top:0;">Agendar Cliente (Teléfono/Local)</h3>
+        <form id="form-add">
+            <div class="form-grid">
+                <div>
+                    <label style="font-size:0.8rem; opacity:0.7">Nombre del Cliente</label>
+                    <input type="text" id="manual-nombre" placeholder="Ej: Juan Pérez" required>
+                </div>
+                <div>
+                    <label style="font-size:0.8rem; opacity:0.7">Fecha y Hora</label>
+                    <input type="datetime-local" id="manual-fecha" step="1200" required>
+                </div>
+                <div>
+                    <label style="font-size:0.8rem; opacity:0.7">Servicio</label>
+                    <input type="text" id="manual-servicio" placeholder="Ej: Corte + Barba" required>
+                </div>
+                <div>
+                    <label style="font-size:0.8rem; opacity:0.7">Precio (€)</label>
+                    <input type="number" id="manual-precio" value="14" required>
+                </div>
+            </div>
+            <button type="submit" class="btn-add" style="width:100%; justify-content:center;">Guardar Cita</button>
+        </form>
+    </div>
+
+    <div id="lista-citas" class="citas-grid">
+        <p style="opacity: 0.5; grid-column: 1/-1; text-align: center;">Cargando sistema...</p>
+    </div>
+
+    <script type="module">
+        import { db, collection, getDocs, query, orderBy, deleteDoc, addDoc, doc } from './firebase-config.js';
+
+        // 1. Login sencillo
+        const pass = sessionStorage.getItem("adminLog");
+        if (!pass) {
+            const input = prompt("Contraseña de Admin:");
+            if (input === "hugo123") sessionStorage.setItem("adminLog", "true");
+            else { document.body.innerHTML = "<h1 style='text-align:center;margin-top:50px'>🔒 Acceso Denegado</h1>"; throw "Stop"; }
+        }
+
+        const lista = document.getElementById('lista-citas');
+        const contador = document.getElementById('contador-citas');
+
+        // --- FUNCIÓN: CARGAR CITAS ---
+        async function cargarCitas() {
+            lista.innerHTML = '<p style="text-align:center; width:100%">Actualizando...</p>';
+            try {
+                // Ordenar por fecha
+                const q = query(collection(db, "citas"), orderBy("fecha", "asc"));
+                const snapshot = await getDocs(q);
+                
+                lista.innerHTML = ""; // Limpiar
+                let count = 0;
+
+                if (snapshot.empty) {
+                    lista.innerHTML = "<p style='text-align:center; opacity:0.5; grid-column:1/-1'>No hay citas programadas.</p>";
+                    contador.innerText = "0";
+                    return;
+                }
+
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    count++;
+                    
+                    // Formatear Fecha
+                    const fecha = data.fecha.toDate();
+                    const dia = fecha.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+                    const hora = fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+                    // Crear Tarjeta
+                    const card = document.createElement('div');
+                    card.className = 'cita-card';
+                    card.innerHTML = `
+                        <span class="cita-dia">${dia}</span>
+                        <div class="cita-hora">${hora}</div>
+                        <div class="cita-cliente">${data.cliente}</div>
+                        <div class="cita-servicios">✂️ ${data.servicios}</div>
+                        
+                        <div class="cita-actions">
+                            <span class="precio-badge">${data.total}€</span>
+                            <button class="btn-delete" id="del-${docSnap.id}">Cancelar</button>
+                        </div>
+                    `;
+                    lista.appendChild(card);
+
+                    // Botón Borrar
+                    document.getElementById(`del-${docSnap.id}`).addEventListener('click', async () => {
+                        if(confirm(`¿Borrar la cita de ${data.cliente}?`)) {
+                            await deleteDoc(doc(db, "citas", docSnap.id));
+                            cargarCitas();
+                        }
+                    });
+                });
+                contador.innerText = count;
+
+            } catch (e) {
+                console.error(e);
+                alert("Error cargando citas: " + e.message);
+            }
+        }
+        
+        // --- VIGILANTE DE 20 MINUTOS ---
+        document.getElementById('manual-fecha').addEventListener('change', function() {
+            if (!this.value) return;
+            const d = new Date(this.value);
+            
+            // Calcular minutos
+            let minutes = d.getMinutes();
+            const remainder = minutes % 20;
+            
+            if (remainder !== 0) {
+                const roundedMinutes = Math.round(minutes / 20) * 20;
+                d.setMinutes(roundedMinutes, 0, 0); 
+                
+                const pad = n => String(n).padStart(2, '0');
+                const localStr = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+                
+                this.value = localStr;
+            }
+        });
+
+        // --- FUNCIÓN: GUARDAR CITA MANUAL ---
+        document.getElementById('form-add').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalTxt = btn.innerText;
+            btn.innerText = "Guardando...";
+            btn.disabled = true;
+
+            const nombre = document.getElementById('manual-nombre').value;
+            const fechaStr = document.getElementById('manual-fecha').value; // YYYY-MM-DDTHH:MM
+            const servicio = document.getElementById('manual-servicio').value;
+            const precio = Number(document.getElementById('manual-precio').value);
+
+            try {
+                await addDoc(collection(db, "citas"), {
+                    cliente: nombre + " (Manual)",
+                    fecha: new Date(fechaStr),
+                    fecha_texto: fechaStr, // Para bloqueo
+                    servicios: servicio,
+                    total: precio,
+                    estado: 'pendiente',
+                    timestamp: new Date()
+                });
+                
+                alert("✅ Cita agendada correctamente");
+                document.getElementById('form-add').reset();
+                toggleForm(); // Cerrar formulario
+                cargarCitas(); // Recargar lista
+
+            } catch (error) {
+                alert("Error: " + error.message);
+            } finally {
+                btn.innerText = originalTxt;
+                btn.disabled = false;
+            }
+        });
+
+        // Iniciar
+        cargarCitas();
+
+        // Hacer global la función toggle para el botón HTML
+        window.toggleForm = () => {
+            const f = document.getElementById('form-manual');
+            f.style.display = f.style.display === 'block' ? 'none' : 'block';
+        };
+    </script>
+</body>
+</html>

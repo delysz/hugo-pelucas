@@ -1,7 +1,7 @@
 // firebase-config.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 // HE AÑADIDO: query, where
-import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDL-dmJzqy-B4sxY3JGN81x5lQA8e_Xtag",
@@ -17,4 +17,4 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // HE AÑADIDO AL FINAL: query, where
-export { db, collection, addDoc, getDocs, query, where };
+export { db, collection, addDoc, getDocs, query, where, orderBy, deleteDoc, doc };
