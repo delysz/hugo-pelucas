@@ -1971,8 +1971,8 @@ html.is-loading, html.is-loading body {
     border-radius: 0 !important;         /* Quita el recorte circular */
     width: auto !important;              /* Deja que use su ancho natural */
     height: auto !important;             /* Deja que use su alto natural */
-    max-width: 300px;                    /* Limite para que no se vea gigante */
-    max-height: 150px;                   /* Limite de altura */
+    max-width: 350px;                    /* Limite para que no se vea gigante */
+    max-height: 350px;                   /* Limite de altura */
     aspect-ratio: auto !important;       /* Evita deformaciones */
     filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5)); /* Sombra bonita al contorno PNG */
     background: transparent !important;  /* Asegura fondo transparente */
