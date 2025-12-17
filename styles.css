@@ -1965,3 +1965,22 @@ html.is-loading, html.is-loading body {
     pointer-events: none; /* No se puede clicar */
     opacity: 0.6;
 }
+
+.logo-barber {
+    object-fit: contain !important;      /* Asegura que la imagen entre entera */
+    border-radius: 0 !important;         /* Quita el recorte circular */
+    width: auto !important;              /* Deja que use su ancho natural */
+    height: auto !important;             /* Deja que use su alto natural */
+    max-width: 300px;                    /* Limite para que no se vea gigante */
+    max-height: 150px;                   /* Limite de altura */
+    aspect-ratio: auto !important;       /* Evita deformaciones */
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5)); /* Sombra bonita al contorno PNG */
+    background: transparent !important;  /* Asegura fondo transparente */
+}
+
+/* Ajuste para móviles para que no se salga */
+@media (max-width: 680px) {
+    .logo-barber {
+        max-width: 220px;
+    }
+}
