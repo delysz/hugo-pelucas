@@ -1,14 +1,11 @@
 // =================================================================
-//  BARBERÍA HUGO - SCRIPT PRINCIPAL UNIFICADO
+//  BARBERÍA HUGO - SCRIPT PRINCIPAL UNIFICADO (VERSIÓN WHATSAPP)
 // =================================================================
 //  Autor: delysz (https://github.com/delysz)
 //  Descripción: Este archivo contiene toda la lógica funcional
 //  de la web, unificando carruseles, galería, traducciones y
-//  otras interacciones para evitar conflictos y mejorar el
-//  rendimiento.
+//  la gestión de reservas redirigida a WhatsApp.
 // =================================================================
-// Línea 1
-import { db, collection, addDoc, query, where, getDocs } from './firebase-config.js';
 
 (() => {
   "use strict";
@@ -16,7 +13,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
   // --- Utilidades comunes ---
   const $ = (sel, root = document) => {
     if (!sel || typeof sel !== 'string') return null;
-    // Evita pasar URLs o HTML a querySelector
     if (/^https?:\/\//i.test(sel) || /</.test(sel)) return null;
     try { return root.querySelector(sel); } catch { return null; }
   };
@@ -30,7 +26,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
   const on = (el, ev, fn, opts) => el && el.addEventListener(ev, fn, opts);
   const encode = (s) => encodeURIComponent(String(s ?? ""));
 
-  // Tilt util compartido (disponible para todos los módulos)
   function attachTiltEffect(card) {
     if (!card) return;
 
@@ -76,33 +71,32 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
     const DURATION = 9000;
 
     function show(i) {
-      if (idx === i) return; // No hacer nada si es el mismo slide
+      if (idx === i) return;
 
       const currentItem = items[idx];
       const nextItem = items[i];
 
-      // Ocultar el texto del slide actual
       if (currentItem) {
         const currentText = currentItem.querySelector('.review-text');
-        gsap.to(currentText, { opacity: 0, y: 10, duration: 0.3 });
+        if (window.gsap) gsap.to(currentText, { opacity: 0, y: 10, duration: 0.3 });
       }
 
-      // Preparar el siguiente slide
       items.forEach(el => el.classList.remove('active'));
       nextItem.classList.add('active');
 
       const nextText = nextItem.querySelector('.review-text');
       const nextAuthor = nextItem.querySelector('.review-author');
 
-      // Animar la entrada del nuevo texto y autor
-      gsap.fromTo(nextText,
-        { opacity: 0, y: -15 },
-        { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.3 }
-      );
-      gsap.fromTo(nextAuthor,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.5, delay: 0.5 }
-      );
+      if (window.gsap) {
+        gsap.fromTo(nextText,
+          { opacity: 0, y: -15 },
+          { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.3 }
+        );
+        gsap.fromTo(nextAuthor,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.5, delay: 0.5 }
+        );
+      }
 
       idx = i;
     }
@@ -121,7 +115,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
     });
     root.setAttribute("tabindex", "0");
     root.setAttribute("role", "region");
-    root.setAttribute("aria-label", "Carrusel de opiniones de clientes");
 
     let startX = 0, dx = 0, touching = false;
     on(root, "touchstart", (e) => { touching = true; startX = e.touches[0].clientX; dx = 0; stop(); }, { passive: true });
@@ -175,7 +168,7 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
   })();
 
   // ===============================================
-  //  3. SISTEMA DE TRADUCCIONES (i18n) - ÚNICO Y CENTRALIZADO
+  //  3. SISTEMA DE TRADUCCIONES (i18n)
   // ===============================================
   (function i18nSystem() {
     const I18N = {
@@ -230,7 +223,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
           trat_peeling: "Peeling facial con vapor",
           extra_cejas: "Cejas"
         },
-
         aria_carousel: "Carrusel de opiniones de clientes",
         stars_label: (n = 5) => `${n} de 5`,
       },
@@ -401,10 +393,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
     let currentLang = (localStorage.getItem("lang") || navigator.language || "es").slice(0, 2);
     if (!I18N[currentLang]) currentLang = "es";
 
-    const formatEUR = (n) => new Intl.NumberFormat(currentLang, { style: "currency", currency: "EUR" }).format(n);
-    const formatDate = (d) => d.toLocaleDateString(currentLang, { day: '2-digit', month: '2-digit', year: 'numeric' });
-    const formatTime = (d) => d.toLocaleTimeString(currentLang, { hour: "2-digit", minute: "2-digit" });
-
     function applyI18n(lang) {
       const dict = I18N[lang] || I18N.es;
       document.documentElement.lang = lang;
@@ -426,7 +414,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
 
       $$(".stars[aria-label]").forEach(st => st.setAttribute("aria-label", dict.stars_label?.(5) || "5/5"));
 
-      // La sección de servicios se actualiza a través de su propia lógica
       if (typeof window.renderServicesI18n === 'function') {
         window.renderServicesI18n(lang);
       }
@@ -479,10 +466,8 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
       on(document, "keydown", (e) => { if (e.key === "Escape") close(); });
     }
 
-    // Hacemos el diccionario accesible globalmente para otros módulos
     window.I18N = I18N;
 
-    // --- Inicialización ---
     function init() {
       bindLangSwitch();
       applyI18n(currentLang);
@@ -496,9 +481,8 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
     }
   })();
 
-
-// ===============================================
-  //  4. SERVICIOS Y RESERVAS (CON VISUALIZACIÓN DE HUECOS)
+  // ===============================================
+  //  4. SERVICIOS Y RESERVAS (VÍA WHATSAPP)
   // ===============================================
   (function services() {
     const host = $("#servicios");
@@ -523,23 +507,18 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
     let currentLang = (localStorage.getItem("lang") || "es").slice(0, 2);
     if (!window.I18N || !window.I18N[currentLang]) currentLang = "es";
 
-    // --- HTML ---
     const wrap = document.createElement("div");
     wrap.className = "svc-wrap";
     wrap.innerHTML = `
       <div class="svc-grid"></div>
       
       <div class="client-form" style="margin-top:20px; padding:20px; background:rgba(20, 25, 55, 0.6); border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
-        <h3 style="font-size:1.1rem; color:#f6c90e; margin:0 0 15px 0; font-family:'Bebas Neue'; letter-spacing:1px;">1. Tus Datos</h3>
-        <div style="display:grid; gap:10px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-            <input type="text" id="cli-name" placeholder="Nombre *" style="padding:10px; border-radius:6px; border:1px solid #444; background:#0f1220; color:white;">
-            <input type="tel" id="cli-phone" placeholder="Teléfono *" style="padding:10px; border-radius:6px; border:1px solid #444; background:#0f1220; color:white;">
-            <input type="email" id="cli-email" placeholder="Email *" style="padding:10px; border-radius:6px; border:1px solid #444; background:#0f1220; color:white; grid-column: 1 / -1;">
-        </div>
+        <h3 style="font-size:1.1rem; color:#f6c90e; margin:0 0 15px 0; font-family:'Bebas Neue'; letter-spacing:1px;">1. Tu Nombre</h3>
+        <input type="text" id="cli-name" placeholder="¿Cómo te llamas? *" style="width:100%; padding:10px; border-radius:6px; border:1px solid #444; background:#0f1220; color:white;">
       </div>
 
       <div class="svc-bar" style="display:block; margin-top:15px;">
-        <h3 style="font-size:1.1rem; color:#f6c90e; margin:0 0 10px 0; font-family:'Bebas Neue'; letter-spacing:1px;">2. Elige Día y Hora</h3>
+        <h3 style="font-size:1.1rem; color:#f6c90e; margin:0 0 10px 0; font-family:'Bebas Neue'; letter-spacing:1px;">2. Elige Día y Hora Preferida</h3>
         
         <input type="date" id="date-picker" style="width:100%; padding:12px; background:#fff; color:#000; border-radius:6px; font-weight:bold; cursor:pointer;">
         
@@ -548,9 +527,9 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
         </div>
 
         <div class="svc-total" style="margin-top:20px; border-top:1px solid #333; padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
-             <span>Total:</span> <strong class="svc-amount" style="font-size:1.4rem; color:#f6c90e">0€</strong>
+             <span>Total aprox:</span> <strong class="svc-amount" style="font-size:1.4rem; color:#f6c90e">0€</strong>
         </div>
-        <button type="button" class="svc-wa" style="width:100%; margin-top:10px;">Confirmar Reserva</button>
+        <button type="button" class="svc-wa" style="width:100%; margin-top:10px;">Solicitar por WhatsApp</button>
       </div>`;
     host.appendChild(wrap);
 
@@ -558,130 +537,92 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
     const amountEl = $(".svc-amount", wrap);
     const waBtn = $(".svc-wa", wrap);
     const cliName = $("#cli-name", wrap);
-    const cliPhone = $("#cli-phone", wrap);
-    const cliEmail = $("#cli-email", wrap);
     const datePicker = $("#date-picker", wrap);
     const slotsContainer = $("#slots-container", wrap);
 
-    // Variable para guardar la selección final (YYYY-MM-DDTHH:MM)
-    let finalDateTime = null;
+    // --- BLOQUEAR FECHAS PASADAS ---
+    const hoy = new Date();
+    const year = hoy.getFullYear();
+    const month = String(hoy.getMonth() + 1).padStart(2, '0');
+    const day = String(hoy.getDate()).padStart(2, '0');
+    datePicker.min = `${year}-${month}-${day}`;
+    // -------------------------------
 
-    // --- GENERADOR DE HORARIOS ---
-    async function generateSlots(dateStr) {
-        slotsContainer.innerHTML = '<p style="grid-column:1/-1; text-align:center;">Cargando disponibilidad...</p>';
-        finalDateTime = null; // Reset
+    let finalDateTime = null;
+    function generateSlots(dateStr) {
+        slotsContainer.innerHTML = '';
+        finalDateTime = null; 
         waBtn.textContent = "Elige una hora...";
         waBtn.disabled = true;
 
         const dateObj = new Date(dateStr);
-        const day = dateObj.getDay(); // 0=Dom, 1=Lun...
+        const day = dateObj.getDay(); 
 
-        // 1. Definir rango de apertura según día
         let ranges = [];
         if (day === 0 || day === 6) {
             slotsContainer.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#ff6b6b">⛔ Cerrado los fines de semana.</p>';
             return;
-        } else if (day === 1) { // Lunes tarde
+        } else if (day === 1) { 
             ranges = [[16, 21]]; 
-        } else { // Mar-Vie
-            ranges = [[10, 14], [16, 21]]; // Empezamos a las 10:00 para cuadrar el :00, :20, :40
+        } else { 
+            ranges = [[10, 14], [16, 21]]; 
         }
 
-        // 2. Generar lista de horas teóricas (ej: 10:00, 10:20...)
         const slots = [];
         ranges.forEach(([startH, endH]) => {
             for (let h = startH; h < endH; h++) {
                 for (let m = 0; m < 60; m += 20) {
-                    // Excepción cierre: Si es el turno de mañana y son las 13:40, es la última. A las 14:00 cierran.
                     slots.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
                 }
             }
         });
 
-        // 3. CONSULTAR FIREBASE (Lo que ya está ocupado)
-        // Buscamos todas las citas que empiecen por esa fecha "YYYY-MM-DD"
-        try {
-            const q = query(
-                collection(db, "citas"),
-                where("fecha_texto", ">=", dateStr),
-                where("fecha_texto", "<=", dateStr + "\uf8ff")
-            );
-            const snapshot = await getDocs(q);
-            const busyTimes = new Set();
-            snapshot.forEach(doc => {
-                const ft = doc.data().fecha_texto; // "2023-10-20T10:20"
-                if(ft) busyTimes.add(ft.split('T')[1]); // Guardamos solo la hora "10:20"
-            });
+        const now = new Date();
+        const isToday = (dateStr === now.toISOString().split('T')[0]);
+        const currentMins = now.getHours() * 60 + now.getMinutes();
 
-            // 4. PINTAR BOTONES
-            slotsContainer.innerHTML = "";
-            
-            // Filtrar pasado (si eliges hoy, no mostrar horas pasadas)
-            const now = new Date();
-            const isToday = (dateStr === now.toISOString().split('T')[0]);
-            const currentMins = now.getHours() * 60 + now.getMinutes();
+        if (slots.length === 0) {
+            slotsContainer.innerHTML = '<p>No hay horas disponibles.</p>';
+            return;
+        }
 
-            if (slots.length === 0) {
-                slotsContainer.innerHTML = '<p>No hay horas disponibles.</p>';
-                return;
+        slots.forEach(time => {
+            const [h, m] = time.split(':').map(Number);
+            const slotMins = h * 60 + m;
+
+            const btn = document.createElement("div");
+            btn.className = "time-btn";
+            btn.textContent = time;
+
+            if (isToday && slotMins < currentMins) {
+                btn.classList.add("taken");
+                btn.style.opacity = "0.3";
+                btn.title = "Hora pasada";
+            } else {
+                btn.onclick = () => selectSlot(btn, dateStr, time);
             }
 
-            slots.forEach(time => {
-                const [h, m] = time.split(':').map(Number);
-                const slotMins = h * 60 + m;
-
-                const btn = document.createElement("div");
-                btn.className = "time-btn";
-                btn.textContent = time;
-
-                // Bloquear si está ocupado
-                if (busyTimes.has(time)) {
-                    btn.classList.add("taken");
-                    btn.title = "Ocupado";
-                }
-                // Bloquear si ya pasó la hora (solo si es hoy)
-                else if (isToday && slotMins < currentMins) {
-                    btn.classList.add("taken");
-                    btn.style.opacity = "0.3";
-                    btn.title = "Hora pasada";
-                } 
-                // Si está libre
-                else {
-                    btn.onclick = () => selectSlot(btn, dateStr, time);
-                }
-
-                slotsContainer.appendChild(btn);
-            });
-
-        } catch (e) {
-            console.error(e);
-            slotsContainer.innerHTML = '<p style="color:red">Error cargando disponibilidad.</p>';
-        }
+            slotsContainer.appendChild(btn);
+        });
     }
 
     function selectSlot(btn, dateStr, time) {
-        // Quitar selección previa
         $$(".time-btn.selected", slotsContainer).forEach(b => b.classList.remove("selected"));
-        // Marcar nuevo
         btn.classList.add("selected");
-        
-        // Guardar valor
         finalDateTime = `${dateStr}T${time}`;
-        waBtn.textContent = "Confirmar Reserva";
+        waBtn.textContent = "Solicitar Reserva por WhatsApp";
         waBtn.disabled = false;
     }
 
-    // Evento al cambiar fecha
     datePicker.addEventListener('change', (e) => {
         if(e.target.value) generateSlots(e.target.value);
     });
 
-    // --- CÁLCULO TOTAL Y RENDERIZADO (Igual que antes) ---
     const formatEUR = (n, lang) => new Intl.NumberFormat(lang, { style: "currency", currency: "EUR" }).format(n);
+    
     function updateTotal(lang) {
       const dict = window.I18N[lang] || window.I18N.es;
       const total = CATALOG_DATA.filter((s) => selected.has(s.id)).reduce((a, b) => a + b.price, 0);
-      $(".svc-total span", wrap).textContent = dict.svc_total;
       amountEl.textContent = formatEUR(total, lang);
     }
 
@@ -730,100 +671,52 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
       updateTotal(lang);
     };
 
-    // --- CLICK RESERVAR (NOTIFICACIÓN AL CLIENTE VÍA CALENDARIO) ---
-    on(waBtn, "click", async () => {
-        // 1. RECOGER DATOS
+    on(waBtn, "click", () => {
         const nombre = cliName.value.trim();
-        const telefono = cliPhone.value.trim();
-        const email = cliEmail.value.trim();
 
-        // 2. VALIDACIONES
-        if (nombre.length < 3) { alert("⚠️ Falta tu nombre."); cliName.focus(); return; }
-        const phoneRegex = /^[6789]\d{8}$/;
-        if (!phoneRegex.test(telefono)) { alert("⚠️ Teléfono incorrecto."); cliPhone.focus(); return; }
-        // Validación Email (opcional si no vas a enviar correo, pero bueno para guardar)
-        // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        // if (!emailRegex.test(email)) { alert("⚠️ Email incorrecto."); cliEmail.focus(); return; }
-
-        if (!finalDateTime) { alert("⚠️ Toca una hora verde."); return; }
-        const chosen = CATALOG_DATA.filter((s) => selected.has(s.id));
-        if (!chosen.length) { alert("⚠️ Elige un servicio."); return; }
-
-        // 3. BLOQUEAR BOTÓN
-        waBtn.textContent = "Guardando...";
-        waBtn.disabled = true;
-
-        try {
-            // A) Chequeo de seguridad
-            const q = query(collection(db, "citas"), where("fecha_texto", "==", finalDateTime));
-            const snap = await getDocs(q);
-            if (!snap.empty) {
-                alert("⛔ ¡Vaya! Te han quitado el hueco. Elige otro.");
-                const datePart = finalDateTime.split('T')[0];
-                generateSlots(datePart); 
-                return;
-            }
-
-            // B) Calcular totales
-            const total = chosen.reduce((a, b) => a + b.price, 0);
-            const serviciosTexto = chosen.map(s => {
-               const dict = window.I18N[currentLang] || window.I18N.es;
-               return dict.svc_catalog[s.id] || s.id; 
-            }).join(", ");
-
-            // C) GUARDAR EN FIREBASE
-            await addDoc(collection(db, "citas"), {
-                fecha: new Date(finalDateTime),
-                fecha_texto: finalDateTime,
-                servicios: serviciosTexto,
-                total: total,
-                cliente: nombre,
-                telefono: telefono,
-                email: email,
-                origen: "App Web",
-                estado: "pendiente",
-                timestamp: new Date()
-            });
-
-            // D) GENERAR ENLACE DE CALENDARIO (La Notificación Gratis) 📅
-            // Formato de fecha para Google: YYYYMMDDTHHMMSS
-            const fechaObj = new Date(finalDateTime);
-            const finObj = new Date(fechaObj.getTime() + 20*60000); // +20 minutos
-
-            const fmt = (date) => {
-                return date.toISOString().replace(/-|:|\.\d\d\d/g, "").split("Z")[0]; // Truco para formato Google local
-            };
-            
-            // Construir URL de Google Calendar
-            const gCalUrl = new URL("https://calendar.google.com/calendar/render");
-            gCalUrl.searchParams.append("action", "TEMPLATE");
-            gCalUrl.searchParams.append("text", "💈 Cita Barbería Hugo");
-            gCalUrl.searchParams.append("dates", `${fmt(fechaObj)}/${fmt(finObj)}`);
-            gCalUrl.searchParams.append("details", `Servicios: ${serviciosTexto}\nPrecio: ${total}€\nCliente: ${nombre}`);
-            gCalUrl.searchParams.append("location", "Barbería Hugo, Zaragoza");
-
-            // E) MENSAJE FINAL
-            if(confirm(`✅ ¡RESERVA CONFIRMADA!\n\nTe esperamos el ${fechaObj.toLocaleString()}.\n\n¿Quieres guardar el recordatorio en tu calendario ahora?`)) {
-                window.open(gCalUrl.toString(), '_blank');
-            }
-            
-            location.reload(); 
-
-        } catch (error) {
-            console.error(error);
-            alert("❌ Error de conexión.");
-            waBtn.disabled = false;
+        if (nombre.length < 2) { 
+            alert("⚠️Falta tu nombre. Rellénalo para poder cerrar la cita.⚠️"); 
+            cliName.focus(); 
+            return; 
         }
+
+        if (!finalDateTime) { alert("⚠️Selecciona un día y una hora en el calendario.⚠️"); return; }
+        
+        const chosen = CATALOG_DATA.filter((s) => selected.has(s.id));
+        if (!chosen.length) { alert("⚠️Añade al menos un servicio antes de reservar.⚠️"); return; }
+
+        const total = chosen.reduce((a, b) => a + b.price, 0);
+        const dict = window.I18N[currentLang] || window.I18N.es;
+        const serviciosTexto = chosen.map(s => dict.svc_catalog[s.id] || s.id).join(", ");
+
+        const [fecha, hora] = finalDateTime.split('T');
+        const [yy, mm, dd] = fecha.split('-');
+        const fechaFormateada = `${dd}/${mm}/${yy}`;
+
+        const mensaje = `Hola, Hugo! Quiero solicitar una cita.
+
+        DATOS DE LA RESERVA:
+        - Cliente: ${nombre}
+        - Fecha: ${fechaFormateada}
+        - Hora: ${hora}
+        - Servicios: ${serviciosTexto}
+        - Total: ${total}€
+
+        Confírmame si tienes el hueco disponible. Un saludo.`;
+
+        const telefonoEmpresa = "34651435444";
+        const url = `https://wa.me/${telefonoEmpresa}?text=${encodeURIComponent(mensaje)}`;
+        
+        window.open(url, '_blank');
     });
 
     if (window.I18N) window.renderServicesI18n(currentLang);
   })();
 
   // ===============================================
-  //  5. GALERÍA CON LIGHTBOX (CORREGIDO) Y AUTOPLAY
+  //  5. GALERÍA CON LIGHTBOX Y AUTOPLAY
   // ===============================================
   (function galleryFeatures() {
-    // --- Autoplay ---
     const wrap = $(".gallery-carousel");
     if (!wrap) return;
     if (wrap.dataset.init === "1") return;
@@ -860,7 +753,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
     show(i);
     start();
 
-    // --- Lightbox (integrado y corregido) ---
     let lb = $(".lightbox");
     if (!lb) {
       lb = document.createElement("div");
@@ -893,7 +785,7 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
 
     function closeLightbox() {
       lb.hidden = true;
-      imgEl.src = ""; // Libera memoria
+      imgEl.src = "";
       document.body.style.overflow = "";
     }
 
@@ -919,7 +811,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
       if (e.key === "ArrowRight") nextLightbox();
     });
   })();
-
 
   // =================================
   //  6. AVISO 'SÍGUENOS' (CTA)
@@ -1003,31 +894,25 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
   //  8. EFECTOS "WOW" Y MISCELÁNEA
   // =================================
   (function miscAndWowEffects() {
-    // Rel noopener para enlaces externos
     $$("a[target='_blank']").forEach((a) => {
       if (!/noopener/.test(a.rel)) a.rel = (a.rel ? a.rel + " " : "") + "noopener";
     });
 
-    // Fallback para mapa de Google
     on($(".mapa iframe"), "error", (e) => {
       const backup = document.createElement("p");
       backup.innerHTML = `<a href="https://www.google.com/maps?q=41.7171479,-0.8414919" target="_blank">Abrir mapa en Google Maps</a>`;
       e.target.replaceWith(backup);
     });
 
-    // Efectos que respetan 'prefers-reduced-motion'
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) return;
 
-    // Tilt del logo en hero + GSAP hover avanzado
     const hero = $("header");
     const logo = $(".logo-barber");
     if (hero && logo) {
-      // Fallback destello CSS
       on(logo, "mouseenter", () => logo.classList.add("hover-shine"));
       on(logo, "animationend", (e) => { if (e.animationName === "logoShine") logo.classList.remove("hover-shine"); });
 
-      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const hasGSAP = typeof window.gsap !== 'undefined' && !reduce;
 
       if (hasGSAP) {
@@ -1036,7 +921,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
           .to(logo, { duration: 0.35, rotateZ: -2 }, 0)
           .to(document.documentElement, { duration: 0.35, "--ring-opacity": 0.95, "--ring-scale": 1, ease: "power2.out" }, 0);
 
-        // Rotación continua del anillo mientras hover
         let ringTween = null;
 
         const activate = () => {
@@ -1052,13 +936,11 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
         on(logo, "mouseenter", activate);
         on(logo, "mouseleave", deactivate);
 
-        // Soporte táctil: tap activa animación 1.5s
         on(logo, "touchstart", () => {
           activate();
           setTimeout(deactivate, 1500);
         }, { passive: true });
 
-        // Tilt 3D suave con GSAP
         on(hero, "mousemove", (e) => {
           const r = hero.getBoundingClientRect();
           const x = (e.clientX - r.left) / r.width - 0.5;
@@ -1069,7 +951,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
           gsap.to(logo, { duration: 0.35, rotateX: 0, rotateY: 0, rotateZ: 0, scale: 1, filter: "drop-shadow(0 4px 12px rgba(0,0,0,.4))" });
         });
       } else {
-        // Fallback sin GSAP (CSS transforms directos)
         on(hero, "mousemove", (e) => {
           const r = hero.getBoundingClientRect();
           const x = (e.clientX - r.left) / r.width - 0.5;
@@ -1080,7 +961,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
       }
     }
 
-    // Barra de progreso de scroll
     const bar = $("#scrollProgress");
     if (bar) {
       const updateProgress = () => {
@@ -1097,19 +977,15 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
 
   console.log("%cSitio diseñado por delysz — https://github.com/delysz", "color: #f6c90e; font-size:14px;");
 
-
   // =================================
-  //  9. GSAP EXTRAS — detalles finos
+  //  9. GSAP EXTRAS
   // =================================
   (function gsapCandy() {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    // if (reduce) return;  // ← comenta o elimina esta línea SOLO si quieres forzar el hero
     if (!window.gsap) return;
     const gsap = window.gsap;
-    // Hero: Animación de entrada para el logo
     const logo = document.querySelector('.logo-barber');
     if (logo) {
-      // Replicamos la animación 'logoIntro' con GSAP
       gsap.from(logo, {
         duration: 1.8,
         delay: 0.12,
@@ -1120,7 +996,7 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
         ease: 'cubic-bezier(0.2, 0.65, 0.25, 1)',
       });
     }
-    // --- Split text utility (no plugin needed) ---
+
     function split(el, mode = 'chars') {
       if (!el) return [];
       const text = el.textContent;
@@ -1137,7 +1013,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
       return nodes;
     }
 
-    // Hero: letras que aparecen desde abajo + ligero overshoot
     const h1 = document.querySelector('.titulo-principal');
     if (h1) {
       const chars = split(h1, 'chars');
@@ -1150,7 +1025,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
       });
     }
 
-    // Slogan: animación sencilla para mostrar sin dividir en palabras
     const sl = document.querySelector('.slogan');
     if (sl) {
       gsap.from(sl, {
@@ -1163,7 +1037,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
       });
     }
 
-    // Stagger en Servicios (si existe grid)
     const grid = document.querySelector('#servicios .svc-grid');
     if (grid) {
       const cards = Array.from(grid.children);
@@ -1172,7 +1045,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
         gsap.to(cards, { y: 0, opacity: 1, duration: 0.55, ease: 'power2.out', stagger: 0.07 });
         window.removeEventListener('scroll', onEnter);
       };
-      // simple viewport check without extra plugins
       const check = () => {
         const r = grid.getBoundingClientRect();
         if (r.top < window.innerHeight * 0.85) onEnter();
@@ -1183,7 +1055,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
       setTimeout(onEnterOnce, 250);
     }
 
-    // Botones magnéticos (float + CTAs)
     const magnets = document.querySelectorAll('.whatsapp-float, .social-float, .whatsapp-btn.grande, .call-btn.grande');
     magnets.forEach((btn) => {
       let qx = gsap.quickTo(btn, 'x', { duration: 0.25, ease: 'power3' });
@@ -1199,7 +1070,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
       btn.addEventListener('touchstart', () => { qx(0); qy(0); }, { passive: true });
     });
 
-    // Estrellas del review: respiración sutil
     document.querySelectorAll('.review-card .star.filled').forEach((star, i) => {
       gsap.to(star, {
         opacity: 0.75,
@@ -1212,9 +1082,8 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
     });
   })();
 
-
   // =================================
-  // 10. GSAP TURBO — parallax, pin, tilt
+  // 10. GSAP TURBO
   // =================================
   (function gsapTurbo() {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1223,7 +1092,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
     const ST = window.ScrollTrigger;
     if (ST) gsap.registerPlugin(ST);
 
-    // Header parallax glow + logo float
     const header = document.querySelector('header#top');
     if (header && ST) {
       gsap.to(header, {
@@ -1240,16 +1108,31 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
       }
     }
 
-    // Section headings: soft reveal on scroll (no pin to avoid layout shifts)
-    document.querySelectorAll('.section-card > h2').forEach((h2) => {
-      gsap.from(h2, {
-        y: 24, opacity: 0,
-        duration: 0.6, ease: 'power2.out',
-        scrollTrigger: { trigger: h2, start: 'top 80%' }
-      });
+    // --- Efecto aparición "de la nada" para las secciones completas ---
+    document.querySelectorAll('.section-card').forEach((section) => {
+      gsap.fromTo(section, 
+        { 
+          opacity: 0, 
+          y: 80,               // Empieza 80px más abajo
+          scale: 0.85,         // Un poco más encogida
+          filter: "blur(12px)" // Desenfoque inicial (efecto aparecer de la nada)
+        }, 
+        { 
+          opacity: 1, 
+          y: 0, 
+          scale: 1, 
+          filter: "blur(0px)",
+          duration: 1, 
+          ease: "back.out(1.4)", // Efecto rebote (overshoot) al colocarse
+          scrollTrigger: { 
+            trigger: section, 
+            start: "top 85%", // La animación salta cuando asoma un poco por abajo
+            toggleActions: "play none none reverse" // ¡Magia! Si subes, desaparecen. Si bajas, vuelven a aparecer.
+          } 
+        }
+      );
     });
 
-    // Ken Burns en la Galería (loop suave, no intrusivo)
     document.querySelectorAll('.gallery-carousel .g-slide img').forEach((img, i) => {
       gsap.fromTo(img, { scale: 1, xPercent: -2 }, {
         scale: 1.1, xPercent: 2,
@@ -1259,63 +1142,12 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
       });
     });
 
-    // ===============================================
-    //  FUNCIÓN PARA EFECTO TILT 3D EN TARJETAS
-    // ===============================================
-
-    function applyTilt3D(selector, options = {}) {
-      const elements = document.querySelectorAll(selector);
-      if (!elements.length) return;
-      const defaults = { maxRotate: 8, perspective: 800, scale: 1.04, ease: 'power3.out', duration: 0.3 };
-      const opts = { ...defaults, ...options };
-      elements.forEach((el) => {
-        let qx = gsap.quickTo(el, 'rotateX', { duration: opts.duration, ease: opts.ease });
-        let qy = gsap.quickTo(el, 'rotateY', { duration: opts.duration, ease: opts.ease });
-        let qs = gsap.quickTo(el, 'scale', { duration: opts.duration, ease: opts.ease });
-
-        el.style.transformStyle = 'preserve-3d';
-        el.style.transformPerspective = `${opts.perspective}px`;
-
-        el.addEventListener('mousemove', (e) => {
-          const r = el.getBoundingClientRect();
-          const x = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
-          const y = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
-          qx(-y * opts.maxRotate);
-          qy(x * opts.maxRotate);
-          qs(opts.scale);
-        });
-        el.addEventListener('mouseleave', () => {
-          qx(0);
-          qy(0);
-          qs(1);
-        });
-        el.addEventListener('touchstart', () => {
-          qx(0);
-          qy(0);
-          qs(1);
-        }, { passive: true });
-      });
-    }
-
-    // Flotantes con vaivén sutil (versión segura)
     document.querySelectorAll('.whatsapp-float, .social-float').forEach((el, i) => {
       if (!el || !window.gsap) return;
       gsap.to(el, { y: -6, duration: 2 + i * 0.3, ease: 'sine.inOut', yoyo: true, repeat: -1 });
     });
-
-    // Parallax simple por data-speed (opcional si hay elementos con data-speed)
-    document.querySelectorAll('[data-speed]').forEach((el) => {
-      const speed = parseFloat(el.getAttribute('data-speed')) || 0.2;
-      if (!ST) return;
-      gsap.to(el, {
-        yPercent: -speed * 100,
-        ease: 'none',
-        scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true }
-      });
-    });
   })();
 
-  // Tiempo mínimo visible del preloader (en ms)
   const PRELOADER_MIN_SHOW = 900;
   const __preloaderStart = performance.now();
 
@@ -1330,7 +1162,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
 
       const remove = () => {
         preloader.remove();
-        // ⬇️ AVISA AL RESTO DE QUE YA PODEMOS ANIMAR LA PÁGINA
         window.dispatchEvent(new Event('app:ready'));
       };
       preloader.addEventListener("transitionend", remove, { once: true });
@@ -1342,15 +1173,13 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
     setTimeout(doHide, wait);
   }
   if (document.readyState === "complete") {
-    setTimeout(hidePreloader, 3000); // 3 segundos
+    hidePreloader();
   } else {
-    window.addEventListener("load", () => setTimeout(hidePreloader, 3000));
+    window.addEventListener("load", hidePreloader);
   }
 
 })();
 
-
-// Animación del H1 (Barbería Hugo) sincronizada con preloader
 (function heroTitleAnim() {
   function startHeroTitle() {
     const gsap = window.gsap;
@@ -1360,7 +1189,6 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
     const h1 = document.querySelector('.titulo-principal');
     if (!h1) return;
 
-    // Split a caracteres (evita duplicarlo si ya se hizo)
     let chars = Array.from(h1.querySelectorAll('.char'));
     if (!chars.length) {
       const text = h1.textContent;
@@ -1385,10 +1213,8 @@ import { db, collection, addDoc, query, where, getDocs } from './firebase-config
     });
   }
 
-  // Arrancamos en el momento adecuado:
   const run = () => startHeroTitle();
 
-  // Si el preloader ya no está o nunca existió, corre tras DOM listo.
   const readyNow = () => {
     const pre = document.getElementById('preloader');
     if (!pre || pre.classList.contains('hide')) run();

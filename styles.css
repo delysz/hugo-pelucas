@@ -1984,3 +1984,29 @@ html.is-loading, html.is-loading body {
         max-width: 220px;
     }
 }
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg); /* Fondo oscuro */
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2); 
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent); /* Se vuelve dorada al pasar el ratón */
+}
+
+/* Latido para el botón de llamada a la acción (CTA) */
+@keyframes pulse-cta {
+  0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4); }
+  70% { box-shadow: 0 0 0 12px rgba(37, 211, 102, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+}
+
+#servicios .svc-wa:not([disabled]) {
+  animation: pulse-cta 2s infinite;
+}
